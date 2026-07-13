@@ -1,0 +1,176 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="KCbrwLCSQgP31lRxVSSn" name="第 1 页">
+    <mxGraphModel dx="968" dy="684" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="pool" parent="1" style="swimlane;startSize=40;horizontal=1;fillColor=#f5f5f5;strokeColor=#555555;fontStyle=1;fontSize=15;fontColor=#333333;" value="SC Risk System — Multi-Agent Pipeline" vertex="1">
+          <mxGeometry height="1040" width="1500" x="30" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="divLine" parent="pool" style="line;strokeColor=#aaaaaa;fillColor=none;strokeWidth=1.5;vertical=1;strokeDash=4;" value="" vertex="1">
+          <mxGeometry height="900" width="2" x="960" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="l1" parent="pool" style="swimlane;startSize=160;horizontal=0;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=12;fontColor=#333333;" value="1 · Auslöser" vertex="1">
+          <mxGeometry height="120" width="1500" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="tA" parent="l1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffd966;strokeColor=#d6b656;fontSize=11;" value="&lt;b&gt;Trigger A&lt;/b&gt;&lt;br&gt;Eingehende Nachricht&lt;br&gt;&lt;font color=&#39;#666666&#39;&gt;NewsAPI / Datei-Input&lt;/font&gt;" vertex="1">
+          <mxGeometry height="70" width="185" x="175" y="23" as="geometry" />
+        </mxCell>
+        <mxCell id="tB" parent="l1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffd966;strokeColor=#d6b656;fontSize=11;" value="&lt;b&gt;Trigger B&lt;/b&gt;&lt;br&gt;Nutzeranfrage&lt;br&gt;&lt;font color=&#39;#666666&#39;&gt;Streamlit UI&lt;/font&gt;" vertex="1">
+          <mxGeometry height="70" width="185" x="540" y="23" as="geometry" />
+        </mxCell>
+        <mxCell id="merge1" parent="l1" style="ellipse;fillColor=#555555;strokeColor=#555555;aspect=fixed;" value="" vertex="1">
+          <mxGeometry height="12" width="12" x="424" y="52" as="geometry" />
+        </mxCell>
+        <mxCell id="eTA" edge="1" parent="l1" source="tA" style="edgeStyle=elbowEdgeStyle;" target="merge1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eTB" edge="1" parent="l1" source="tB" style="edgeStyle=elbowEdgeStyle;" target="merge1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l2" parent="pool" style="swimlane;startSize=160;horizontal=0;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=12;" value="2 · Intake Agent" vertex="1">
+          <mxGeometry height="130" width="1500" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="intakeBox" parent="l2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" value="&lt;b&gt;Nachrichtenfilterung (LLM)&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;div&gt;Relevanzprüfung&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="200" x="265" y="25" as="geometry" />
+        </mxCell>
+        <mxCell id="intakeDec" parent="l2" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;fontStyle=1;" value="Relevant?" vertex="1">
+          <mxGeometry height="70" width="110" x="560" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="discardBox" parent="l2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" value="Verwerfen /&lt;br&gt;Hinweis ausgeben" vertex="1">
+          <mxGeometry height="50" width="160" x="770" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="eIn1" edge="1" parent="l2" source="intakeBox" style="edgeStyle=orthogonalEdgeStyle;" target="intakeDec">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eIn2" edge="1" parent="l2" source="intakeDec" style="edgeStyle=orthogonalEdgeStyle;fontSize=10;fillColor=#a20025;strokeColor=light-dark(#B85450,#D7817E);fontColor=light-dark(#B85450,#D7817E);" target="discardBox" value="Nicht relevant">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="io2" parent="l2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#f9a825;fontSize=10;align=left;verticalAlign=top;spacingTop=6;spacingLeft=8;" value="&lt;b&gt;IN:&lt;/b&gt;  raw_text (str) | user_query (str)&lt;br&gt;&lt;br&gt;&lt;b&gt;OUT:&lt;/b&gt;  relevant: bool&lt;br&gt;  trigger_type: str (A | B)&lt;br&gt;  material: str&lt;br&gt;  region: str&lt;br&gt;  keywords: list[str]&lt;br&gt;  filtered_text: str" vertex="1">
+          <mxGeometry height="120" width="480" x="975" y="6" as="geometry" />
+        </mxCell>
+        <mxCell id="l3" parent="pool" style="swimlane;startSize=160;horizontal=0;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=12;" value="3 · Risk Assessment" vertex="1">
+          <mxGeometry height="110" width="1500" y="290" as="geometry" />
+        </mxCell>
+        <mxCell id="riskBox" parent="l3" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" value="&lt;b&gt;Risikoklassifikation (LLM)&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;div&gt;Severity (1–5)&amp;nbsp;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="200" x="265" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="io3" parent="l3" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#f9a825;fontSize=10;align=left;verticalAlign=top;spacingTop=6;spacingLeft=8;" value="&lt;b&gt;IN:&lt;/b&gt;  filtered_text, material, region&lt;br&gt;&lt;br&gt;&lt;b&gt;OUT:&lt;/b&gt;  severity: int (1–5)&lt;br&gt;  risk_type: str&lt;br&gt;  affected_material: str&lt;br&gt;  affected_region: str&lt;br&gt;  reason: str" vertex="1">
+          <mxGeometry height="100" width="480" x="975" y="5" as="geometry" />
+        </mxCell>
+        <mxCell id="l4" parent="pool" style="swimlane;startSize=160;horizontal=0;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=12;" value="4 · Network Agent" vertex="1">
+          <mxGeometry height="110" width="1500" y="400" as="geometry" />
+        </mxCell>
+        <mxCell id="netBox" parent="l4" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" value="&lt;b&gt;Graph-Traversal (NetworkX)&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;div&gt;Betroffene-, Alternative Facilities&amp;nbsp;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="200" x="265" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="netDB" parent="l4" style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;fontSize=10;" value="Knowledge Graph&lt;div&gt;&lt;br&gt;knowledge_graph.json&lt;/div&gt;" vertex="1">
+          <mxGeometry height="75" width="155" x="610" y="15" as="geometry" />
+        </mxCell>
+        <mxCell id="eNet1" edge="1" parent="l4" source="netDB" style="dashed=1;endArrow=open;endFill=0;" target="netBox">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="io4" parent="l4" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#f9a825;fontSize=10;align=left;verticalAlign=top;spacingTop=6;spacingLeft=8;" value="&lt;b&gt;IN:&lt;/b&gt;  severity, affected_material, affected_region&lt;br&gt;&lt;br&gt;&lt;b&gt;OUT:&lt;/b&gt;  affected_nodes: list[Node]&lt;br&gt;  alt_nodes: list[Node]&lt;br&gt;  tier_weights: dict[id → float]&lt;br&gt;  downstream_fanout: dict[id → int]" vertex="1">
+          <mxGeometry height="100" width="480" x="975" y="5" as="geometry" />
+        </mxCell>
+        <mxCell id="l5" parent="pool" style="swimlane;startSize=160;horizontal=0;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=12;" value="5 · Data Retrieval" vertex="1">
+          <mxGeometry height="110" width="1500" y="510" as="geometry" />
+        </mxCell>
+        <mxCell id="dataBox" parent="l5" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" value="&lt;b&gt;Kapazitätsdaten abrufen (Pandas)&lt;/b&gt;" vertex="1">
+          <mxGeometry height="70" width="200" x="265" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="naatDB" parent="l5" style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;fontSize=10;" value="NAATBatt DB&lt;div&gt;&lt;br&gt;facilities_clean.csv&lt;/div&gt;" vertex="1">
+          <mxGeometry height="75" width="155" x="610" y="15" as="geometry" />
+        </mxCell>
+        <mxCell id="eDat1" edge="1" parent="l5" source="naatDB" style="dashed=1;endArrow=open;endFill=0;" target="dataBox">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="io5" parent="l5" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#f9a825;fontSize=10;align=left;verticalAlign=top;spacingTop=6;spacingLeft=8;" value="&lt;b&gt;IN:&lt;/b&gt;  affected_nodes, alt_nodes, affected_material&lt;br&gt;&lt;br&gt;&lt;b&gt;OUT:&lt;/b&gt;  facility_data: dict[id → {capacity, capacity_source,&lt;br&gt;  single_source, import_dep, lead_time_norm, capacity_share}]&lt;br&gt;  BetroffeneKapazität%: float&lt;br&gt;  AlternativeKapazität%: float" vertex="1">
+          <mxGeometry height="100" width="480" x="975" y="5" as="geometry" />
+        </mxCell>
+        <mxCell id="l6" parent="pool" style="swimlane;startSize=160;horizontal=0;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=12;" value="6 · Synthesis Agent" vertex="1">
+          <mxGeometry height="120" width="1500" y="620" as="geometry" />
+        </mxCell>
+        <mxCell id="synthBox" parent="l6" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" value="&lt;b&gt;Risikobericht generieren (LLM)&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;div&gt;RiskScore&amp;nbsp;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="200" x="265" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="io6" parent="l6" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#f9a825;fontSize=10;align=left;verticalAlign=top;spacingTop=6;spacingLeft=8;" value="&lt;b&gt;IN:&lt;/b&gt;  severity, risk_type, reason, affected_material,&lt;br&gt;  affected_region, affected_nodes, tier_weights,&lt;br&gt;  downstream_fanout, alt_nodes, facility_data&lt;br&gt;&lt;br&gt;&lt;b&gt;OUT:&lt;/b&gt;  risk_report: str&lt;br&gt;  top3_facilities: list[Facility]&lt;br&gt;  risk_scores: dict[id → float]&lt;br&gt;  global_metrics: dict" vertex="1">
+          <mxGeometry height="117" width="480" x="975" y="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l7" parent="pool" style="swimlane;startSize=160;horizontal=0;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;fontSize=12;" value="7 · Validation Agent" vertex="1">
+          <mxGeometry height="180" width="1500" y="740" as="geometry" />
+        </mxCell>
+        <mxCell id="valBox" parent="l7" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;" value="&lt;b&gt;Validierung (&lt;/b&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;rule-based/&lt;/span&gt;&lt;b style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;LLM)&lt;/b&gt;&lt;b&gt;&lt;br&gt;&lt;/b&gt;&lt;br&gt;&lt;div&gt;Quellencheck , EntityPrecision&lt;br&gt;Begründungslogik&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="200" x="265" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="io7" parent="l7" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#f9a825;fontSize=10;align=left;verticalAlign=top;spacingTop=6;spacingLeft=8;" value="&lt;b&gt;IN:&lt;/b&gt;  risk_report, top3_facilities, risk_scores,&lt;br&gt;  facility_ids_in_db: list[str]&lt;br&gt;&lt;br&gt;&lt;b&gt;OUT:&lt;/b&gt;  valid: bool&lt;br&gt;  failure_type: minor | severe&lt;br&gt;  issues: list[str]&lt;br&gt;  iteration: int (max 2)" vertex="1">
+          <mxGeometry height="120" width="480" x="975" y="15" as="geometry" />
+        </mxCell>
+        <mxCell id="valDec" parent="l7" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;fontStyle=1;" value="Valide?" vertex="1">
+          <mxGeometry height="70" width="110" x="560" y="102" as="geometry" />
+        </mxCell>
+        <mxCell id="eVal1" edge="1" parent="l7" source="valBox" style="edgeStyle=orthogonalEdgeStyle;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="valDec">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="l8" parent="pool" style="swimlane;startSize=160;horizontal=0;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=12;" value="8 · Ausgabe" vertex="1">
+          <mxGeometry height="120" width="1500" y="920" as="geometry" />
+        </mxCell>
+        <mxCell id="reportBox" parent="l8" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#82b366;strokeColor=#6c8ebf;fontColor=#ffffff;fontStyle=1;fontSize=12;" value="Risikobericht (Streamlit Dashboard)" vertex="1">
+          <mxGeometry height="50" width="200" x="265" y="41" as="geometry" />
+        </mxCell>
+        <mxCell id="io8" parent="l8" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#f9a825;fontSize=10;align=left;verticalAlign=top;spacingTop=6;spacingLeft=8;" value="&lt;b&gt;IN:&lt;/b&gt;  risk_report (validated, str)&lt;br&gt;Rendering via Streamlit" vertex="1">
+          <mxGeometry height="55" width="480" x="975" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="eL12" edge="1" parent="pool" source="merge1" style="edgeStyle=orthogonalEdgeStyle;" target="intakeBox">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eL23" edge="1" parent="pool" source="intakeDec" style="edgeStyle=orthogonalEdgeStyle;fontSize=10;strokeColor=#336600;fontColor=#336600;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="riskBox" value="Relevant">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="615" y="345" />
+            </Array>
+            <mxPoint x="590" y="280" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="eL34" edge="1" parent="pool" source="riskBox" style="edgeStyle=orthogonalEdgeStyle;" target="netBox">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eL45" edge="1" parent="pool" source="netBox" style="edgeStyle=orthogonalEdgeStyle;" target="dataBox">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eL56" edge="1" parent="pool" source="dataBox" style="edgeStyle=orthogonalEdgeStyle;" target="synthBox">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eL67" edge="1" parent="pool" source="synthBox" style="edgeStyle=orthogonalEdgeStyle;" target="valBox">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eL78" edge="1" parent="pool" source="valDec" style="edgeStyle=orthogonalEdgeStyle;fontSize=10;strokeColor=#336600;fontColor=#336600;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="reportBox" value="✓ Valide">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+            <mxPoint x="615" y="830" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="eFeedback1" edge="1" parent="pool" source="valDec" style="edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#b85450;fontColor=#b85450;fontSize=10;rounded=1;" target="synthBox" value="✗ Leichter Fehler (max. 2×) — Retry Synthesis">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="730" y="875" />
+              <mxPoint x="730" y="675" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="eFeedback2" edge="1" parent="pool" source="valDec" style="edgeStyle=orthogonalEdgeStyle;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#b85450;fontColor=#b85450;fontSize=10;dashed=1;rounded=1;" target="riskBox" value="✗ Schwerwiegend — Neustart Risk Assessment">
+          <mxGeometry relative="1" x="0.0011" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="200" y="875" />
+              <mxPoint x="200" y="345" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ioHeader" parent="pool" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontStyle=1;fontSize=11;fontColor=#555555;" value="&lt;b&gt;Datenschnittstelle (Input / Output)&lt;/b&gt;" vertex="1">
+          <mxGeometry height="30" width="480" x="990" y="20" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
