@@ -190,7 +190,7 @@ def run_network_agent(state: PipelineState) -> PipelineState:
             longitude=attrs.get("longitude") or 0.0,
             production_capacity_raw=attrs.get("production_capacity_raw", "nan"),
             production_units=attrs.get("production_units", ""),
-            capacity_source=attrs.get("capacity_source", "simulated"),
+            capacity_source=attrs.get("capacity_source", "unknown"),
             supplier_concentration=bool(attrs.get("supplier_concentration", False)),
             import_dependency=bool(attrs.get("import_dependency", False)),
             import_origin_region=attrs.get("import_origin_region", ""),

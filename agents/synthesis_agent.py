@@ -85,6 +85,7 @@ def _compute_scores(state: PipelineState) -> tuple[dict[str, float], list[Facili
             "company":            node.get("company", ""),
             "facility_name":      node.get("facility_name", ""),
             "segment":            node.get("segment", ""),
+            "city":               node.get("city", ""),
             "country":            node.get("country", ""),
             "state":              node.get("state", ""),
             "latitude":           node.get("latitude", 0.0),
@@ -203,7 +204,7 @@ def _format_top3(top3: list[Facility]) -> str:
     for i, f in enumerate(top3, 1):
         lines.append(
             f"{i}. {f['company']} | {f['facility_name']} | {f['segment']} | "
-            f"{f['city'] if 'city' in f else ''}, {f['state']}, {f['country']} | "
+            f"{f['city']}, {f['state']}, {f['country']} | "
             f"RiskScore={f['risk_score_normalized']}/100 | "
             f"Vulnerability={f['vulnerability']:.3f} | "
             f"TierWeight={f['tier_weight']} | "

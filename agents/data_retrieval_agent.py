@@ -90,9 +90,16 @@ def run_data_retrieval_agent(state: PipelineState) -> PipelineState:
     df_idx = df.set_index("facility_id")
 
     # ── Total NA capacity for this material (denominator for all %) ───────────
-    # Only facilities that carry this material keyword and have real capacity data
+    # Only facilities that carry this material keyword and have real capacity data.
+    # Scoped per segment: Upstream (MT/yr) and Midstream-Cell (GWh/yr) use different
+    # units and must not be summed together (see CapacityShare comment below).
     material_rows = df[df["material_keywords"].str.contains(material, na=False)]
-    total_capacity = material_rows["production_capacity_raw"].apply(_parse_capacity).sum()
+    total_capacity_by_segment: dict[str, float] = {
+        seg: material_rows[material_rows["supply_chain_segment"] == seg][
+            "production_capacity_raw"
+        ].apply(_parse_capacity).sum()
+        for seg in ("Upstream", "Midstream-Cell")
+    }
 
 
     # ── Pre-compute capacities for all relevant nodes ─────────────────────────
@@ -144,7 +151,7 @@ def run_data_retrieval_agent(state: PipelineState) -> PipelineState:
         # MWh→GWh conversion and exclusion of non-comparable records in build_facilities).
         # Midstream-BGM (MT/mm²/GWh mixed) and Downstream excluded.
         if seg in ("Upstream", "Midstream-Cell") and capacity_known:
-            cap_share = _capacity_share(capacity, total_capacity)
+            cap_share = _capacity_share(capacity, total_capacity_by_segment[seg])
         else:
             cap_share = 0.0
 

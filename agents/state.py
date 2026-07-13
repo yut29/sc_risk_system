@@ -92,6 +92,7 @@ class Facility(TypedDict):
     company: str
     facility_name: str
     segment: Segment
+    city: str
     country: str
     state: str                    # US-Bundesstaat oder Provinz (für Karten-Tooltip)
     latitude: float               # Für Streamlit-Kartenmarkierung
@@ -228,16 +229,16 @@ RISK_SCORE_MAX_THEORETICAL: float = 5.0
 
 MAX_VALIDATION_ITERATIONS: int = 2
 
-# ── USGS Weltproduktion (Quelle: USGS Mineral Commodity Summaries 2024) ───────
-# Einheit: MT/yr (Minenproduktion). Nur für Upstream/Midstream-BGM-Vergleich geeignet.
+# ── USGS Weltproduktion (Quelle: USGS Mineral Commodity Summaries 2026, Feb 2026) ─
+# Einheit: MT/yr (Minenproduktion, Berichtsjahr 2025). Nur für Upstream/Midstream-BGM-Vergleich geeignet.
 # Midstream-Cell (GWh) und Downstream werden NICHT mit diesen Zahlen verglichen.
 USGS_GLOBAL_PRODUCTION_MT: dict[str, float] = {
-    "cobalt":     220_000,    # MT, Weltminenproduktion 2023; DRC ~73 %
-    "lithium":    180_000,    # MT LCE, Weltminenproduktion 2023; Australien+Chile ~70 %
-    "graphite": 1_300_000,    # MT, Weltminenproduktion 2023; China ~79 %
-    "nickel":   3_300_000,    # MT, Weltminenproduktion 2023
-    "manganese":20_000_000,   # MT, Weltminenproduktion 2023
-    "copper":   22_000_000,   # MT, Weltminenproduktion 2023
+    "cobalt":     310_000,    # MT, Weltminenproduktion 2025; DRC 73 % + Indonesia 14 %
+    "lithium":    290_000,    # MT (Lithiumgehalt, ohne US-Produktion), Weltminenproduktion 2025; +31 % ggü. 2024
+    "graphite": 1_800_000,    # MT, Weltminenproduktion 2025; China ~77 %
+    "nickel":   3_900_000,    # MT, Weltminenproduktion 2025; +5 % ggü. 2024
+    "manganese":21_000_000,   # MT, Weltminenproduktion 2025 (Schätzung)
+    "copper":   23_000_000,   # MT, Weltminenproduktion 2025 (Schätzung)
 }
 # Verwendung: betroffene_kapazitaet_global_pct = Σ affected_capacity / USGS_GLOBAL_PRODUCTION_MT[material] × 100
 # Hinweis: NAATBatt-Kapazitäten decken nur nordamerikanische Anlagen ab → global% ist ein konservativer Untergrenzenwert.

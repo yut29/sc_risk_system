@@ -182,7 +182,7 @@ if top3:
                 "Rank":      i,
                 "Company":   f["company"],
                 "Segment":   f["segment"],
-                "Location":  f"{f.get('state', '')}, {f['country']}",
+                "Location":  f"{f.get('city', '')}, {f.get('state', '')}, {f['country']}",
                 "Score":     f"{f['risk_score_normalized']:.1f} / 100",
                 "Vuln.":     f"{f['vulnerability']:.3f}",
                 "Tier Wt.":  f"{f['tier_weight']}",
