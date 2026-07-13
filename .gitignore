@@ -5,3 +5,10 @@ __pycache__/
 .venv/
 venv/
 .claude/settings.local.json
+
+# non-code artifacts (docs, diagrams, generated reports)
+docs/
+scripts/
+*.drawio
+*.svg
+ui/*.pdf

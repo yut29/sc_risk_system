@@ -80,6 +80,7 @@ class FacilityData(TypedDict):
     import_dep: bool
     lead_time_norm: float         # lead_time_weeks / 12, normiert auf 0–1
     capacity_share: float         # Rohanteil an Gesamtkapazität (0–1); 0 wenn unbekannt oder nicht vergleichbar
+    resilience_discount: float    # 0–0.5 (basiert auf AltCapacityRatio)
 
 
 class Facility(TypedDict):
