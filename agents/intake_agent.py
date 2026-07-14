@@ -13,7 +13,6 @@ Output (written to PipelineState):
   filtered_text: str    cleaned, relevant excerpt
 """
 
-import json
 import os
 from pathlib import Path
 from typing import Optional
@@ -24,6 +23,7 @@ from langchain_groq import ChatGroq
 
 load_dotenv(Path(__file__).parent.parent / ".env")
 
+from agents.llm_utils import invoke_json
 from agents.state import PipelineState
 
 # ── LLM singleton ─────────────────────────────────────────────────────────────
@@ -103,17 +103,7 @@ def run_intake_agent(state: PipelineState) -> PipelineState:
         HumanMessage(content=USER_PROMPT_TEMPLATE.format(raw_input=raw_input)),
     ]
 
-    response = llm.invoke(messages)
-    content = response.content.strip()
-
-    # Strip markdown code fences if model wraps response anyway
-    if content.startswith("```"):
-        content = content.split("```")[1]
-        if content.startswith("json"):
-            content = content[4:]
-        content = content.strip()
-
-    parsed = json.loads(content)
+    parsed = invoke_json(llm, messages)
 
     relevant: bool      = bool(parsed.get("relevant", False))
     trigger_type: str   = parsed.get("trigger_type", "A")

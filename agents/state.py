@@ -38,6 +38,14 @@ minor  → fehlende Quellenangabe, Entität nicht belegt → Retry ab Synthesis 
 severe → falsche Materialzuordnung, inkonsistente Klassifikation → Neustart ab Risk Assessment
 """
 
+ExposureType = Literal["direct", "propagated"]
+"""
+direct     → Facility ist selbst Seed-Node (MaterialMatch + RegionMatch erfüllt);
+             supply_chain_paths-Eintrag hat Länge 1 (nur die Facility selbst).
+propagated → Facility wurde erst über BFS-Traversierung im Wissensgraphen erreicht
+             (nachgelagert zu einem Seed-Node); Pfadlänge > 1.
+"""
+
 
 # ──────────────────────────────────────────────────────────────────────────────
 #  Komplexe Datentypen
@@ -102,6 +110,8 @@ class Facility(TypedDict):
     tier_weight: float            # 1.0 / 0.6 / 0.35 / 0.15  (distance-based, see DISTANCE_WEIGHT)
     vulnerability: float          # 0–1 (gewichtete Summe aus 4 Dimensionen)
     resilience_discount: float    # 0–0.5 (basiert auf AltCapacityRatio)
+    supply_path: str              # z.B. "Kamoto Copper (Upstream) → CATL Cathode (Midstream-BGM) → ..."
+    exposure_type: ExposureType    # "direct" = Seed-Node selbst (MaterialMatch+RegionMatch) | "propagated" = via BFS erreicht
 
 
 class GlobalMetrics(TypedDict):
@@ -167,6 +177,8 @@ class PipelineState(TypedDict, total=False):
     alt_nodes: list[Node]              # Gleiches Material, NICHT betroffene Region
     tier_weights: dict[str, float]     # {facility_id: TierWeight}
     downstream_fanout: dict[str, int]  # {facility_id: Anzahl nachgelagerter Nodes}
+    supply_chain_paths: dict[str, list[str]]  # {facility_id: [seed_id, ..., facility_id]}
+    total_network_facilities: int     # Alle Facilities im Graph, unabhängig vom Material (Datensatz-Konstante)
 
     # ── [D] Data Retrieval Agent — Deterministic (CSV + Arithmetik) ──────────
     facility_data: dict[str, FacilityData]  # {facility_id: FacilityData}

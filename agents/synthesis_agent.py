@@ -51,12 +51,25 @@ def _get_llm() -> ChatGroq:
 
 # ── Deterministic: RiskScore calculation ─────────────────────────────────────
 
+def _format_supply_path(path_ids: list[str], node_by_id: dict[str, dict]) -> str:
+    """Turns a list of facility IDs into a readable 'Company (Segment) → ...' chain."""
+    parts = []
+    for pid in path_ids:
+        n = node_by_id.get(pid)
+        if n is None:
+            continue
+        parts.append(f"{n.get('company', pid)} ({n.get('segment', '')})")
+    return " → ".join(parts)
+
+
 def _compute_scores(state: PipelineState) -> tuple[dict[str, float], list[Facility]]:
     affected_nodes = state.get("affected_nodes", [])
     facility_data  = state.get("facility_data", {})
     tier_weights   = state.get("tier_weights", {})
+    supply_chain_paths = state.get("supply_chain_paths", {})
     severity       = state.get("severity", 3)
 
+    node_by_id = {n["id"]: n for n in affected_nodes}
     risk_scores: dict[str, float] = {}
     facility_objects: list[dict] = []
 
@@ -79,6 +92,10 @@ def _compute_scores(state: PipelineState) -> tuple[dict[str, float], list[Facili
         raw_score = severity * tw * vulnerability * (1 - rd)
         normalized = round(raw_score / RISK_SCORE_MAX_THEORETICAL * 100, 2)
 
+        path_ids = supply_chain_paths.get(nid, [nid])
+        supply_path = _format_supply_path(path_ids, node_by_id)
+        exposure_type = "direct" if len(path_ids) == 1 else "propagated"
+
         risk_scores[nid] = normalized
         facility_objects.append({
             "id":                 nid,
@@ -95,6 +112,8 @@ def _compute_scores(state: PipelineState) -> tuple[dict[str, float], list[Facili
             "tier_weight":        tw,
             "vulnerability":      round(vulnerability, 4),
             "resilience_discount": rd,
+            "supply_path":        supply_path,
+            "exposure_type":      exposure_type,
         })
 
     top3: list[Facility] = sorted(
@@ -146,7 +165,8 @@ def _compute_global_metrics(state: PipelineState) -> GlobalMetrics:
 # ── LLM: report narrative ─────────────────────────────────────────────────────
 
 SYSTEM_PROMPT = """You are the Synthesis Agent for a Battery Supply Chain Risk System.
-Write a concise, structured risk report in English for supply chain analysts.
+Write as a senior supply chain risk analyst producing a professional report for other analysts —
+factual and precise, but with genuine expert judgment, not a template fill-in.
 
 Report format (use these exact section headers):
 
@@ -162,19 +182,47 @@ Two bullet points using the provided percentages:
 - Alternative NA capacity: X%
 - Affected global capacity (USGS basis): X% [only if > 0]
 
+## Supply Chain Exposure Analysis
+Using the exposure summary provided in the context, explain — don't just restate the numbers:
+- How many facilities/companies are affected in total, and how that breaks down by supply chain tier.
+- The difference between Primary exposure (North American facilities that themselves import the
+  affected material from the affected region — an import-dependency match, NOT a geographic one;
+  they are not located in the affected region, NAATBatt only covers North America) and Propagated
+  exposure (affected only because they sit downstream of a Primary-exposure facility in the graph).
+- If Affected NA capacity (Upstream) is 0% or low while many facilities are still listed as affected,
+  explicitly reconcile this: mining/Upstream capacity being untouched does not mean there is no risk —
+  say so, and point to the Midstream/Downstream exposure as the actual risk driver.
+
 ## Top 3 High-Risk Facilities
 For each facility (numbered 1–3):
-**[Company] — [City, State/Country]** (Segment, RiskScore: X/100)
+**[Company] — [City, State/Country]** (Segment, RiskScore: X/100, Exposure: Primary|Propagated)
 - One sentence explaining WHY this facility is high risk (import dependency, single source, capacity share).
+  Do not imply the facility is physically located in the affected region — Primary exposure means it
+  imports from there, nothing more.
+- If Exposure=Propagated, briefly trace the supply path provided (which upstream event/facility it is
+  downstream of) — this is the causal chain, state it explicitly rather than skipping it.
 - Recommended action: [concrete mitigation step]
 
-## Overall Risk Assessment
-Severity X/5 — [one sentence summary]. [One sentence on system resilience based on alternative capacity].
+## Expert Risk Synthesis
+A multi-paragraph expert assessment (this is the section that earns your "senior analyst" title —
+go beyond restating earlier sections). Cover each of these angles explicitly, in your own words:
+- **Geopolitical / market structure**: what does supplier concentration and import dependency for
+  this material mean here — is this a one-off event or a symptom of a structurally fragile supply base?
+- **Network propagation**: what does the Primary-vs-Propagated exposure split say about how this
+  disruption travels through the supply chain — is the risk concentrated at one tier or does it cascade?
+- **Resilience**: given the alternative/remaining capacity figures, how much slack does the system
+  actually have — is that slack usable in practice (same tier, comparable lead time) or theoretical?
+- **Severity in context**: why does this event warrant its severity rating — what would make it worse
+  or better, and over what time horizon?
+- **Strategic recommendation**: 1-2 concrete, prioritized actions for a supply chain risk manager reading
+  this — distinguish immediate mitigation from longer-term structural fixes (e.g. diversification).
 
 Rules:
-- Be factual. Only reference data provided in the context.
+- Be factual. Only reference data provided in the context — do not invent facts, but you MAY draw
+  reasonable inferences and judgments from the data provided (that is the point of this section).
 - Do not invent company relationships or capacities not in the input.
-- Keep the report under 400 words.
+- Prioritize interpretation over restating numbers — a reader should understand *why* the numbers mean what they mean.
+- Keep the report under 750 words.
 """
 
 USER_PROMPT_TEMPLATE = """Generate the risk report based on this data:
@@ -192,10 +240,13 @@ CAPACITY METRICS:
 - Alternative NA upstream capacity: {alternative_na}%
 - Affected global capacity (USGS): {betroffene_global}%
 
-TOP 3 HIGH-RISK FACILITIES:
-{top3_text}
+SUPPLY CHAIN EXPOSURE SUMMARY:
+{exposure_summary}
 
-Total affected nodes: {n_affected} facilities across the supply chain.
+TOP 3 HIGH-RISK FACILITIES (Exposure = Direct means Primary exposure — the facility itself matched the
+event via import dependency, NOT that it is physically located in the affected region; Propagated means
+it was only reached via downstream supply-chain traversal — SupplyPath shows that chain):
+{top3_text}
 """
 
 
@@ -208,9 +259,39 @@ def _format_top3(top3: list[Facility]) -> str:
             f"RiskScore={f['risk_score_normalized']}/100 | "
             f"Vulnerability={f['vulnerability']:.3f} | "
             f"TierWeight={f['tier_weight']} | "
-            f"ResilienceDiscount={f['resilience_discount']:.2f}"
+            f"ResilienceDiscount={f['resilience_discount']:.2f} | "
+            f"Exposure={f['exposure_type']} | "
+            f"SupplyPath={f['supply_path']}"
         )
     return "\n".join(lines) if lines else "No high-risk facilities identified."
+
+
+def _compute_exposure_summary(state: PipelineState) -> str:
+    """Segment breakdown + direct/propagated counts across all affected_nodes (not just Top 3)."""
+    affected_nodes = state.get("affected_nodes", [])
+    supply_chain_paths = state.get("supply_chain_paths", {})
+
+    segment_counts: dict[str, int] = {}
+    for n in affected_nodes:
+        seg = n.get("segment", "unknown")
+        segment_counts[seg] = segment_counts.get(seg, 0) + 1
+
+    direct_count = sum(
+        1 for n in affected_nodes
+        if len(supply_chain_paths.get(n["id"], [n["id"]])) == 1
+    )
+    propagated_count = len(affected_nodes) - direct_count
+    manufacturers = len({n.get("company", "") for n in affected_nodes})
+    seg_text = ", ".join(f"{seg}={cnt}" for seg, cnt in sorted(segment_counts.items()))
+
+    return (
+        f"Total affected facilities: {len(affected_nodes)} across {manufacturers} companies "
+        f"(by segment: {seg_text or 'none'}). "
+        f"Primary exposure (North American facilities that themselves import the material from the "
+        f"affected region — an import-dependency match, not a geographic one): {direct_count}. "
+        f"Propagated exposure (reached only via downstream supply chain links from a Primary-exposure "
+        f"facility): {propagated_count}."
+    )
 
 
 # ── Main agent function ────────────────────────────────────────────────────────
@@ -223,7 +304,8 @@ def run_synthesis_agent(state: PipelineState) -> PipelineState:
     risk_scores, top3 = _compute_scores(state)
     global_metrics    = _compute_global_metrics(state)
 
-    top3_text = _format_top3(top3)
+    top3_text        = _format_top3(top3)
+    exposure_summary = _compute_exposure_summary(state)
 
     messages = [
         SystemMessage(content=SYSTEM_PROMPT),
@@ -237,8 +319,8 @@ def run_synthesis_agent(state: PipelineState) -> PipelineState:
             betroffene_na    = global_metrics["betroffene_kapazitaet_na_pct"],
             alternative_na   = global_metrics["alternative_kapazitaet_na_pct"],
             betroffene_global= global_metrics["betroffene_kapazitaet_global_pct"],
+            exposure_summary = exposure_summary,
             top3_text        = top3_text,
-            n_affected       = len(state.get("affected_nodes", [])),
         )),
     ]
 

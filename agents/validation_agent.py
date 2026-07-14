@@ -19,7 +19,6 @@ Retry routing (handled by LangGraph pipeline):
   Max iterations: 2  (defined in state.MAX_VALIDATION_ITERATIONS)
 """
 
-import json
 import os
 from pathlib import Path
 from typing import Optional
@@ -28,6 +27,7 @@ from dotenv import load_dotenv
 from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_groq import ChatGroq
 
+from agents.llm_utils import invoke_json
 from agents.state import (
     FailureType,
     MAX_VALIDATION_ITERATIONS,
@@ -197,15 +197,7 @@ def run_validation_agent(state: PipelineState) -> PipelineState:
         )),
     ]
 
-    response = _get_llm().invoke(messages)
-    content = response.content.strip()
-    if content.startswith("```"):
-        content = content.split("```")[1]
-        if content.startswith("json"):
-            content = content[4:]
-        content = content.strip()
-
-    llm_result = json.loads(content)
+    llm_result = invoke_json(_get_llm(), messages)
     llm_issues: list[str] = llm_result.get("issues", [])
     all_issues.extend(llm_issues)
 

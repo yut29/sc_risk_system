@@ -15,7 +15,6 @@ Output (written to PipelineState):
   reason           : str       mandatory justification for Validation Agent
 """
 
-import json
 import os
 from pathlib import Path
 from typing import Optional
@@ -24,6 +23,7 @@ from dotenv import load_dotenv
 from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_groq import ChatGroq
 
+from agents.llm_utils import invoke_json
 from agents.state import PipelineState
 
 load_dotenv(Path(__file__).parent.parent / ".env")
@@ -118,16 +118,7 @@ def run_risk_assessment_agent(state: PipelineState) -> PipelineState:
         )),
     ]
 
-    response = llm.invoke(messages)
-    content = response.content.strip()
-
-    if content.startswith("```"):
-        content = content.split("```")[1]
-        if content.startswith("json"):
-            content = content[4:]
-        content = content.strip()
-
-    parsed = json.loads(content)
+    parsed = invoke_json(llm, messages)
 
     return {
         **state,

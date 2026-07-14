@@ -112,6 +112,36 @@ def _bfs_descendants(G: nx.DiGraph, start_ids: list[str]) -> set[str]:
     return visited
 
 
+def _bfs_with_predecessors(G: nx.DiGraph, start_ids: list[str]) -> tuple[set[str], dict[str, str]]:
+    """
+    Same traversal as _bfs_descendants, but also records which node first
+    discovered each newly-visited node (predecessor), so a path back to a
+    seed can be reconstructed later.
+    """
+    visited: set[str] = set(start_ids)
+    predecessor: dict[str, str] = {}
+    queue = deque(start_ids)
+    while queue:
+        cur = queue.popleft()
+        for nxt in G.successors(cur):
+            if nxt not in visited:
+                visited.add(nxt)
+                predecessor[nxt] = cur
+                queue.append(nxt)
+    return visited, predecessor
+
+
+def _reconstruct_path(predecessor: dict[str, str], node_id: str) -> list[str]:
+    """Walk backward from node_id to its seed via the predecessor map."""
+    path = [node_id]
+    cur = node_id
+    while cur in predecessor:
+        cur = predecessor[cur]
+        path.append(cur)
+    path.reverse()
+    return path
+
+
 def _downstream_fanout(G: nx.DiGraph, node_id: str) -> int:
     """Number of Downstream-segment nodes reachable from node_id."""
     reachable = _bfs_descendants(G, [node_id])
@@ -143,13 +173,20 @@ def run_network_agent(state: PipelineState) -> PipelineState:
     ]
 
     # ── Step 2: BFS expansion — all nodes reachable from seeds ───────────────
-    reachable: set[str] = _bfs_descendants(G, seed_ids)
+    reachable, predecessor = _bfs_with_predecessors(G, seed_ids)
 
     # ── Step 3: affected_nodes — all reachable from seeds ────────────────────
     # MaterialMatch only required for seeds; downstream nodes are included
     # regardless of their own keywords (they're affected via supply chain links).
     # Downstream nodes rarely carry raw-material keywords in NAATBatt.
     affected_ids: set[str] = reachable
+
+    # Path from seed to each affected node (for display: "why is this facility affected").
+    # If a node is reachable via multiple seeds/paths, this is just one such path,
+    # not an exhaustive list of all possible routes.
+    supply_chain_paths: dict[str, list[str]] = {
+        nid: _reconstruct_path(predecessor, nid) for nid in affected_ids
+    }
 
     # ── Step 4: alt_nodes — same material, NOT affected ──────────────────────
     alt_ids: set[str] = {
@@ -202,8 +239,10 @@ def run_network_agent(state: PipelineState) -> PipelineState:
 
     return {
         **state,
-        "affected_nodes":    affected_nodes,
-        "alt_nodes":         alt_nodes,
-        "tier_weights":      tier_weights,
-        "downstream_fanout": fanout,
+        "affected_nodes":         affected_nodes,
+        "alt_nodes":              alt_nodes,
+        "tier_weights":           tier_weights,
+        "downstream_fanout":      fanout,
+        "supply_chain_paths":     supply_chain_paths,
+        "total_network_facilities": len(all_nodes),  # all facilities, any material — dataset-wide constant
     }
