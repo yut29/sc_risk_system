@@ -166,6 +166,21 @@ def run_validation_agent(state: PipelineState) -> PipelineState:
     """
     iteration = state.get("iteration", 0) + 1
 
+    # The "no_seed_found" report (see synthesis_agent._no_seed_found_report) is a fixed,
+    # non-generative notice — there's no risk claim, entity reference, or capacity figure
+    # to validate. Judging it against normal-report expectations produces spurious
+    # complaints (observed: "missing Top-3 justification") that would trigger a wasted
+    # retry loop back to Risk Assessment Agent, which would just reproduce the same
+    # no_seed_found result deterministically.
+    if state.get("seed_generation_status") == "no_seed_found":
+        return {
+            **state,
+            "valid":        True,
+            "failure_type": None,
+            "issues":       [],
+            "iteration":    iteration,
+        }
+
     # Hard stop: exceeded max iterations → accept report as-is with warning
     if iteration > MAX_VALIDATION_ITERATIONS:
         return {

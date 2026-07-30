@@ -46,6 +46,20 @@ propagated → Facility wurde erst über BFS-Traversierung im Wissensgraphen err
              (nachgelagert zu einem Seed-Node); Pfadlänge > 1.
 """
 
+SeedGenerationStatus = Literal["rule_matched", "no_seed_found"]
+"""
+rule_matched   → mindestens ein Root-Seed über Material+Region-Matching gefunden (Strategy A).
+no_seed_found  → kein Seed gefunden. WICHTIG: das ist NICHT gleichbedeutend mit "keine
+                 NA-Exposition" — der aktuelle Matching-Mechanismus deckt nur einen
+                 Ereignistyp ab (importabhängige Rohstoffstörung, siehe architecture.md
+                 "Bekannte Grenzen des Seeding-Mechanismus"). "no_seed_found" bedeutet
+                 häufig "dieser Ereignistyp wird vom System nicht erkannt", nicht
+                 "geprüft und für unbedenklich befunden". Muss im Bericht/UI explizit
+                 von einem echten Nullbefund unterschieden werden.
+(Weitere Werte "entity_matched"/"llm_fallback" vorgesehen, sobald Strategy B/C
+ umgesetzt sind — siehe architecture.md "Vorschlag: Multi-Strategie Seed Generator".)
+"""
+
 
 # ──────────────────────────────────────────────────────────────────────────────
 #  Komplexe Datentypen
@@ -179,6 +193,7 @@ class PipelineState(TypedDict, total=False):
     downstream_fanout: dict[str, int]  # {facility_id: Anzahl nachgelagerter Nodes}
     supply_chain_paths: dict[str, list[str]]  # {facility_id: [seed_id, ..., facility_id]}
     total_network_facilities: int     # Alle Facilities im Graph, unabhängig vom Material (Datensatz-Konstante)
+    seed_generation_status: SeedGenerationStatus
 
     # ── [D] Data Retrieval Agent — Deterministic (CSV + Arithmetik) ──────────
     facility_data: dict[str, FacilityData]  # {facility_id: FacilityData}
@@ -190,6 +205,7 @@ class PipelineState(TypedDict, total=False):
     top3_facilities: list[Facility]    # Absteigend nach risk_score_normalized
     risk_scores: dict[str, float]      # {facility_id: risk_score_normalized (0–100)}
     global_metrics: GlobalMetrics
+    risk_tier_counts: dict[str, int]   # {"high"/"medium"/"low": count} — quantile-based, siehe compute_risk_tiers()
 
     # ── [V] Validation Agent — LLM ───────────────────────────────────────────
     valid: bool

@@ -2,7 +2,7 @@
   "metadata": {
     "total_nodes": 386,
     "total_edges": 1537,
-    "created_at": "2026-07-07",
+    "created_at": "2026-07-20",
     "edge_params": {
       "K_NEAR": 5,
       "K_FAR": 3,
@@ -34,7 +34,7 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": false,
-      "import_origin_region": "South America / Australia",
+      "import_origin_region": "Australia",
       "lead_time_weeks": 12
     },
     {
@@ -54,7 +54,7 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": false,
-      "import_origin_region": "South America / Australia",
+      "import_origin_region": "South America (Chile/Argentina)",
       "lead_time_weeks": 12
     },
     {
@@ -74,7 +74,7 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": false,
-      "import_origin_region": "South America / Australia",
+      "import_origin_region": "South America (Chile/Argentina)",
       "lead_time_weeks": 12
     },
     {
@@ -114,7 +114,7 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": false,
-      "import_origin_region": "Asia (China)",
+      "import_origin_region": "Africa (Mozambique, Madagascar, Tanzania)",
       "lead_time_weeks": 12
     },
     {
@@ -154,7 +154,7 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": false,
-      "import_origin_region": "Asia / Pacific",
+      "import_origin_region": "Asia (Indonesia)",
       "lead_time_weeks": 12
     },
     {
@@ -174,7 +174,7 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": true,
       "import_dependency": false,
-      "import_origin_region": "Africa (DRC)",
+      "import_origin_region": "Asia (Indonesia)",
       "lead_time_weeks": 12
     },
     {
@@ -194,7 +194,7 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": false,
-      "import_origin_region": "Asia / Pacific",
+      "import_origin_region": "Asia (Indonesia)",
       "lead_time_weeks": 12
     },
     {
@@ -254,7 +254,7 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": false,
-      "import_origin_region": "Asia / Pacific",
+      "import_origin_region": "Asia (Indonesia)",
       "lead_time_weeks": 12
     },
     {
@@ -274,7 +274,7 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": false,
-      "import_origin_region": "Asia / Pacific",
+      "import_origin_region": "Asia (Indonesia)",
       "lead_time_weeks": 12
     },
     {
@@ -354,7 +354,7 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": false,
-      "import_origin_region": "Asia (China)",
+      "import_origin_region": "Africa (Mozambique, Madagascar, Tanzania)",
       "lead_time_weeks": 12
     },
     {
@@ -374,7 +374,7 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": false,
-      "import_origin_region": "South America / Australia",
+      "import_origin_region": "South America (Chile/Argentina)",
       "lead_time_weeks": 12
     },
     {
@@ -434,7 +434,7 @@
       "capacity_source": "unknown",
       "supplier_concentration": false,
       "import_dependency": false,
-      "import_origin_region": "Africa / Asia",
+      "import_origin_region": "Asia / Pacific (Australia)",
       "lead_time_weeks": 12
     },
     {
@@ -454,7 +454,7 @@
       "capacity_source": "unknown",
       "supplier_concentration": false,
       "import_dependency": false,
-      "import_origin_region": "South America / Australia",
+      "import_origin_region": "Other / Diversified",
       "lead_time_weeks": 12
     },
     {
@@ -494,7 +494,7 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": true,
       "import_dependency": false,
-      "import_origin_region": "Africa (DRC)",
+      "import_origin_region": "Other / Diversified",
       "lead_time_weeks": 12
     },
     {
@@ -534,7 +534,7 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": false,
-      "import_origin_region": "Asia / Pacific",
+      "import_origin_region": "Other / Diversified",
       "lead_time_weeks": 12
     },
     {
@@ -554,7 +554,7 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": false,
-      "import_origin_region": "Asia / Pacific",
+      "import_origin_region": "Asia (Indonesia)",
       "lead_time_weeks": 12
     },
     {
@@ -574,7 +574,7 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": false,
-      "import_origin_region": "Asia / Pacific",
+      "import_origin_region": "Asia (Indonesia)",
       "lead_time_weeks": 12
     },
     {
@@ -674,7 +674,7 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": true,
-      "import_origin_region": "Asia (China)",
+      "import_origin_region": "Africa (Mozambique, Madagascar, Tanzania)",
       "lead_time_weeks": 8
     },
     {
@@ -694,7 +694,7 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": true,
-      "import_origin_region": "South America / Australia",
+      "import_origin_region": "South America (Chile/Argentina)",
       "lead_time_weeks": 8
     },
     {
@@ -714,7 +714,7 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": true,
-      "import_origin_region": "South America / Australia",
+      "import_origin_region": "Australia",
       "lead_time_weeks": 8
     },
     {
@@ -774,7 +774,7 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": true,
-      "import_origin_region": "South America / Australia",
+      "import_origin_region": "Australia",
       "lead_time_weeks": 8
     },
     {
@@ -813,8 +813,8 @@
       "production_units": "MT",
       "capacity_source": "naatbatt",
       "supplier_concentration": true,
-      "import_dependency": true,
-      "import_origin_region": "Africa (DRC)",
+      "import_dependency": false,
+      "import_origin_region": "nan",
       "lead_time_weeks": 8
     },
     {
@@ -914,7 +914,7 @@
       "capacity_source": "unknown",
       "supplier_concentration": false,
       "import_dependency": true,
-      "import_origin_region": "South America / Australia",
+      "import_origin_region": "South America (Chile/Argentina)",
       "lead_time_weeks": 8
     },
     {
@@ -1014,7 +1014,7 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": true,
-      "import_origin_region": "South America / Australia",
+      "import_origin_region": "South America (Chile/Argentina)",
       "lead_time_weeks": 8
     },
     {
@@ -1034,7 +1034,7 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": true,
-      "import_origin_region": "South America / Australia",
+      "import_origin_region": "South America (Chile/Argentina)",
       "lead_time_weeks": 8
     },
     {
@@ -1054,7 +1054,7 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": true,
-      "import_origin_region": "Asia / Pacific",
+      "import_origin_region": "Asia / Pacific (Philippines)",
       "lead_time_weeks": 8
     },
     {
@@ -1083,7 +1083,7 @@
       "facility_name": "Ni-CAT USA",
       "segment": "Midstream-BGM",
       "product_type": "Cathode Processing",
-      "material_keywords": "nmc,nca,lithium",
+      "material_keywords": "nmc,nca,lithium,cobalt,nickel,manganese",
       "country": "US",
       "state": "DE",
       "city": "Dover",
@@ -1094,7 +1094,7 @@
       "capacity_source": "unknown",
       "supplier_concentration": true,
       "import_dependency": true,
-      "import_origin_region": "South America / Australia",
+      "import_origin_region": "South America (Chile/Argentina)",
       "lead_time_weeks": 8
     },
     {
@@ -1133,8 +1133,8 @@
       "production_units": "MT/yr",
       "capacity_source": "naatbatt",
       "supplier_concentration": true,
-      "import_dependency": true,
-      "import_origin_region": "Africa (DRC)",
+      "import_dependency": false,
+      "import_origin_region": "nan",
       "lead_time_weeks": 8
     },
     {
@@ -1194,7 +1194,7 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": true,
-      "import_origin_region": "South America / Australia",
+      "import_origin_region": "Other / Diversified",
       "lead_time_weeks": 8
     },
     {
@@ -1293,8 +1293,8 @@
       "production_units": "MT finished Ni/yr",
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
-      "import_dependency": true,
-      "import_origin_region": "Asia / Pacific",
+      "import_dependency": false,
+      "import_origin_region": "Caribbean / Africa (non-DRC)",
       "lead_time_weeks": 8
     },
     {
@@ -1313,8 +1313,8 @@
       "production_units": "MT finished Co/yr",
       "capacity_source": "naatbatt",
       "supplier_concentration": true,
-      "import_dependency": true,
-      "import_origin_region": "Africa (DRC)",
+      "import_dependency": false,
+      "import_origin_region": "Caribbean / Africa (non-DRC)",
       "lead_time_weeks": 8
     },
     {
@@ -1414,7 +1414,7 @@
       "capacity_source": "unknown",
       "supplier_concentration": false,
       "import_dependency": true,
-      "import_origin_region": "Asia (China)",
+      "import_origin_region": "Other / Diversified",
       "lead_time_weeks": 8
     },
     {
@@ -1434,7 +1434,7 @@
       "capacity_source": "unknown",
       "supplier_concentration": false,
       "import_dependency": true,
-      "import_origin_region": "South America / Australia",
+      "import_origin_region": "South America (Chile/Argentina)",
       "lead_time_weeks": 8
     },
     {
@@ -1474,7 +1474,7 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": true,
       "import_dependency": true,
-      "import_origin_region": "Africa (DRC)",
+      "import_origin_region": "Asia (Indonesia)",
       "lead_time_weeks": 8
     },
     {
@@ -1494,7 +1494,7 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": true,
-      "import_origin_region": "Asia / Pacific",
+      "import_origin_region": "Asia / Pacific (Philippines)",
       "lead_time_weeks": 8
     },
     {
@@ -1534,7 +1534,7 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": true,
-      "import_origin_region": "Asia / Pacific",
+      "import_origin_region": "Asia / Pacific (Philippines)",
       "lead_time_weeks": 8
     },
     {
@@ -1574,7 +1574,7 @@
       "capacity_source": "unknown",
       "supplier_concentration": false,
       "import_dependency": true,
-      "import_origin_region": "South America / Australia",
+      "import_origin_region": "South America (Chile/Argentina)",
       "lead_time_weeks": 6
     },
     {
@@ -1594,7 +1594,7 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": true,
-      "import_origin_region": "South America / Australia",
+      "import_origin_region": "Australia",
       "lead_time_weeks": 6
     },
     {
@@ -1734,7 +1734,7 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": true,
-      "import_origin_region": "South America / Australia",
+      "import_origin_region": "Australia",
       "lead_time_weeks": 6
     },
     {
@@ -1894,7 +1894,7 @@
       "capacity_source": "unknown",
       "supplier_concentration": true,
       "import_dependency": true,
-      "import_origin_region": "Africa (DRC)",
+      "import_origin_region": "Other / Diversified",
       "lead_time_weeks": 6
     },
     {
@@ -1914,7 +1914,7 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": true,
       "import_dependency": true,
-      "import_origin_region": "Africa (DRC)",
+      "import_origin_region": "Other / Diversified",
       "lead_time_weeks": 6
     },
     {
@@ -1934,7 +1934,7 @@
       "capacity_source": "unknown",
       "supplier_concentration": false,
       "import_dependency": true,
-      "import_origin_region": "South America / Australia",
+      "import_origin_region": "Australia",
       "lead_time_weeks": 6
     },
     {
@@ -2014,7 +2014,7 @@
       "capacity_source": "unknown",
       "supplier_concentration": false,
       "import_dependency": true,
-      "import_origin_region": "South America / Australia",
+      "import_origin_region": "South America (Chile/Argentina)",
       "lead_time_weeks": 6
     },
     {
@@ -2034,7 +2034,7 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": true,
-      "import_origin_region": "South America / Australia",
+      "import_origin_region": "Australia",
       "lead_time_weeks": 6
     },
     {
@@ -2154,7 +2154,7 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": true,
-      "import_origin_region": "South America / Australia",
+      "import_origin_region": "South America (Chile/Argentina)",
       "lead_time_weeks": 6
     },
     {
@@ -2183,7 +2183,7 @@
       "facility_name": "Saft America Jacksonville Lithium Ion Battery Manufacturing Plant",
       "segment": "Midstream-Cell",
       "product_type": "Pouch cells",
-      "material_keywords": "nmc",
+      "material_keywords": "nmc,cobalt,nickel,manganese",
       "country": "US",
       "state": "FL",
       "city": "Jacksonville",
@@ -2193,8 +2193,8 @@
       "production_units": "GWh/yr",
       "capacity_source": "naatbatt",
       "supplier_concentration": true,
-      "import_dependency": false,
-      "import_origin_region": "nan",
+      "import_dependency": true,
+      "import_origin_region": "Asia (Indonesia)",
       "lead_time_weeks": 6
     },
     {
@@ -2203,7 +2203,7 @@
       "facility_name": "Saft America Cockeysville Lithium Ion Battery Manufacturing Plant",
       "segment": "Midstream-Cell",
       "product_type": "Cylindrical cells",
-      "material_keywords": "nmc",
+      "material_keywords": "nmc,cobalt,nickel,manganese",
       "country": "US",
       "state": "MD",
       "city": "Cockeysville",
@@ -2213,8 +2213,8 @@
       "production_units": "GWh/yr",
       "capacity_source": "naatbatt",
       "supplier_concentration": true,
-      "import_dependency": false,
-      "import_origin_region": "nan",
+      "import_dependency": true,
+      "import_origin_region": "Asia (Indonesia)",
       "lead_time_weeks": 6
     },
     {
@@ -2354,7 +2354,7 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": true,
       "import_dependency": true,
-      "import_origin_region": "Africa (DRC)",
+      "import_origin_region": "Asia (Indonesia)",
       "lead_time_weeks": 6
     },
     {
@@ -2363,7 +2363,7 @@
       "facility_name": "Toyota Battery Manufacturing North Carolina (TBMNC)",
       "segment": "Midstream-Cell",
       "product_type": "Prismatic cell",
-      "material_keywords": "nmc",
+      "material_keywords": "nmc,cobalt,nickel,manganese",
       "country": "US",
       "state": "NC",
       "city": "Liberty",
@@ -2373,8 +2373,8 @@
       "production_units": "GWh/yr",
       "capacity_source": "naatbatt",
       "supplier_concentration": true,
-      "import_dependency": false,
-      "import_origin_region": "nan",
+      "import_dependency": true,
+      "import_origin_region": "Africa (DRC)",
       "lead_time_weeks": 6
     },
     {
@@ -2383,7 +2383,7 @@
       "facility_name": "Spring Hill Battery Manufacturing Plant",
       "segment": "Midstream-Cell",
       "product_type": "Prismatic pouch cells",
-      "material_keywords": "nmc,lfp",
+      "material_keywords": "nmc,lfp,cobalt,nickel,manganese",
       "country": "US",
       "state": "TN",
       "city": "Spring Hill",
@@ -2393,8 +2393,8 @@
       "production_units": "GWh/yr",
       "capacity_source": "naatbatt",
       "supplier_concentration": true,
-      "import_dependency": false,
-      "import_origin_region": "nan",
+      "import_dependency": true,
+      "import_origin_region": "Asia (Indonesia)",
       "lead_time_weeks": 6
     },
     {
@@ -3114,7 +3114,7 @@
       "capacity_source": "unknown",
       "supplier_concentration": false,
       "import_dependency": true,
-      "import_origin_region": "South America / Australia",
+      "import_origin_region": "South America (Chile/Argentina)",
       "lead_time_weeks": 4
     },
     {
@@ -3583,7 +3583,7 @@
       "facility_name": "Estes Energy",
       "segment": "Downstream",
       "product_type": "Development",
-      "material_keywords": "nmc,lfp",
+      "material_keywords": "nmc,lfp,cobalt,nickel,manganese",
       "country": "US",
       "state": "CA",
       "city": "San Francisco",
@@ -3593,8 +3593,8 @@
       "production_units": "nan",
       "capacity_source": "unknown",
       "supplier_concentration": true,
-      "import_dependency": false,
-      "import_origin_region": "nan",
+      "import_dependency": true,
+      "import_origin_region": "Africa (DRC)",
       "lead_time_weeks": 4
     },
     {
@@ -4514,7 +4514,7 @@
       "capacity_source": "unknown",
       "supplier_concentration": false,
       "import_dependency": true,
-      "import_origin_region": "South America / Australia",
+      "import_origin_region": "Australia",
       "lead_time_weeks": 4
     },
     {
@@ -6234,7 +6234,7 @@
       "capacity_source": "unknown",
       "supplier_concentration": false,
       "import_dependency": true,
-      "import_origin_region": "Asia (China)",
+      "import_origin_region": "Africa (Mozambique, Madagascar, Tanzania)",
       "lead_time_weeks": 8
     },
     {
@@ -6274,7 +6274,7 @@
       "capacity_source": "unknown",
       "supplier_concentration": false,
       "import_dependency": true,
-      "import_origin_region": "South America / Australia",
+      "import_origin_region": "Other / Diversified",
       "lead_time_weeks": 6
     },
     {
@@ -6314,7 +6314,7 @@
       "capacity_source": "unknown",
       "supplier_concentration": true,
       "import_dependency": true,
-      "import_origin_region": "Africa (DRC)",
+      "import_origin_region": "Other / Diversified",
       "lead_time_weeks": 8
     },
     {
@@ -6354,7 +6354,7 @@
       "capacity_source": "unknown",
       "supplier_concentration": false,
       "import_dependency": true,
-      "import_origin_region": "South America / Australia",
+      "import_origin_region": "South America (Chile/Argentina)",
       "lead_time_weeks": 8
     },
     {
@@ -6374,7 +6374,7 @@
       "capacity_source": "unknown",
       "supplier_concentration": true,
       "import_dependency": true,
-      "import_origin_region": "Africa (DRC)",
+      "import_origin_region": "Other / Diversified",
       "lead_time_weeks": 8
     },
     {
@@ -6454,7 +6454,7 @@
       "capacity_source": "unknown",
       "supplier_concentration": false,
       "import_dependency": true,
-      "import_origin_region": "South America / Australia",
+      "import_origin_region": "Australia",
       "lead_time_weeks": 6
     },
     {
@@ -6494,7 +6494,7 @@
       "capacity_source": "unknown",
       "supplier_concentration": false,
       "import_dependency": true,
-      "import_origin_region": "South America / Australia",
+      "import_origin_region": "South America (Chile/Argentina)",
       "lead_time_weeks": 6
     },
     {
@@ -6534,7 +6534,7 @@
       "capacity_source": "unknown",
       "supplier_concentration": false,
       "import_dependency": true,
-      "import_origin_region": "South America / Australia",
+      "import_origin_region": "Australia",
       "lead_time_weeks": 6
     },
     {
@@ -6574,7 +6574,7 @@
       "capacity_source": "unknown",
       "supplier_concentration": false,
       "import_dependency": true,
-      "import_origin_region": "South America / Australia",
+      "import_origin_region": "Australia",
       "lead_time_weeks": 6
     },
     {
@@ -7334,7 +7334,7 @@
       "capacity_source": "unknown",
       "supplier_concentration": false,
       "import_dependency": true,
-      "import_origin_region": "South America / Australia",
+      "import_origin_region": "South America (Chile/Argentina)",
       "lead_time_weeks": 8
     },
     {
@@ -7434,7 +7434,7 @@
       "capacity_source": "unknown",
       "supplier_concentration": false,
       "import_dependency": true,
-      "import_origin_region": "South America / Australia",
+      "import_origin_region": "Other / Diversified",
       "lead_time_weeks": 8
     },
     {
@@ -7654,7 +7654,7 @@
       "capacity_source": "unknown",
       "supplier_concentration": false,
       "import_dependency": true,
-      "import_origin_region": "Asia / Pacific",
+      "import_origin_region": "Asia (Indonesia)",
       "lead_time_weeks": 6
     },
     {
@@ -10485,73 +10485,73 @@
       "source": "2029",
       "target": "4063",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "nca"
     },
     {
       "source": "2029",
       "target": "4020",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "nca"
     },
     {
       "source": "2029",
       "target": "4077",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "nca"
     },
     {
       "source": "2029",
       "target": "4093",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "nca"
     },
     {
       "source": "2029",
       "target": "3013",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "nca"
     },
     {
       "source": "2029",
       "target": "3017",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "nca"
     },
     {
       "source": "2030",
       "target": "4063",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "nmc"
     },
     {
       "source": "2030",
       "target": "4020",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "nmc"
     },
     {
       "source": "2030",
       "target": "4077",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "nmc"
     },
     {
       "source": "2030",
       "target": "4093",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "nmc"
     },
     {
       "source": "2030",
       "target": "3013",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "nmc"
     },
     {
       "source": "2030",
       "target": "3017",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "nmc"
     },
     {
       "source": "2031",
@@ -10593,37 +10593,37 @@
       "source": "2032",
       "target": "3017",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "nmc"
     },
     {
       "source": "2032",
       "target": "4110",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "nmc"
     },
     {
       "source": "2032",
       "target": "4093",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "nmc"
     },
     {
       "source": "2032",
       "target": "3013",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "nmc"
     },
     {
       "source": "2032",
       "target": "4077",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "nmc"
     },
     {
       "source": "2032",
       "target": "4029",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "nmc"
     },
     {
       "source": "2037",
@@ -11133,37 +11133,37 @@
       "source": "2095",
       "target": "4091",
       "relationship": "supplies_material",
-      "material": "nmc"
+      "material": "nca"
     },
     {
       "source": "2095",
       "target": "4081",
       "relationship": "supplies_material",
-      "material": "nmc"
+      "material": "nca"
     },
     {
       "source": "2095",
       "target": "4029",
       "relationship": "supplies_material",
-      "material": "nmc"
+      "material": "nca"
     },
     {
       "source": "2095",
       "target": "4110",
       "relationship": "supplies_material",
-      "material": "nmc"
+      "material": "nca"
     },
     {
       "source": "2095",
       "target": "4108",
       "relationship": "supplies_material",
-      "material": "nmc"
+      "material": "nca"
     },
     {
       "source": "2095",
       "target": "3017",
       "relationship": "supplies_material",
-      "material": "nmc"
+      "material": "nca"
     },
     {
       "source": "2098",
@@ -11817,37 +11817,37 @@
       "source": "2142",
       "target": "3013",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "nca"
     },
     {
       "source": "2142",
       "target": "4093",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "nca"
     },
     {
       "source": "2142",
       "target": "4077",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "nca"
     },
     {
       "source": "2142",
       "target": "3017",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "nca"
     },
     {
       "source": "2142",
       "target": "4028",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "nca"
     },
     {
       "source": "2142",
       "target": "4110",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "nca"
     },
     {
       "source": "2147",
@@ -14085,37 +14085,37 @@
       "source": "11002",
       "target": "4069",
       "relationship": "supplies_material",
-      "material": "electrolyte"
+      "material": "graphite"
     },
     {
       "source": "11002",
       "target": "4011",
       "relationship": "supplies_material",
-      "material": "electrolyte"
+      "material": "graphite"
     },
     {
       "source": "11002",
       "target": "11021",
       "relationship": "supplies_material",
-      "material": "electrolyte"
+      "material": "graphite"
     },
     {
       "source": "11002",
       "target": "4076",
       "relationship": "supplies_material",
-      "material": "electrolyte"
+      "material": "graphite"
     },
     {
       "source": "11002",
       "target": "4031",
       "relationship": "supplies_material",
-      "material": "electrolyte"
+      "material": "graphite"
     },
     {
       "source": "11002",
       "target": "3065",
       "relationship": "supplies_material",
-      "material": "electrolyte"
+      "material": "graphite"
     },
     {
       "source": "11003",
@@ -14241,73 +14241,73 @@
       "source": "11008",
       "target": "4103",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "nmc"
     },
     {
       "source": "11008",
       "target": "4028",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "nmc"
     },
     {
       "source": "11008",
       "target": "4081",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "nmc"
     },
     {
       "source": "11008",
       "target": "4029",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "nmc"
     },
     {
       "source": "11008",
       "target": "4091",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "nmc"
     },
     {
       "source": "11008",
       "target": "3017",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "nmc"
     },
     {
       "source": "11009",
       "target": "4103",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "nca"
     },
     {
       "source": "11009",
       "target": "4028",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "nca"
     },
     {
       "source": "11009",
       "target": "4081",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "nca"
     },
     {
       "source": "11009",
       "target": "4029",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "nca"
     },
     {
       "source": "11009",
       "target": "4091",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "nca"
     },
     {
       "source": "11009",
       "target": "3017",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "nca"
     },
     {
       "source": "11010",
@@ -14349,37 +14349,37 @@
       "source": "11011",
       "target": "4103",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "lithium"
     },
     {
       "source": "11011",
       "target": "4028",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "lithium"
     },
     {
       "source": "11011",
       "target": "4081",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "lithium"
     },
     {
       "source": "11011",
       "target": "4029",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "lithium"
     },
     {
       "source": "11011",
       "target": "4091",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "lithium"
     },
     {
       "source": "11011",
       "target": "3017",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "lithium"
     },
     {
       "source": "11012",

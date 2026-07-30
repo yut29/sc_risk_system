@@ -6,6 +6,7 @@
 v2 (2026-06-10): 适配 March 2026 版本，Midstream 按 Product/Facility Type 拆分为 BGM/Cell
 """
 
+import random
 import re
 import pandas as pd
 from pathlib import Path
@@ -24,12 +25,41 @@ LEAD_TIME = {
 
 IMPORT_MATERIALS = {"cobalt", "nickel", "lithium", "manganese", "graphite"}
 
-IMPORT_ORIGIN = {
-    "cobalt":    "Africa (DRC)",
-    "nickel":    "Asia / Pacific",
-    "lithium":   "South America / Australia",
-    "manganese": "Africa / Asia",
-    "graphite":  "Asia (China)",
+# IMPORT_ORIGIN_DISTRIBUTION: realistic supplier-country split instead of a single
+# dominant region — every NA facility handling e.g. cobalt was previously tagged
+# "Africa (DRC)", implying 100% of them import from the DRC specifically, which
+# overstated how many facilities a DRC-only event could plausibly hit. Shares below
+# reflect real market concentration (USGS MCS 2026 / IEA GCMO 2025, see
+# risk_model.md §SupplierConcentration); "Other / Diversified" facilities are not
+# tied to any single dominant-source event. Assignment is a per-facility weighted
+# random draw (agents/state.py-independent, in build_facilities.py), seeded by
+# facility_id so it's reproducible across re-runs — see infer_import_origin().
+IMPORT_ORIGIN_DISTRIBUTION: dict[str, list[tuple[str, float]]] = {
+    "cobalt": [
+        ("Africa (DRC)",            0.73),  # USGS MCS 2026: DRC 73% of world mine production
+        ("Asia (Indonesia)",        0.14),  # USGS MCS 2026: Indonesia 14%
+        ("Other / Diversified",     0.13),
+    ],
+    "nickel": [
+        ("Asia (Indonesia)",              0.67),  # USGS MCS 2026: Indonesia ~67%
+        ("Asia / Pacific (Philippines)",  0.18),
+        ("Other / Diversified",           0.15),
+    ],
+    "lithium": [
+        ("South America (Chile/Argentina)", 0.45),
+        ("Australia",                        0.35),
+        ("Other / Diversified",              0.20),
+    ],
+    "manganese": [
+        ("Africa (South Africa, Gabon)",  0.55),
+        ("Asia / Pacific (Australia)",    0.25),
+        ("Other / Diversified",           0.20),
+    ],
+    "graphite": [
+        ("Asia (China)",                                0.77),  # USGS MCS 2026: China ~77%
+        ("Africa (Mozambique, Madagascar, Tanzania)",   0.15),
+        ("Other / Diversified",                          0.08),
+    ],
 }
 
 # SupplierConcentration: literaturbasierte Regel — globale Marktstruktur (nicht Nordamerika-Zählung)
@@ -70,6 +100,18 @@ CELL_TYPE_KEYWORDS = [
     "cell assembly", "consumer batter",
 ]
 
+# NMC/NCA sind Kathodenchemien (Verbundprodukte), keine Rohstoffe — enthalten aber
+# die genannten Rohstoffe. Ohne diese Zuordnung würde ein Produkttext wie "NMC
+# Cathode Active Material" nur material_keywords=["nmc"] ergeben, ohne "cobalt" —
+# ein Kobalt-Ereignis würde diese Anlage dann über _material_match() nicht finden,
+# obwohl NMC-Kathodenmaterial de facto Kobalt enthält (docs/architecture.md
+# "Bekannte Grenzen des Seeding-Mechanismus" Punkt 4). Aluminium wird in diesem
+# System nicht als Risikomaterial geführt, daher kein "aluminum" für NCA.
+CATHODE_CHEMISTRY_RAW_MATERIALS: dict[str, list[str]] = {
+    "nmc": ["cobalt", "nickel", "manganese"],
+    "nca": ["cobalt", "nickel"],
+}
+
 
 def classify_midstream(product_type: str) -> str:
     """将 Midstream 设施按 Product/Facility Type 分为 BGM 或 Cell。"""
@@ -85,13 +127,36 @@ def extract_keywords(product_text: str) -> list[str]:
     for patterns, keyword in KEYWORD_RULES:
         if any(p in text for p in patterns) and keyword not in found:
             found.append(keyword)
+
+    # Kathodenchemien implizieren ihre Rohstoffe, auch wenn der Produkttext die
+    # Rohstoffe nicht separat nennt (siehe CATHODE_CHEMISTRY_RAW_MATERIALS oben)
+    for chemistry, raw_materials in CATHODE_CHEMISTRY_RAW_MATERIALS.items():
+        if chemistry in found:
+            for raw in raw_materials:
+                if raw not in found:
+                    found.append(raw)
+
     return found
 
 
-def infer_import_origin(keywords: list[str]) -> str:
+def infer_import_origin(facility_id: str, keywords: list[str]) -> str:
+    """
+    Weighted, per-facility draw from IMPORT_ORIGIN_DISTRIBUTION — not every facility
+    handling a material gets the single dominant source country; seeded by facility_id
+    so the assignment is reproducible across re-runs of this script.
+    """
     for kw in keywords:
-        if kw in IMPORT_ORIGIN:
-            return IMPORT_ORIGIN[kw]
+        dist = IMPORT_ORIGIN_DISTRIBUTION.get(kw)
+        if not dist:
+            continue
+        rng = random.Random(f"{facility_id}:{kw}")
+        r = rng.random()
+        cumulative = 0.0
+        for region, share in dist:
+            cumulative += share
+            if r < cumulative:
+                return region
+        return dist[-1][0]  # float-rounding fallback
     return ""
 
 
@@ -122,7 +187,9 @@ def build_computed_fields(df: pd.DataFrame) -> pd.DataFrame:
                   and any(kw in IMPORT_MATERIALS for kw in r["material_keywords"]),
         axis=1,
     )
-    df["import_origin_region"] = df["material_keywords"].apply(infer_import_origin)
+    df["import_origin_region"] = df.apply(
+        lambda r: infer_import_origin(str(r["facility_id"]), r["material_keywords"]), axis=1
+    )
 
     # Apply facility-specific overrides (documented exceptions to the USGS NIR rule)
     for company, overrides in IMPORT_DEP_OVERRIDES.items():

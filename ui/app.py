@@ -151,6 +151,17 @@ k2.metric("Risk Type", RISK_TYPE_LABEL.get(risk_type, risk_type))
 k3.metric("Material", material.capitalize())
 k4.metric("Region", region)
 
+if result.get("seed_generation_status") == "no_seed_found":
+    st.error(
+        "⚠️ **Not classifiable by this system — this is NOT a \"no risk found\" result.** "
+        "The system currently only detects import-dependent raw-material disruptions abroad "
+        "(a North American facility importing the affected material from the affected region). "
+        "This event didn't match that pattern — it may be a facility-specific incident, a "
+        "domestic tier-wide issue, or a logistics/port event, none of which this system can "
+        "currently classify. **Treat any numbers below as not meaningful and review this case "
+        "manually** — do not read the absence of results as evidence of no exposure."
+    )
+
 st.divider()
 
 # ── Supply chain exposure ─────────────────────────────────────────────────────
@@ -183,12 +194,13 @@ _prop_pct = (propagated_count / len(affected_nodes) * 100) if affected_nodes els
 
 with st.container(border=True):
     st.subheader("Supply chain exposure")
-    st.caption("How much of the entire North American battery supply chain network (all materials) this event touches.")
+    st.caption("How much of the entire North American battery supply chain network (all materials) this event "
+               "structurally reaches — reachability, not severity (see Risk Level below for that).")
     st.metric(
-        "Affected facilities (share of full network)",
+        "Potentially exposed facilities (share of full network)",
         f"{len(affected_nodes)} / {total_network}",
         delta=f"{_pct:.1f}% of network", delta_color="inverse",
-        help="Affected facilities / ALL facilities in the dataset, regardless of material. "
+        help="Potentially exposed facilities / ALL facilities in the dataset, regardless of material. "
              "Shows how large this event is relative to the whole network.",
     )
 
@@ -198,20 +210,33 @@ with st.container(border=True):
                f"{material_label.lower()} or sit downstream of one that does): how deep did this event reach?")
     mc1, mc2 = st.columns(2)
     mc1.metric(
-        "Affected nodes", f"{len(affected_nodes)} / {len(material_nodes)}",
+        "Potentially exposed nodes", f"{len(affected_nodes)} / {len(material_nodes)}",
         delta=f"{_mat_pct:.1f}% penetration", delta_color="inverse",
-        help=f"Affected / total facilities within the {material_label} sub-network specifically "
+        help=f"Potentially exposed / total facilities within the {material_label} sub-network specifically "
              f"(a much smaller, more relevant denominator than the full {total_network}-facility dataset).",
     )
     mc2.metric(
-        "Affected manufacturers", f"{len(affected_companies)} / {len(material_companies)}",
+        "Potentially exposed manufacturers", f"{len(affected_companies)} / {len(material_companies)}",
         help="Same, but counted by distinct company (one company can own several facilities).",
     )
 
 with st.container(border=True):
+    st.subheader("Risk level")
+    st.caption("Reachable ≠ high-risk. RiskScore already discounts facilities by distance from the event's "
+               "origin tier (TierWeight) — most potentially-exposed facilities end up Low tier once that's "
+               "applied. Tiers are quantile-based (top 20% / next 30% / bottom 50% of THIS event's own "
+               "RiskScore distribution), not a fixed 0-100 scale.")
+    tiers = result.get("risk_tier_counts", {"high": 0, "medium": 0, "low": 0})
+    t1, t2, t3 = st.columns(3)
+    t1.metric("🔴 High", tiers.get("high", 0), help="Top 20% of RiskScore among potentially exposed facilities.")
+    t2.metric("🟠 Medium", tiers.get("medium", 0), help="Next 30% of RiskScore.")
+    t3.metric("🟢 Low", tiers.get("low", 0), help="Bottom 50% of RiskScore — typically discounted hard by "
+              "TierWeight distance from the event's origin tier.")
+
+with st.container(border=True):
     st.subheader("Risk propagation")
-    st.caption("Of the affected facilities: how many matched the event's import dependency directly "
-               "vs. only reached through the supply chain graph.")
+    st.caption("Of the potentially exposed facilities: how many matched the event's import dependency "
+               "directly vs. only reached through the supply chain graph.")
     pc1, pc2 = st.columns(2)
     pc1.metric(
         "Primary exposure", direct_count,
@@ -221,12 +246,12 @@ with st.container(border=True):
     )
     pc2.metric(
         "Propagated exposure", propagated_count,
-        delta=f"{_prop_pct:.1f}% of affected" if affected_nodes else None, delta_color="inverse",
+        delta=f"{_prop_pct:.1f}% of exposed" if affected_nodes else None, delta_color="inverse",
         help="Facilities reached only via downstream graph traversal from a primary-exposure facility — "
-             "affected because they depend on it, not because they import from the affected region themselves.",
+             "exposed because they depend on it, not because they import from the affected region themselves.",
     )
 
-    st.markdown("**Affected facilities by supply chain stage** (within the material sub-network above)")
+    st.markdown("**Potentially exposed facilities by supply chain stage** (within the material sub-network above)")
     seg_order = ["Upstream", "Midstream-BGM", "Midstream-Cell", "Downstream"]
     seg_help = {
         "Upstream":       "Mining / raw material extraction.",
@@ -248,37 +273,13 @@ with st.container(border=True):
 st.divider()
 
 # ── Capacity metrics ──────────────────────────────────────────────────────────
-# Scope: Upstream (mining) only — the only tier with comparable units (MT/yr).
-# This is a production-capacity metric, not a full supply-chain impact metric —
-# see the interpretation note and the exposure numbers above for the Midstream/Downstream picture.
-
+# "North American Upstream Mining Capacity" module hidden (2026-07-20) — Upstream-only
+# scope made this near-always 0%/100% for import-driven events (see architecture.md /
+# risk_model.md discussion), which read as confusing or contradictory next to the
+# Supply Chain Exposure / Risk Level cards above. gm is kept available in `result` for
+# the LLM report (Capacity Impact section) even though the UI no longer surfaces it
+# as its own card.
 gm = result.get("global_metrics", {})
-
-with st.container(border=True):
-    st.subheader("North American upstream mining capacity")
-    st.caption("Affected vs. remaining production capacity among North American mining facilities for this material.")
-    u1, u2 = st.columns(2)
-    u1.metric("Affected capacity",  f"{gm.get('betroffene_kapazitaet_na_pct', 0):.1f}%")
-    u2.metric("Remaining capacity", f"{gm.get('alternative_kapazitaet_na_pct', 0):.1f}%")
-
-    st.markdown("**Share of global supply** (USGS world production)")
-    g1, g2 = st.columns(2)
-    g1.metric("Affected capacity",  f"{gm.get('betroffene_kapazitaet_global_pct', 0):.2f}%")
-    g2.metric("Remaining capacity", f"{gm.get('alternative_kapazitaet_global_pct', 0):.2f}%")
-
-    if gm.get("betroffene_kapazitaet_na_pct", 0) == 0 and affected_nodes:
-        non_upstream = [n for n in affected_nodes if n.get("segment") != "Upstream"]
-        if non_upstream:
-            st.info(
-                f"No upstream mining facility in the current network is located in the "
-                f"affected region — so 0% of North American mining capacity is directly hit. "
-                f"This does **not** mean there is no risk: **{len(non_upstream)} Midstream/Downstream "
-                f"facilities** are still flagged as affected via import dependency (see Top 3 below). "
-                f"**Import dependency exposure is not captured by mining capacity impact** — "
-                f"see Supply Chain Exposure above for the fuller picture."
-            )
-
-st.divider()
 
 # ── Top 3 + Map ───────────────────────────────────────────────────────────────
 
@@ -333,6 +334,11 @@ if top3:
         if f.get("supply_path"):
             label = "🔴 Primary" if f.get("exposure_type") == "direct" else "🔀 Propagated"
             st.markdown(f"{i}. [{label}] {f['supply_path']}")
+elif result.get("seed_generation_status") == "no_seed_found":
+    st.caption("No candidate facilities generated. Please refer to the system limitation notice above.")
+else:
+    st.caption("No high-risk facilities identified — this event matched the supported pattern "
+               "but the resulting network had no facilities with usable risk data.")
 
 st.divider()
 

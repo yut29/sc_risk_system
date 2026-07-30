@@ -142,6 +142,33 @@ def _reconstruct_path(predecessor: dict[str, str], node_id: str) -> list[str]:
     return path
 
 
+def _find_root_seeds(G: nx.DiGraph, candidates: list[str]) -> list[str]:
+    """
+    A candidate (material+region match) is only a genuine seed — a propagation
+    ROOT — if no OTHER candidate can reach it via the graph. If it's reachable from
+    another candidate, it's not an independent entry point; it's downstream of one,
+    so it should be scored as propagated exposure, not counted as a second seed for
+    the same underlying event. This replaces a hard segment restriction (e.g.
+    "only Midstream-BGM can seed") with a structural one that works for any segment:
+    a seed is defined by what it *is* (a root of the candidate set), not by which
+    tier it happens to sit in.
+    """
+    candidate_set = set(candidates)
+    reached_by_other: set[str] = set()
+    for c in candidates:
+        visited: set[str] = set()
+        queue = deque(G.successors(c))
+        while queue:
+            cur = queue.popleft()
+            if cur in visited:
+                continue
+            visited.add(cur)
+            if cur in candidate_set and cur != c:
+                reached_by_other.add(cur)
+            queue.extend(G.successors(cur))
+    return [c for c in candidates if c not in reached_by_other]
+
+
 def _downstream_fanout(G: nx.DiGraph, node_id: str) -> int:
     """Number of Downstream-segment nodes reachable from node_id."""
     reachable = _bfs_descendants(G, [node_id])
@@ -167,10 +194,31 @@ def run_network_agent(state: PipelineState) -> PipelineState:
     all_nodes: dict[str, dict] = dict(G.nodes(data=True))
 
     # ── Step 1: seed nodes — direct material + region match ──────────────────
-    seed_ids: list[str] = [
+    # A seed is defined structurally, not by tier: any node matching material+region
+    # (a "candidate") is a genuine seed only if no OTHER candidate can already reach it
+    # via the graph (_find_root_seeds). This lets any segment seed in principle — no
+    # hardcoded "must be Midstream-BGM" — while still preventing double-counting when
+    # e.g. a Cell facility that also matches material+region is already downstream of
+    # a Midstream-BGM candidate for the same event.
+    #
+    # SCOPE: this whole match (material+region+import_dependency) only models ONE event
+    # type — an import-dependent raw-material disruption abroad ("regional_supply").
+    # It does NOT handle a named-facility disruption (needs entity extraction, no such
+    # mechanism exists) or a tier-wide domestic disruption without a foreign region
+    # (needs a different seed strategy entirely, since _region_match() requires
+    # import_dependency+region that a domestic event wouldn't have).
+    # See docs/architecture.md "Bekannte Grenzen des Seeding-Mechanismus" for the full writeup.
+    candidate_ids: list[str] = [
         nid for nid, attrs in all_nodes.items()
         if _material_match(attrs, material) and _region_match(attrs, region)
     ]
+    seed_ids: list[str] = _find_root_seeds(G, candidate_ids)
+
+    # "no_seed_found" must NOT be read as "no NA exposure" — see SeedGenerationStatus
+    # docstring in state.py. Currently only Strategy A (rule matching) exists, so this
+    # fires for any event type this system doesn't yet model (facility-specific,
+    # tier-wide domestic, logistics/port — see architecture.md).
+    seed_generation_status: str = "rule_matched" if seed_ids else "no_seed_found"
 
     # ── Step 2: BFS expansion — all nodes reachable from seeds ───────────────
     reachable, predecessor = _bfs_with_predecessors(G, seed_ids)
@@ -245,4 +293,5 @@ def run_network_agent(state: PipelineState) -> PipelineState:
         "downstream_fanout":      fanout,
         "supply_chain_paths":     supply_chain_paths,
         "total_network_facilities": len(all_nodes),  # all facilities, any material — dataset-wide constant
+        "seed_generation_status": seed_generation_status,
     }

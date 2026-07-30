@@ -13,7 +13,6 @@ Output (written to PipelineState):
   global_metrics  : GlobalMetrics
 """
 
-import json
 import os
 from pathlib import Path
 from typing import Optional
@@ -116,8 +115,20 @@ def _compute_scores(state: PipelineState) -> tuple[dict[str, float], list[Facili
             "exposure_type":      exposure_type,
         })
 
+    # Deduplicate by physical site (company + city + state) before ranking Top 3.
+    # NAATBatt records one row per company/material-product-line, so a multi-material
+    # company at a single site (e.g. Targray in Kirkland, QC) can occupy several
+    # facility_id rows with identical risk inputs — without this, Top 3 could show
+    # the same site 2-3x instead of surfacing genuinely distinct high-risk sites.
+    best_by_site: dict[tuple, dict] = {}
+    for obj in facility_objects:
+        site_key = (obj["company"], obj["city"], obj["state"])
+        existing = best_by_site.get(site_key)
+        if existing is None or obj["risk_score_normalized"] > existing["risk_score_normalized"]:
+            best_by_site[site_key] = obj
+
     top3: list[Facility] = sorted(
-        facility_objects, key=lambda x: x["risk_score_normalized"], reverse=True
+        best_by_site.values(), key=lambda x: x["risk_score_normalized"], reverse=True
     )[:3]
 
     return risk_scores, top3
@@ -184,14 +195,20 @@ Two bullet points using the provided percentages:
 
 ## Supply Chain Exposure Analysis
 Using the exposure summary provided in the context, explain — don't just restate the numbers:
-- How many facilities/companies are affected in total, and how that breaks down by supply chain tier.
+- How many facilities/companies are **potentially exposed** (reachable in the supply chain graph
+  from this event) in total, and how that breaks down by supply chain tier. Use "potentially exposed"
+  or "reachable", not "affected" — reachability is a structural/graph property, not a severity claim.
 - The difference between Primary exposure (North American facilities that themselves import the
   affected material from the affected region — an import-dependency match, NOT a geographic one;
   they are not located in the affected region, NAATBatt only covers North America) and Propagated
-  exposure (affected only because they sit downstream of a Primary-exposure facility in the graph).
-- If Affected NA capacity (Upstream) is 0% or low while many facilities are still listed as affected,
+  exposure (exposed only because they sit downstream of a Primary-exposure facility in the graph).
+- The High/Medium/Low risk-tier counts in the exposure summary are quantile-based (relative to this
+  event's own RiskScore distribution, not a fixed scale) — state plainly that most reachable facilities
+  are typically Low tier once TierWeight distance-discounting is applied, and only the High-tier
+  facilities warrant real attention. This is the key distinction: reachable ≠ high-risk.
+- If Affected NA capacity (Upstream) is 0% or low while many facilities are potentially exposed,
   explicitly reconcile this: mining/Upstream capacity being untouched does not mean there is no risk —
-  say so, and point to the Midstream/Downstream exposure as the actual risk driver.
+  say so, and point to the High-tier Midstream/Downstream exposure as the actual risk driver.
 
 ## Top 3 High-Risk Facilities
 For each facility (numbered 1–3):
@@ -267,7 +284,12 @@ def _format_top3(top3: list[Facility]) -> str:
 
 
 def _compute_exposure_summary(state: PipelineState) -> str:
-    """Segment breakdown + direct/propagated counts across all affected_nodes (not just Top 3)."""
+    """
+    Segment breakdown + direct/propagated counts across all affected_nodes (not just Top 3).
+    Only called when seed_generation_status == "rule_matched" — the "no_seed_found" case is
+    short-circuited in run_synthesis_agent() before this is ever invoked (see
+    _no_seed_found_report).
+    """
     affected_nodes = state.get("affected_nodes", [])
     supply_chain_paths = state.get("supply_chain_paths", {})
 
@@ -294,18 +316,94 @@ def _compute_exposure_summary(state: PipelineState) -> str:
     )
 
 
+def compute_risk_tiers(risk_scores: dict[str, float]) -> dict[str, int]:
+    """
+    Buckets affected facilities into High/Medium/Low risk tiers using rank-based
+    quantiles (top 20% / next 30% / bottom 50% by RANK) rather than fixed score
+    bands or value-based thresholds.
+
+    RiskScore_normalized is heavily right-skewed in practice: TierWeight discounts
+    most facilities that aren't at the event's origin tier hard (0.6/0.35/0.15), so
+    fixed bands like 0-30/30-60/60-100 would put nearly everything in "Low" and
+    leave "High" empty. It's also common for many facilities to share the exact same
+    score (same segment + same TierWeight + similar Vulnerability inputs) — a
+    value-based cutoff (e.g. "low = score < median") can then collapse an entire
+    tier to zero because every tied value lands on one side of the cutoff. Ranking
+    first and slicing by position avoids both problems: proportions are always
+    ~20/30/50 regardless of how many scores are tied.
+    """
+    n = len(risk_scores)
+    if n == 0:
+        return {"high": 0, "medium": 0, "low": 0}
+
+    high_n = max(1, round(n * 0.2))
+    medium_n = round(n * 0.3)
+    low_n = n - high_n - medium_n
+    return {"high": high_n, "medium": medium_n, "low": low_n}
+
+
 # ── Main agent function ────────────────────────────────────────────────────────
+
+def _no_seed_found_report(state: PipelineState) -> PipelineState:
+    """
+    Deterministic short-circuit — no LLM call. When no seed was found, letting the LLM
+    free-write the full report template is unsafe: observed in testing (2026-07-20) that
+    even with explicit instructions, the LLM would correctly flag the limitation in the
+    "Supply Chain Exposure Analysis" section, then contradict itself two sections later
+    in "Expert Risk Synthesis" by analyzing the 0% capacity figures as if they were a
+    real finding ("the system has 0.0% affected capacity, which suggests there is no
+    slack..."). A fixed, non-generative notice guarantees no self-contradiction and
+    costs no API call / rate-limit budget.
+    """
+    material = state.get("affected_material", "")
+    region   = state.get("affected_region", "")
+    report = (
+        "## System Limitation Notice\n\n"
+        f"This event (material: {material or 'unknown'}, region: {region or 'unknown'}, "
+        f"risk type: {state.get('risk_type', 'unknown')}, severity: {state.get('severity', '?')}/5) "
+        "could not be classified into the one event type this system currently supports — an "
+        "import-dependent raw-material disruption originating abroad, matched via "
+        "`import_dependency` + `import_origin_region`.\n\n"
+        "**This is NOT a \"no North American exposure\" finding.** It means this event's "
+        "material/region combination did not match any facility's import profile in the current "
+        "model. Likely reasons: a facility-specific incident (a named plant disruption), a domestic "
+        "tier-wide issue without a foreign origin, or a logistics/port event — none of which the "
+        "current rule-based matching (Strategy A) can detect. See `docs/architecture.md`, "
+        "\"Bekannte Grenzen des Seeding-Mechanismus\", for supported vs. unsupported event types.\n\n"
+        "**Recommendation: this case requires manual review.** Do not treat the absence of results "
+        "as evidence of no risk.\n\n"
+        f"Assessment reason (from Risk Assessment Agent): {state.get('reason', 'n/a')}\n\n"
+        "Source: NAATBatt facility data — no matching facility found."
+    )
+    return {
+        **state,
+        "risk_report":      report,
+        "top3_facilities":  [],
+        "risk_scores":      {},
+        "global_metrics":   _compute_global_metrics(state),
+        "risk_tier_counts": {"high": 0, "medium": 0, "low": 0},
+    }
+
 
 def run_synthesis_agent(state: PipelineState) -> PipelineState:
     """
     LangGraph-compatible node function.
     Computes RiskScores deterministically, then generates narrative via LLM.
     """
+    if state.get("seed_generation_status") == "no_seed_found":
+        return _no_seed_found_report(state)
+
     risk_scores, top3 = _compute_scores(state)
     global_metrics    = _compute_global_metrics(state)
+    risk_tiers        = compute_risk_tiers(risk_scores)
 
     top3_text        = _format_top3(top3)
-    exposure_summary = _compute_exposure_summary(state)
+    exposure_summary = (
+        f"{_compute_exposure_summary(state)} "
+        f"Risk tiers among affected facilities (quantile-based, top 20%/next 30%/bottom 50% "
+        f"of this event's RiskScore distribution — NOT a fixed absolute scale): "
+        f"High={risk_tiers['high']}, Medium={risk_tiers['medium']}, Low={risk_tiers['low']}."
+    )
 
     messages = [
         SystemMessage(content=SYSTEM_PROMPT),
@@ -328,8 +426,9 @@ def run_synthesis_agent(state: PipelineState) -> PipelineState:
 
     return {
         **state,
-        "risk_report":     report,
-        "top3_facilities": top3,
-        "risk_scores":     risk_scores,
-        "global_metrics":  global_metrics,
+        "risk_report":      report,
+        "top3_facilities":  top3,
+        "risk_scores":      risk_scores,
+        "global_metrics":   global_metrics,
+        "risk_tier_counts": risk_tiers,
     }
