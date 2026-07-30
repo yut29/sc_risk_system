@@ -12,3 +12,5 @@ scripts/
 *.drawio
 *.svg
 ui/*.pdf
+archive/
+docs/emails/
