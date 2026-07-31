@@ -112,6 +112,40 @@ CATHODE_CHEMISTRY_RAW_MATERIALS: dict[str, list[str]] = {
     "nca": ["cobalt", "nickel"],
 }
 
+# Manuelle Ergänzung für Midstream-Cell-Hersteller, deren `product`/`product_type`
+# nur generische Begriffe enthalten ("Other/Unknown", "Cell", "Solid-state battery" o.ä.)
+# ohne Chemie zu nennen — anders als bei den literaturbasierten Regeln (USGS/IEA, siehe
+# oben) beruht dies auf öffentlich zugänglichen Firmen-/Produktinformationen, nicht auf
+# einer standardisierten Statistikquelle, und ist daher im Sinn von Baris' "reale Daten /
+# simulierte Annahmen / Modellvereinfachungen"-Dreiteilung als Modellvereinfachung mit
+# manueller Recherche zu kennzeichnen (siehe docs/data_processing.md §4.6). Nur Firmen
+# aufgenommen, deren Kernchemie öffentlich eindeutig dokumentiert ist; Stryten Energy
+# (führt sowohl Blei-Säure- als auch Lithium-Produktlinien) bewusst NICHT aufgenommen,
+# da für genau diese Anlage (Ottawa Transportation Manufacturing Plant) keine
+# Chemie-spezifische Quelle gefunden wurde — Rätselraten hier wäre nicht vertretbar.
+MATERIAL_KEYWORD_OVERRIDES: dict[str, list[str]] = {
+    "ABSL Power Solutions, Inc.": ["lithium"],           # EnerSys/ABSL Li-ion Zellen für Raumfahrt/Verteidigung
+    "American Lithium Energy":    ["lithium"],           # Hochsicherheits-Li-Ion-Zellen (100C), Silizium-Anode
+    "Nanotech Energy":             ["lithium"],           # Graphen-verstärkte Li-Ion-Zellen, nicht-brennbarer Elektrolyt
+    "Nuvvon Inc":                   ["lithium", "nickel"],  # Festkörper-Polymerelektrolyt + Lithium-Metall-Anode + Hochnickel-Kathode
+    "Samsung SDI America Inc.":    ["lithium", "nmc"],      # NMC-Dreistoff-Li-Ion-Zellen (EV/ESS)
+    "Solid Power Inc.":             ["lithium", "nmc"],      # Sulfid-Festelektrolyt + NMC-Kathode
+}
+
+# Diese Midstream-Cell-Anlagen liefern nachweislich mechanische/sicherheitstechnische
+# Komponenten (Gehäuse, Dichtungen, Klebstoffe, BMS-Module, Thermomanagement), keine
+# elektrochemisch aktiven Materialien — anhand von product_type/product einzeln geprüft
+# (docs/data_processing.md §4.6). Ohne diese Markierung würde build_graph.py sie via
+# "if not c_kws" fälschlich als Treffer für JEDE BGM-Materialsuche werten (Kanten zu
+# jedem geografisch nahen BGM-Knoten, unabhängig vom Material). Der Marker-Keyword
+# "non_active_material" taucht in keiner KEYWORD_RULES/BGM_TO_CELL-Zielmenge auf und
+# bewirkt daher über die bestehende `c_kws & cell_targets`-Logik automatisch "kein
+# Treffer", ohne build_graph.py selbst ändern zu müssen.
+NON_MATERIAL_COMPONENT_COMPANIES = {
+    "3M", "ADA Technologies, Inc.", "ArlanXEO", "Avery Dennison Corp",
+    "Intriplex", "Vertical Partners West LLC",
+}
+
 
 def classify_midstream(product_type: str) -> str:
     """将 Midstream 设施按 Product/Facility Type 分为 BGM 或 Cell。"""
@@ -165,6 +199,44 @@ def build_computed_fields(df: pd.DataFrame) -> pd.DataFrame:
     # material_keywords
     df["material_keywords"] = df["product"].apply(
         lambda x: extract_keywords(str(x))
+    )
+
+    # product_type gezielt nur auf "LIB" (Lithium-Ion Battery) prüfen, nicht blanket
+    # mit product zusammenführen: ein Blanket-Merge löst fälschlich die "anode"→graphite
+    # Regel für product_type="Anode ..." aus, auch bei Silizium-/LTO-Anodenmaterialien,
+    # die de facto kein Graphit sind (2026-07-31, 16 Facilities betroffen, u.a. Group14
+    # Technologies/Sila Nanotechnologies — beide Silizium-Anodenhersteller, kein Graphit).
+    # "LIB" ist dagegen ein eindeutiges, unmehrdeutiges Signal für Lithium.
+    df["material_keywords"] = df.apply(
+        lambda r: r["material_keywords"] + (
+            ["lithium"] if "lib" in str(r["product_type"]).lower() and "lithium" not in r["material_keywords"] else []
+        ),
+        axis=1,
+    )
+
+    # Manuelle Chemie-Ergänzung für Zellhersteller ohne Chemie-Angabe im Produkttext
+    # (siehe MATERIAL_KEYWORD_OVERRIDES oben) — inkl. NMC/NCA-Rohstoff-Ableitung, damit
+    # z.B. "nmc" bei Samsung SDI auch cobalt/nickel/manganese nach sich zieht.
+    def _apply_material_overrides(row: pd.Series) -> list[str]:
+        kws = list(row["material_keywords"])
+        for kw in MATERIAL_KEYWORD_OVERRIDES.get(row["company"], []):
+            if kw not in kws:
+                kws.append(kw)
+        for chemistry, raw_materials in CATHODE_CHEMISTRY_RAW_MATERIALS.items():
+            if chemistry in kws:
+                for raw in raw_materials:
+                    if raw not in kws:
+                        kws.append(raw)
+        return kws
+
+    df["material_keywords"] = df.apply(_apply_material_overrides, axis=1)
+
+    # Komponentenlieferanten markieren (siehe NON_MATERIAL_COMPONENT_COMPANIES oben)
+    df["material_keywords"] = df.apply(
+        lambda r: ["non_active_material"]
+        if r["company"] in NON_MATERIAL_COMPONENT_COMPANIES and not r["material_keywords"]
+        else r["material_keywords"],
+        axis=1,
     )
 
     # capacity_source

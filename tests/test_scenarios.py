@@ -23,11 +23,15 @@ from agents.synthesis_agent import (
 from agents.validation_agent import run_validation_agent
 
 
-def test_scenario_seed_generation_status_is_rule_matched(scenario_state):
-    """S1-S3 are all designed to hit the supported event pattern (regional_supply) and
-    must report seed_generation_status="rule_matched", not "no_seed_found" — the status
-    flag itself needs a passing case, not just the failing one below."""
-    assert scenario_state["seed_generation_status"] == "rule_matched"
+def test_scenario_seed_generation_status_is_supported(scenario_state):
+    """S1/S2 are import-dependent material+region disruptions (Strategy A ->
+    "rule_matched"). S3 is a facility-specific disruption (Strategy B, entity matching
+    -> "entity_matched") — redefined 2026-07-31 to match what was already communicated
+    to the advisor (2026-07-20 email): a Facility Disruption scenario instead of a
+    port/logistics event, since no port/logistics-node concept exists in the graph.
+    All three must report a supported status, never "no_seed_found"."""
+    expected = {"S1": "rule_matched", "S2": "rule_matched", "S3": "entity_matched"}
+    assert scenario_state["seed_generation_status"] == expected[scenario_state["_scenario_id"]]
 
 
 def test_unmatched_event_reports_no_seed_found_not_a_silent_zero():

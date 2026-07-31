@@ -2,7 +2,7 @@
 基于 facilities_clean.csv 构建供应链知识图谱，输出 knowledge_graph.json。
 
 边生成逻辑：
-  Upstream → Midstream-BGM  : 共享原材料关键词（cobalt→nmc/nca, lithium→lfp/electrolyte, ...）
+  Upstream → Midstream-BGM  : 关键词匹配 + 地理距离排序，每节点最多 K_UPSTREAM_BGM 条边
   Midstream-BGM → Midstream-Cell : 关键词匹配 + 地理距离排序，每节点最多 K_BGM_CELL 条边
   Midstream-Cell → Downstream : 地理距离最近 K_NEAR 条 + 随机远距离 K_FAR 条（模拟跨区域供应）
 
@@ -10,6 +10,15 @@
   旧版 Cell→Downstream 按国家全连接，导致 81% 连通率（6134/7612条边），
   任何 Upstream 事件均可传播到 166/173 个 Downstream 节点，图结构失去区分度。
   新版每个 Cell 节点最多连接 K_NEAR+K_FAR=8 个 Downstream，连通率从 81% 降至约 13%。
+
+改动说明（v3, 2026-07-31）：
+  Upstream→BGM 原本没有度数上限（纯关键词匹配，全连接）——与其余两层已有的
+  K-nearest-by-distance 限制不一致。实测：不设上限时单个 Upstream 节点可连到最多
+  30 个 BGM 节点（lithium：UPSTREAM_TO_BGM 覆盖 lithium/nmc/nca/lfp/electrolyte，
+  候选范围很宽），中位数 13 个，导致单个种子事件（Strategy B 实体匹配验证时发现）
+  可传播到 220+ 个下游节点。新增 K_UPSTREAM_BGM=6，与 K_BGM_CELL 用同一个值和同一套
+  方法（关键词匹配后按距离取最近 N 个）——保持三层连边逻辑方法论一致，不引入新的
+  随意参数。
 """
 
 import json
@@ -25,11 +34,16 @@ FACILITIES_FILE = Path(__file__).parent.parent / "data" / "facilities_clean.csv"
 OUTPUT_FILE     = Path(__file__).parent.parent / "data" / "knowledge_graph.json"
 
 # ── 连边参数 ──────────────────────────────────────────────────────────────────
-K_NEAR      = 5   # Cell→Down: 地理最近的 N 个 Downstream 节点
-K_FAR       = 3   # Cell→Down: 额外随机抽取 N 个（模拟跨区域长链供应）
-K_BGM_CELL  = 6   # BGM→Cell: 关键词匹配后按距离取最近 N 个
+K_NEAR         = 5   # Cell→Down: 地理最近的 N 个 Downstream 节点
+K_FAR          = 3   # Cell→Down: 额外随机抽取 N 个（模拟跨区域长链供应）
+K_BGM_CELL     = 6   # BGM→Cell: 关键词匹配后按距离取最近 N 个
+K_UPSTREAM_BGM = 6   # Upstream→BGM: 关键词匹配后按距离取最近 N 个（跟K_BGM_CELL用同一个值，保持方法论一致）
 
-NORTH_AMERICA_COUNTRIES = {"US", "CA", "Canada", "MX"}
+
+# facilities_clean.csv 里 country 字段实际取值只有这三种（无 "USA"/"CA"/"MX" 缩写变体）——
+# 之前这里写的是 {"US", "CA", "Canada", "MX"}，"CA"/"MX" 从未出现过、"Mexico" 全称又漏了，
+# 导致全部7家墨西哥Downstream设施的country="Mexico"匹配不上，入度永远是0（2026-07-31 发现）。
+NORTH_AMERICA_COUNTRIES = {"US", "Canada", "Mexico"}
 
 # ── 关键词映射表 ──────────────────────────────────────────────────────────────
 UPSTREAM_TO_BGM: dict[str, list[str]] = {
@@ -131,24 +145,35 @@ def build_graph(df: pd.DataFrame):
 
     edge_count = {"up_bgm": 0, "bgm_cell": 0, "cell_down": 0}
 
-    # ── Upstream → Midstream-BGM（关键词匹配，逻辑不变）────────────────────
+    # ── Upstream → Midstream-BGM（关键词匹配 + 地理最近 K_UPSTREAM_BGM）──────
     for _, u_row in up.iterrows():
         u_kws = parse_keywords(u_row["material_keywords"])
         bgm_targets: set[str] = set()
         for uk in u_kws:
             bgm_targets.update(UPSTREAM_TO_BGM.get(uk, []))
 
+        # 关键词匹配的候选 BGM
+        matched: list[pd.Series] = []
         for _, b_row in bgm.iterrows():
             b_kws = parse_keywords(b_row["material_keywords"])
             if b_kws & bgm_targets:
-                shared = list(u_kws & set(UPSTREAM_TO_BGM.keys()))
-                G.add_edge(
-                    str(u_row["facility_id"]),
-                    str(b_row["facility_id"]),
-                    relationship="supplies_material",
-                    material=shared[0] if shared else "unknown",
-                )
-                edge_count["up_bgm"] += 1
+                matched.append(b_row)
+
+        # 按距离排序，取最近 K_UPSTREAM_BGM 个（跟 BGM→Cell 同一套方法，见文件头说明）
+        u_lat = _to_float(u_row.get("latitude"))
+        u_lon = _to_float(u_row.get("longitude"))
+        sorted_bgm = _geo_sort(u_lat, u_lon, matched)
+        selected = sorted_bgm[:K_UPSTREAM_BGM]
+
+        for _, b_row in selected:
+            shared = list(u_kws & set(UPSTREAM_TO_BGM.keys()))
+            G.add_edge(
+                str(u_row["facility_id"]),
+                str(b_row["facility_id"]),
+                relationship="supplies_material",
+                material=shared[0] if shared else "unknown",
+            )
+            edge_count["up_bgm"] += 1
 
     # ── Midstream-BGM → Midstream-Cell（关键词匹配 + 地理最近 K_BGM_CELL）──
     for _, b_row in bgm.iterrows():
@@ -206,6 +231,82 @@ def build_graph(df: pd.DataFrame):
             )
             edge_count["cell_down"] += 1
 
+    # ── Verifizierte reale Lieferbeziehungen (manuelle, quellenbelegte Ausnahme) ──
+    # Alle bisherigen Kanten sind Simulation (Keyword-Matching + geografische Nähe) —
+    # das bleibt die allgemeine Methodik für die restlichen ~380 Facilities. Für eine
+    # nachvollziehbare Demo-/Testszenario-Story (S3, siehe tests/conftest.py) wurde
+    # geprüft, ob eines der öffentlich bekannten realen Kundenverhältnisse zufällig mit
+    # der simulierten Kante übereinstimmt (Panasonic->Tesla, SK Battery America->Ford/VW).
+    # In beiden Fällen war das NICHT so (2026-07-31 verifiziert). Für Toyotas eigene
+    # Zellfabrik (TBMNC, Liberty NC) -> Toyotas eigenes Montagewerk (Georgetown KY) stimmte
+    # die simulierte Kante ebenfalls nicht — ABER die reale Beziehung ist gut dokumentiert
+    # (laufende Lieferungen seit Werkseröffnung, siehe Quelle unten) und wird daher als
+    # eigene verifizierte Kante ergänzt. Alle Kanten hier sind kleine, einzeln
+    # quellenbelegte Ausnahmen, nicht eine generelle Methodikänderung — der Rest des
+    # Graphen (~380 Facilities) bleibt rein simuliert. Beide Endpunkte jeder Kante sind
+    # reale NAATBatt-Einträge; nur die Kante selbst ist neu und entsprechend als
+    # `relationship="verified_real_supply"` markiert (nicht "supplies_cells" wie die
+    # simulierten Kanten), damit sie im Graph unterscheidbar bleibt.
+    VERIFIED_REAL_SUPPLY_LINKS = [
+        {
+            "source_company": "Panasonic", "source_city": "De Soto",
+            "target_company": "Tesla", "target_city": "Austin",
+            "source_note": "Panasonic De Soto, KS built primarily to supply Tesla "
+                            "— InsideEVs, https://insideevs.com/news/765796/"
+                            "panasonic-worlds-largest-battery-plant-tesla-kansas/",
+        },
+        {
+            # 2026-07-31 via WebSearch verifiziert: "At full capacity, the facility will
+            # produce 70 batteries per second for Tesla, Toyota, Lucid, Hexagon Purus and
+            # Harbinger Motors" (InsideEVs). Von diesen 5 sind nur Tesla, Toyota und Lucid
+            # Motors überhaupt als NA-Facility in facilities_clean.csv vorhanden.
+            "source_company": "Panasonic", "source_city": "De Soto",
+            "target_company": "Toyota", "target_city": "Georgetown",
+            "source_note": "Panasonic De Soto, KS also supplies Toyota "
+                            "— InsideEVs, https://insideevs.com/news/765796/"
+                            "panasonic-worlds-largest-battery-plant-tesla-kansas/",
+        },
+        {
+            "source_company": "Panasonic", "source_city": "De Soto",
+            "target_company": "Lucid Motors", "target_city": "Casa Grande",
+            "source_note": "Panasonic De Soto, KS also supplies Lucid Motors "
+                            "— InsideEVs, https://insideevs.com/news/765796/"
+                            "panasonic-worlds-largest-battery-plant-tesla-kansas/",
+        },
+        {
+            # 2026-07-31 via WebSearch verifiziert: Toyota begann Lithium-Batterien vom
+            # NC-Werk zum KY-Montagewerk zu liefern, erste Lieferungen für den Camry HEV
+            # (Automotive Logistics). Reale, eigene vertikal integrierte Lieferkette —
+            # nicht nur ein zusätzlicher externer Kunde wie oben.
+            "source_company": "Toyota", "source_city": "Liberty",
+            "target_company": "Toyota", "target_city": "Georgetown",
+            "source_note": "Toyota Battery Manufacturing North Carolina (TBMNC) ships "
+                            "batteries to Toyota's Georgetown, KY assembly plant "
+                            "— Automotive Logistics, https://www.automotivelogistics.media/"
+                            "nearshoring/toyota-is-making-its-own-batteries-at-a-plant-in-"
+                            "north-carolina-and-will-be-begin-local-supply-in-april/213940",
+        },
+    ]
+    for link in VERIFIED_REAL_SUPPLY_LINKS:
+        src_rows = cell[(cell["company"].str.strip() == link["source_company"]) &
+                         (cell["city"] == link["source_city"])]
+        tgt_rows = down[(down["company"].str.strip() == link["target_company"]) &
+                         (down["city"] == link["target_city"])]
+        if src_rows.empty or tgt_rows.empty:
+            continue  # facility renamed/removed in a later NAATBatt version — skip, don't crash
+        src_id = str(src_rows.iloc[0]["facility_id"])
+        tgt_id = str(tgt_rows.iloc[0]["facility_id"])
+        G.add_edge(
+            src_id, tgt_id,
+            relationship="verified_real_supply",
+            material="battery_cells",
+            citation=link["source_note"],  # NOT "source" — collides with graph_to_json()'s
+                                            # edge "source" (node id) field and silently
+                                            # corrupts the edge on serialization (found
+                                            # 2026-07-31 while adding this exact edge).
+        )
+        edge_count["cell_down"] += 1
+
     return G, edge_count
 
 
@@ -218,7 +319,10 @@ def graph_to_json(G: nx.DiGraph) -> dict:
             "total_nodes": G.number_of_nodes(),
             "total_edges": G.number_of_edges(),
             "created_at": str(date.today()),
-            "edge_params": {"K_NEAR": K_NEAR, "K_FAR": K_FAR, "K_BGM_CELL": K_BGM_CELL},
+            "edge_params": {
+                "K_NEAR": K_NEAR, "K_FAR": K_FAR,
+                "K_BGM_CELL": K_BGM_CELL, "K_UPSTREAM_BGM": K_UPSTREAM_BGM,
+            },
             "edge_source": "All edges simulated: keyword matching + geographic proximity. NAATBatt contains no real supplier links.",
             "segments": ["Upstream", "Midstream-BGM", "Midstream-Cell", "Downstream"],
         },

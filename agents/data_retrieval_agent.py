@@ -93,7 +93,18 @@ def run_data_retrieval_agent(state: PipelineState) -> PipelineState:
     # Only facilities that carry this material keyword and have real capacity data.
     # Scoped per segment: Upstream (MT/yr) and Midstream-Cell (GWh/yr) use different
     # units and must not be summed together (see CapacityShare comment below).
-    material_rows = df[df["material_keywords"].str.contains(material, na=False)]
+    #
+    # Guard (2026-07-31): pandas .str.contains("") is True for every non-null string —
+    # an empty/missing material (facility-specific disruption events, e.g. Strategy B,
+    # carry no affected_material) would otherwise match every one of the 386 facilities,
+    # inflating the capacity denominators with unrelated materials instead of correctly
+    # yielding "not applicable" (CapacityShare/capacity % already degrade gracefully to 0
+    # for a zero/empty denominator — see _capacity_share() below). Same bug class as
+    # _material_match()'s guard in network_agent.py.
+    material_rows = (
+        df[df["material_keywords"].str.contains(material, na=False)] if material
+        else df.iloc[0:0]
+    )
     total_capacity_by_segment: dict[str, float] = {
         seg: material_rows[material_rows["supply_chain_segment"] == seg][
             "production_capacity_raw"
@@ -155,6 +166,19 @@ def run_data_retrieval_agent(state: PipelineState) -> PipelineState:
         else:
             cap_share = 0.0
 
+        # SingleSourceDependency (2026-07-31): Downstream has no comparable capacity unit
+        # for CapacityShare (see above), so that Vulnerability slot sits idle at 0.0 for
+        # every Downstream facility. Substitutes graph connectivity instead — how many
+        # distinct Midstream-Cell suppliers does this Downstream node have in the graph.
+        # Fewer suppliers = more exposed if any one of them is disrupted. NA-graph-scope
+        # caveat applies (see FacilityData docstring in state.py) — only used in place of
+        # capacity_share for Downstream in synthesis_agent.py::_compute_scores.
+        if seg == "Downstream":
+            supplier_count = node.get("cell_supplier_count", 0)
+            single_source_dependency = 1.0 / supplier_count if supplier_count > 0 else 0.0
+        else:
+            single_source_dependency = 0.0
+
         # AltCapacityRatio: same tier comparability rule as CapacityShare.
         # Upstream (MT/yr) and Midstream-Cell (GWh/yr) are comparable within tier.
         # Unknown capacity or incompatible tier → ResilienceDiscount = 0 (conservative).
@@ -174,6 +198,7 @@ def run_data_retrieval_agent(state: PipelineState) -> PipelineState:
             import_dep=import_dep,
             lead_time_norm=lead_time_norm,
             capacity_share=cap_share,
+            single_source_dependency=single_source_dependency,
             resilience_discount=resilience_discount,
         )
 

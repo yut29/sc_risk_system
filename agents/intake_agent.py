@@ -5,12 +5,14 @@ Input (from PipelineState):
   raw_input    : str   news article (Trigger A) or user query (Trigger B)
 
 Output (written to PipelineState):
-  relevant     : bool
-  trigger_type : "A" | "B"
-  material     : str    e.g. "cobalt"
-  region       : str    e.g. "Africa/DRC"
-  keywords     : list[str]
-  filtered_text: str    cleaned, relevant excerpt
+  relevant           : bool
+  trigger_type       : "A" | "B"
+  material           : str    e.g. "cobalt"
+  region             : str    e.g. "Africa/DRC"
+  keywords           : list[str]
+  filtered_text      : str    cleaned, relevant excerpt
+  mentioned_company  : str | None   e.g. "Panasonic" (facility-specific incidents only)
+  mentioned_location : str | None   e.g. "Kansas" (city/state named alongside the company)
 """
 
 import os
@@ -69,6 +71,8 @@ JSON schema:
   "region": "<affected supply region, or empty string>",
   "keywords": ["<keyword1>", "<keyword2>", ...],
   "filtered_text": "<the most relevant 2-3 sentences from the input, or the full input if short>",
+  "mentioned_company": "<specific company/facility operator named in the text, or null>",
+  "mentioned_location": "<city or state named alongside that company, or null>",
   "reasoning": "<one sentence explaining relevance decision>"
 }
 
@@ -78,6 +82,13 @@ Rules:
 - trigger_type "A" = the input looks like a news article; "B" = a direct user question/query
 - material must be one of: cobalt, lithium, nickel, manganese, graphite, copper — or empty
 - If not relevant, set material="", region="", keywords=[], filtered_text=""
+- mentioned_company: only set this for a FACILITY-SPECIFIC incident (a named company's own plant/mine
+  having a fire, strike, shutdown, quality recall, etc.) — NOT for a general regional/material event
+  like a country restricting exports. If the text names a company but the event is a regional/material
+  disruption (e.g. "Chile restricts lithium exports, affecting Albemarle's supply"), still set
+  mentioned_company=null — Albemarle is a downstream effect, not the origin of this event.
+- mentioned_location: the specific city/state of the named facility, if the text says so. Do not
+  invent one — if the text only names the company without a location, leave this null.
 """
 
 USER_PROMPT_TEMPLATE = """Analyze this input:
@@ -112,12 +123,21 @@ def run_intake_agent(state: PipelineState) -> PipelineState:
     keywords: list[str] = parsed.get("keywords", [])
     filtered_text: str  = parsed.get("filtered_text", raw_input)
 
+    mentioned_company  = parsed.get("mentioned_company") or None
+    mentioned_location = parsed.get("mentioned_location") or None
+    if isinstance(mentioned_company, str):
+        mentioned_company = mentioned_company.strip() or None
+    if isinstance(mentioned_location, str):
+        mentioned_location = mentioned_location.strip() or None
+
     return {
         **state,
-        "relevant":      relevant,
-        "trigger_type":  trigger_type,
-        "material":      material,
-        "region":        region,
-        "keywords":      keywords,
-        "filtered_text": filtered_text,
+        "relevant":           relevant,
+        "trigger_type":       trigger_type,
+        "material":           material,
+        "region":             region,
+        "keywords":           keywords,
+        "filtered_text":      filtered_text,
+        "mentioned_company":  mentioned_company,
+        "mentioned_location": mentioned_location,
     }

@@ -80,10 +80,21 @@ def _compute_scores(state: PipelineState) -> tuple[dict[str, float], list[Facili
 
         tw = tier_weights.get(nid, 0.35)
 
+        # Downstream has no comparable capacity unit for CapacityShare (vehicle/pack
+        # counts, not MT or GWh — see data_retrieval_agent.py), so that slot would
+        # otherwise sit at a dead 0.0 for every Downstream facility, making them
+        # indistinguishable from each other. Substitutes SingleSourceDependency (2026-07-31,
+        # 1/cell_supplier_count — see FacilityData docstring in state.py) in the same
+        # weighted slot for Downstream only; Upstream/Midstream-Cell keep the original
+        # CapacityShare, Midstream-BGM keeps the existing 0.0 (still not comparable).
+        capacity_term = (
+            float(fd.get("single_source_dependency", 0.0)) if node.get("segment") == "Downstream"
+            else float(fd["capacity_share"])
+        )
         vulnerability = (
             VULNERABILITY_WEIGHTS["import_dependency"]  * float(fd["import_dep"])
             + VULNERABILITY_WEIGHTS["supplier_concentration"] * float(fd["supplier_concentration"])
-            + VULNERABILITY_WEIGHTS["capacity_share"]     * float(fd["capacity_share"])
+            + VULNERABILITY_WEIGHTS["capacity_share"]     * capacity_term
             + VULNERABILITY_WEIGHTS["lead_time_norm"]     * float(fd["lead_time_norm"])
         )
 
@@ -361,19 +372,90 @@ def _no_seed_found_report(state: PipelineState) -> PipelineState:
         "## System Limitation Notice\n\n"
         f"This event (material: {material or 'unknown'}, region: {region or 'unknown'}, "
         f"risk type: {state.get('risk_type', 'unknown')}, severity: {state.get('severity', '?')}/5) "
-        "could not be classified into the one event type this system currently supports — an "
-        "import-dependent raw-material disruption originating abroad, matched via "
-        "`import_dependency` + `import_origin_region`.\n\n"
-        "**This is NOT a \"no North American exposure\" finding.** It means this event's "
-        "material/region combination did not match any facility's import profile in the current "
-        "model. Likely reasons: a facility-specific incident (a named plant disruption), a domestic "
-        "tier-wide issue without a foreign origin, or a logistics/port event — none of which the "
-        "current rule-based matching (Strategy A) can detect. See `docs/architecture.md`, "
-        "\"Bekannte Grenzen des Seeding-Mechanismus\", for supported vs. unsupported event types.\n\n"
+        "could not be classified into either event type this system currently supports: (1) an "
+        "import-dependent raw-material disruption originating abroad (matched via "
+        "`import_dependency` + `import_origin_region`), or (2) a facility-specific disruption at a "
+        "named company (matched via company-name/location resolution).\n\n"
+        "**This is NOT a \"no North American exposure\" finding.** It means this event didn't match "
+        "either supported pattern. Likely reasons: a domestic tier-wide issue without a foreign "
+        "origin, or a logistics/port event — neither of which the current matching strategies can "
+        "detect. See `docs/architecture.md`, \"Bekannte Grenzen des Seeding-Mechanismus\", for "
+        "supported vs. unsupported event types.\n\n"
         "**Recommendation: this case requires manual review.** Do not treat the absence of results "
         "as evidence of no risk.\n\n"
         f"Assessment reason (from Risk Assessment Agent): {state.get('reason', 'n/a')}\n\n"
         "Source: NAATBatt facility data — no matching facility found."
+    )
+    return {
+        **state,
+        "risk_report":      report,
+        "top3_facilities":  [],
+        "risk_scores":      {},
+        "global_metrics":   _compute_global_metrics(state),
+        "risk_tier_counts": {"high": 0, "medium": 0, "low": 0},
+    }
+
+
+def _entity_ambiguous_report(state: PipelineState) -> PipelineState:
+    """
+    Deterministic short-circuit for seed_generation_status="entity_ambiguous" — a
+    company was recognized in the text, but it has multiple facilities in the graph
+    and the mentioned location (if any) wasn't enough to resolve it to exactly one.
+    Same rationale as _no_seed_found_report: no LLM call, no risk of self-contradiction.
+    """
+    company = state.get("mentioned_company", "unknown")
+    location = state.get("mentioned_location")
+    location_clause = (
+        f'the mentioned location ("{location}") did not' if location
+        else "no location was mentioned to"
+    )
+    report = (
+        "## System Limitation Notice — Ambiguous Facility Reference\n\n"
+        f"The text named a company (\"{company}\") that has multiple facilities in the current "
+        f"network, and {location_clause} "
+        "narrow this down to exactly one.\n\n"
+        "**This system does not guess which facility is meant.** Picking one arbitrarily could "
+        "misattribute the disruption to the wrong site. See `docs/architecture.md`, \"Vorschlag: "
+        "Multi-Strategie Seed Generator\", for the entity-matching design (deliberately scoped to "
+        "not include company-alias mapping or automatic disambiguation).\n\n"
+        "**Recommendation: this case requires manual review** — identify the specific facility "
+        f"(e.g. city/state) and re-run the analysis with that detail included.\n\n"
+        f"Assessment reason (from Risk Assessment Agent): {state.get('reason', 'n/a')}\n\n"
+        "Source: NAATBatt facility data — company matched, facility ambiguous."
+    )
+    return {
+        **state,
+        "risk_report":      report,
+        "top3_facilities":  [],
+        "risk_scores":      {},
+        "global_metrics":   _compute_global_metrics(state),
+        "risk_tier_counts": {"high": 0, "medium": 0, "low": 0},
+    }
+
+
+def _entity_non_material_report(state: PipelineState) -> PipelineState:
+    """
+    Deterministic short-circuit for seed_generation_status="entity_non_material" — the
+    named company resolved to exactly one facility, but that facility is a mechanical/
+    safety/BMS component supplier (marked `non_active_material`, docs/open_issues.md
+    P16), not a processor of any risk material this system tracks (cobalt, lithium,
+    nickel, graphite, manganese). Same rationale as the other short-circuits: no LLM
+    call, no risk of a fabricated material-flow narrative for a facility that doesn't
+    handle raw materials at all.
+    """
+    company = state.get("mentioned_company", "unknown")
+    report = (
+        "## System Limitation Notice — Non-Material Facility\n\n"
+        f"The text named a company (\"{company}\") that was resolved to exactly one facility in "
+        "the current network, but this facility is a mechanical/safety/component supplier "
+        "(e.g. adhesives, thermal systems, cell lid assemblies, BMS modules) — it does not process "
+        "any of the raw materials this system tracks (cobalt, lithium, nickel, graphite, "
+        "manganese).\n\n"
+        "**This system models raw-material supply-chain risk, not general component/BOM "
+        "disruption.** A disruption at this facility may still be operationally significant, but it "
+        "falls outside this system's material-flow risk model and no propagation is computed.\n\n"
+        f"Assessment reason (from Risk Assessment Agent): {state.get('reason', 'n/a')}\n\n"
+        "Source: NAATBatt facility data — company matched, facility is not material-active."
     )
     return {
         **state,
@@ -390,8 +472,13 @@ def run_synthesis_agent(state: PipelineState) -> PipelineState:
     LangGraph-compatible node function.
     Computes RiskScores deterministically, then generates narrative via LLM.
     """
-    if state.get("seed_generation_status") == "no_seed_found":
+    status = state.get("seed_generation_status")
+    if status == "no_seed_found":
         return _no_seed_found_report(state)
+    if status == "entity_ambiguous":
+        return _entity_ambiguous_report(state)
+    if status == "entity_non_material":
+        return _entity_non_material_report(state)
 
     risk_scores, top3 = _compute_scores(state)
     global_metrics    = _compute_global_metrics(state)

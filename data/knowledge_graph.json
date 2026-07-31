@@ -1,12 +1,13 @@
 {
   "metadata": {
     "total_nodes": 386,
-    "total_edges": 1537,
-    "created_at": "2026-07-20",
+    "total_edges": 996,
+    "created_at": "2026-07-31",
     "edge_params": {
       "K_NEAR": 5,
       "K_FAR": 3,
-      "K_BGM_CELL": 6
+      "K_BGM_CELL": 6,
+      "K_UPSTREAM_BGM": 6
     },
     "edge_source": "All edges simulated: keyword matching + geographic proximity. NAATBatt contains no real supplier links.",
     "segments": [
@@ -1603,7 +1604,7 @@
       "facility_name": "ABSL Power Solutions, Inc.",
       "segment": "Midstream-Cell",
       "product_type": "Other/ Unknown cells",
-      "material_keywords": "nan",
+      "material_keywords": "lithium",
       "country": "US",
       "state": "CO",
       "city": "Longmont",
@@ -1613,8 +1614,8 @@
       "production_units": "nan",
       "capacity_source": "unknown",
       "supplier_concentration": false,
-      "import_dependency": false,
-      "import_origin_region": "nan",
+      "import_dependency": true,
+      "import_origin_region": "Australia",
       "lead_time_weeks": 6
     },
     {
@@ -1663,7 +1664,7 @@
       "facility_name": "ALEC",
       "segment": "Midstream-Cell",
       "product_type": "Other/ Unknown cells",
-      "material_keywords": "nan",
+      "material_keywords": "lithium",
       "country": "US",
       "state": "CA",
       "city": "Vista",
@@ -1673,8 +1674,8 @@
       "production_units": "GWh/yr",
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
-      "import_dependency": false,
-      "import_origin_region": "nan",
+      "import_dependency": true,
+      "import_origin_region": "South America (Chile/Argentina)",
       "lead_time_weeks": 6
     },
     {
@@ -1703,7 +1704,7 @@
       "facility_name": "Ateios Systems",
       "segment": "Midstream-Cell",
       "product_type": "LIB Manufacturing",
-      "material_keywords": "nan",
+      "material_keywords": "lithium",
       "country": "US",
       "state": "IN",
       "city": "Newberry",
@@ -1713,8 +1714,8 @@
       "production_units": "GWh/yr",
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
-      "import_dependency": false,
-      "import_origin_region": "nan",
+      "import_dependency": true,
+      "import_origin_region": "South America (Chile/Argentina)",
       "lead_time_weeks": 6
     },
     {
@@ -2063,7 +2064,7 @@
       "facility_name": "Nanotech Energy",
       "segment": "Midstream-Cell",
       "product_type": "Cylindrical cells",
-      "material_keywords": "nan",
+      "material_keywords": "lithium",
       "country": "US",
       "state": "CA",
       "city": "Los Angeles",
@@ -2073,8 +2074,8 @@
       "production_units": "GWh/yr",
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
-      "import_dependency": false,
-      "import_origin_region": "nan",
+      "import_dependency": true,
+      "import_origin_region": "Other / Diversified",
       "lead_time_weeks": 6
     },
     {
@@ -2123,7 +2124,7 @@
       "facility_name": "Nuvvon US Lab",
       "segment": "Midstream-Cell",
       "product_type": "Cell",
-      "material_keywords": "nan",
+      "material_keywords": "lithium,nickel",
       "country": "US",
       "state": "NJ",
       "city": "Parsippany",
@@ -2133,8 +2134,8 @@
       "production_units": "Ah",
       "capacity_source": "unknown",
       "supplier_concentration": false,
-      "import_dependency": false,
-      "import_origin_region": "nan",
+      "import_dependency": true,
+      "import_origin_region": "South America (Chile/Argentina)",
       "lead_time_weeks": 6
     },
     {
@@ -2243,7 +2244,7 @@
       "facility_name": "Auburn Hills",
       "segment": "Midstream-Cell",
       "product_type": "Prismatic metal can cells",
-      "material_keywords": "nan",
+      "material_keywords": "lithium,nmc,cobalt,nickel,manganese",
       "country": "US",
       "state": "MI",
       "city": "Auburn Hills",
@@ -2252,9 +2253,9 @@
       "production_capacity_raw": "nan",
       "production_units": "GWh/yr",
       "capacity_source": "unknown",
-      "supplier_concentration": false,
-      "import_dependency": false,
-      "import_origin_region": "nan",
+      "supplier_concentration": true,
+      "import_dependency": true,
+      "import_origin_region": "South America (Chile/Argentina)",
       "lead_time_weeks": 6
     },
     {
@@ -2283,7 +2284,7 @@
       "facility_name": "Solid Power",
       "segment": "Midstream-Cell",
       "product_type": "Other/ Unknown cells",
-      "material_keywords": "nan",
+      "material_keywords": "lithium,nmc,cobalt,nickel,manganese",
       "country": "US",
       "state": "CO",
       "city": "Louisville",
@@ -2292,9 +2293,9 @@
       "production_capacity_raw": "1",
       "production_units": "GWh/yr",
       "capacity_source": "naatbatt",
-      "supplier_concentration": false,
-      "import_dependency": false,
-      "import_origin_region": "nan",
+      "supplier_concentration": true,
+      "import_dependency": true,
+      "import_origin_region": "South America (Chile/Argentina)",
       "lead_time_weeks": 6
     },
     {
@@ -5243,7 +5244,7 @@
       "facility_name": "Auburn Hills",
       "segment": "Downstream",
       "product_type": "Cell Assemblies/ Groupings",
-      "material_keywords": "nan",
+      "material_keywords": "lithium,nmc,cobalt,nickel,manganese",
       "country": "US",
       "state": "MI",
       "city": "Auburn Hills",
@@ -5252,9 +5253,9 @@
       "production_capacity_raw": "nan",
       "production_units": "nan",
       "capacity_source": "unknown",
-      "supplier_concentration": false,
-      "import_dependency": false,
-      "import_origin_region": "nan",
+      "supplier_concentration": true,
+      "import_dependency": true,
+      "import_origin_region": "Other / Diversified",
       "lead_time_weeks": 4
     },
     {
@@ -5263,7 +5264,7 @@
       "facility_name": "Auburn Hills",
       "segment": "Downstream",
       "product_type": "Cell Assemblies/ Groupings",
-      "material_keywords": "nan",
+      "material_keywords": "lithium,nmc,cobalt,nickel,manganese",
       "country": "US",
       "state": "MI",
       "city": "Auburn Hills",
@@ -5272,9 +5273,9 @@
       "production_capacity_raw": "nan",
       "production_units": "nan",
       "capacity_source": "unknown",
-      "supplier_concentration": false,
-      "import_dependency": false,
-      "import_origin_region": "nan",
+      "supplier_concentration": true,
+      "import_dependency": true,
+      "import_origin_region": "Other / Diversified",
       "lead_time_weeks": 4
     },
     {
@@ -6543,7 +6544,7 @@
       "facility_name": "nan",
       "segment": "Midstream-Cell",
       "product_type": "Cell groupings",
-      "material_keywords": "nan",
+      "material_keywords": "non_active_material",
       "country": "US",
       "state": "ID",
       "city": "Rathdrum",
@@ -6583,7 +6584,7 @@
       "facility_name": "3M Guin",
       "segment": "Midstream-BGM",
       "product_type": "Other",
-      "material_keywords": "nan",
+      "material_keywords": "non_active_material",
       "country": "US",
       "state": "AL",
       "city": "Guin",
@@ -6603,7 +6604,7 @@
       "facility_name": "3M Cottage Grove",
       "segment": "Midstream-BGM",
       "product_type": "Other",
-      "material_keywords": "nan",
+      "material_keywords": "non_active_material",
       "country": "US",
       "state": "MN",
       "city": "Cottage Grove",
@@ -6623,7 +6624,7 @@
       "facility_name": "3M Springfield",
       "segment": "Midstream-Cell",
       "product_type": "Non-cell Components",
-      "material_keywords": "nan",
+      "material_keywords": "non_active_material",
       "country": "US",
       "state": "MO",
       "city": "Springfield",
@@ -6643,7 +6644,7 @@
       "facility_name": "ADA Technologies, Inc.",
       "segment": "Midstream-Cell",
       "product_type": "Non-cell Components",
-      "material_keywords": "nan",
+      "material_keywords": "non_active_material",
       "country": "US",
       "state": "CO",
       "city": "Littleton",
@@ -6763,7 +6764,7 @@
       "facility_name": "Arlanxeo",
       "segment": "Midstream-Cell",
       "product_type": "Cell components",
-      "material_keywords": "nan",
+      "material_keywords": "non_active_material",
       "country": "Canada",
       "state": "ON",
       "city": "Sarina",
@@ -6843,7 +6844,7 @@
       "facility_name": "Performance Tapes Division",
       "segment": "Midstream-Cell",
       "product_type": "Cell components",
-      "material_keywords": "nan",
+      "material_keywords": "non_active_material",
       "country": "US",
       "state": "OH",
       "city": "Painesville",
@@ -7383,7 +7384,7 @@
       "facility_name": "IntriPlex Technologies\n",
       "segment": "Midstream-Cell",
       "product_type": "Cell components",
-      "material_keywords": "nan",
+      "material_keywords": "non_active_material",
       "country": "US",
       "state": "CA",
       "city": "Santa Barbara",
@@ -7741,79 +7742,7 @@
   "edges": [
     {
       "source": "1003",
-      "target": "2022",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1003",
-      "target": "2023",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1003",
-      "target": "2029",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1003",
-      "target": "2030",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1003",
-      "target": "2031",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1003",
-      "target": "2032",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1003",
-      "target": "2058",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1003",
-      "target": "2084",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1003",
-      "target": "2087",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1003",
-      "target": "2095",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1003",
-      "target": "2104",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1003",
-      "target": "2135",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1003",
-      "target": "2142",
+      "target": "3016",
       "relationship": "supplies_material",
       "material": "lithium"
     },
@@ -7825,79 +7754,13 @@
     },
     {
       "source": "1003",
-      "target": "11007",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1003",
-      "target": "11008",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1003",
-      "target": "11009",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1003",
-      "target": "11010",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1003",
-      "target": "11011",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1003",
-      "target": "3016",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1003",
-      "target": "3033",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1003",
-      "target": "3041",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1003",
-      "target": "3045",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1003",
-      "target": "3060",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1003",
-      "target": "3061",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1003",
-      "target": "3069",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1003",
       "target": "3076",
+      "relationship": "supplies_material",
+      "material": "lithium"
+    },
+    {
+      "source": "1003",
+      "target": "2135",
       "relationship": "supplies_material",
       "material": "lithium"
     },
@@ -7909,13 +7772,7 @@
     },
     {
       "source": "1003",
-      "target": "3093",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1003",
-      "target": "3094",
+      "target": "2084",
       "relationship": "supplies_material",
       "material": "lithium"
     },
@@ -7933,133 +7790,7 @@
     },
     {
       "source": "1004",
-      "target": "2029",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1004",
-      "target": "2030",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1004",
-      "target": "2031",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1004",
-      "target": "2032",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1004",
-      "target": "2058",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1004",
-      "target": "2084",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1004",
-      "target": "2087",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1004",
-      "target": "2095",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1004",
       "target": "2104",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1004",
-      "target": "2135",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1004",
-      "target": "2142",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1004",
-      "target": "11002",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1004",
-      "target": "11007",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1004",
-      "target": "11008",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1004",
-      "target": "11009",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1004",
-      "target": "11010",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1004",
-      "target": "11011",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1004",
-      "target": "3016",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1004",
-      "target": "3033",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1004",
-      "target": "3041",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1004",
-      "target": "3045",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1004",
-      "target": "3060",
       "relationship": "supplies_material",
       "material": "lithium"
     },
@@ -8071,145 +7802,13 @@
     },
     {
       "source": "1004",
-      "target": "3069",
+      "target": "3045",
       "relationship": "supplies_material",
       "material": "lithium"
     },
     {
       "source": "1004",
-      "target": "3076",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1004",
-      "target": "3082",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1004",
-      "target": "3093",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1004",
-      "target": "3094",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1015",
-      "target": "2022",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1015",
-      "target": "2023",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1015",
-      "target": "2029",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1015",
-      "target": "2030",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1015",
-      "target": "2031",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1015",
-      "target": "2032",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1015",
-      "target": "2058",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1015",
-      "target": "2084",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1015",
-      "target": "2087",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1015",
-      "target": "2095",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1015",
-      "target": "2104",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1015",
-      "target": "2135",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1015",
-      "target": "2142",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1015",
-      "target": "11002",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1015",
-      "target": "11007",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1015",
-      "target": "11008",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1015",
-      "target": "11009",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1015",
-      "target": "11010",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1015",
-      "target": "11011",
+      "target": "3041",
       "relationship": "supplies_material",
       "material": "lithium"
     },
@@ -8221,43 +7820,7 @@
     },
     {
       "source": "1015",
-      "target": "3033",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1015",
-      "target": "3041",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1015",
-      "target": "3045",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1015",
-      "target": "3060",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1015",
-      "target": "3061",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1015",
-      "target": "3069",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1015",
-      "target": "3076",
+      "target": "11002",
       "relationship": "supplies_material",
       "material": "lithium"
     },
@@ -8269,1039 +7832,469 @@
     },
     {
       "source": "1015",
-      "target": "3093",
+      "target": "3076",
       "relationship": "supplies_material",
       "material": "lithium"
     },
     {
       "source": "1015",
-      "target": "3094",
+      "target": "2135",
       "relationship": "supplies_material",
       "material": "lithium"
     },
     {
-      "source": "1018",
-      "target": "2004",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1018",
-      "target": "2013",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1018",
-      "target": "2017",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1018",
-      "target": "2093",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1018",
-      "target": "2098",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1018",
-      "target": "2114",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1018",
-      "target": "2115",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1018",
-      "target": "2116",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1018",
-      "target": "2117",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1018",
-      "target": "2132",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1018",
-      "target": "2133",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1018",
-      "target": "4078",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1018",
-      "target": "11002",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1018",
-      "target": "11012",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1018",
-      "target": "3007",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1025",
-      "target": "2004",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1025",
-      "target": "2013",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1025",
-      "target": "2017",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1025",
-      "target": "2093",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1025",
-      "target": "2098",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1025",
-      "target": "2114",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1025",
-      "target": "2115",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1025",
-      "target": "2116",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1025",
-      "target": "2117",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1025",
-      "target": "2132",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1025",
-      "target": "2133",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1025",
-      "target": "4078",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1025",
-      "target": "11002",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1025",
-      "target": "11012",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1025",
-      "target": "3007",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1027",
-      "target": "2029",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1027",
-      "target": "2030",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1027",
-      "target": "2032",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1027",
-      "target": "2092",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1027",
-      "target": "2095",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1027",
-      "target": "2101",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1027",
-      "target": "2118",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1027",
-      "target": "2142",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1027",
-      "target": "2147",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1027",
-      "target": "2149",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1027",
-      "target": "11008",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1027",
-      "target": "11009",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1028",
-      "target": "2029",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1028",
-      "target": "2030",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1028",
-      "target": "2032",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1028",
-      "target": "2037",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1028",
-      "target": "2095",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1028",
-      "target": "2101",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1028",
-      "target": "2119",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1028",
-      "target": "2142",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1028",
-      "target": "2148",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1028",
-      "target": "2150",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1028",
-      "target": "11008",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1028",
-      "target": "11009",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1028",
-      "target": "11011",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1029",
-      "target": "2029",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1029",
-      "target": "2030",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1029",
-      "target": "2032",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1029",
-      "target": "2092",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1029",
-      "target": "2095",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1029",
-      "target": "2101",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1029",
-      "target": "2118",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1029",
-      "target": "2142",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1029",
-      "target": "2147",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1029",
-      "target": "2149",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1029",
-      "target": "11008",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1029",
-      "target": "11009",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1030",
-      "target": "2029",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1030",
-      "target": "2030",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1030",
-      "target": "2032",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1030",
-      "target": "2037",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1030",
-      "target": "2095",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1030",
-      "target": "2101",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1030",
-      "target": "2119",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1030",
-      "target": "2142",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1030",
-      "target": "2148",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1030",
-      "target": "2150",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1030",
-      "target": "11008",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1030",
-      "target": "11009",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1030",
-      "target": "11011",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1044",
-      "target": "2029",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1044",
-      "target": "2030",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1044",
-      "target": "2032",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1044",
-      "target": "2092",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1044",
-      "target": "2095",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1044",
-      "target": "2101",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1044",
-      "target": "2118",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1044",
-      "target": "2142",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1044",
-      "target": "2147",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1044",
-      "target": "2149",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1044",
-      "target": "11008",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1044",
-      "target": "11009",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1045",
-      "target": "2029",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1045",
-      "target": "2030",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1045",
-      "target": "2032",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1045",
-      "target": "2092",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1045",
-      "target": "2095",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1045",
-      "target": "2101",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1045",
-      "target": "2118",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1045",
-      "target": "2142",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1045",
-      "target": "2147",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1045",
-      "target": "2149",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1045",
-      "target": "11008",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1045",
-      "target": "11009",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1050",
-      "target": "2029",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1050",
-      "target": "2030",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1050",
-      "target": "2032",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1050",
-      "target": "2037",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1050",
-      "target": "2095",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1050",
-      "target": "2101",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1050",
-      "target": "2119",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1050",
-      "target": "2142",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1050",
-      "target": "2148",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1050",
-      "target": "2150",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1050",
-      "target": "11008",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1050",
-      "target": "11009",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1050",
-      "target": "11011",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1051",
-      "target": "2029",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1051",
-      "target": "2030",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1051",
-      "target": "2032",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1051",
-      "target": "2037",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1051",
-      "target": "2095",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1051",
-      "target": "2101",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1051",
-      "target": "2119",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1051",
-      "target": "2142",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1051",
-      "target": "2148",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1051",
-      "target": "2150",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1051",
-      "target": "11008",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1051",
-      "target": "11009",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1051",
-      "target": "11011",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1062",
-      "target": "2004",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1062",
-      "target": "2013",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1062",
-      "target": "2017",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1062",
-      "target": "2093",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1062",
-      "target": "2098",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1062",
-      "target": "2114",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1062",
-      "target": "2115",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1062",
-      "target": "2116",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1062",
-      "target": "2117",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1062",
-      "target": "2132",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1062",
-      "target": "2133",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1062",
-      "target": "4078",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1062",
-      "target": "11002",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1062",
-      "target": "11012",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1062",
-      "target": "3007",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1064",
-      "target": "2004",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1064",
-      "target": "2013",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1064",
-      "target": "2017",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1064",
-      "target": "2093",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1064",
-      "target": "2098",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1064",
-      "target": "2114",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1064",
-      "target": "2115",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1064",
-      "target": "2116",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1064",
-      "target": "2117",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1064",
-      "target": "2132",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1064",
-      "target": "2133",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1064",
-      "target": "4078",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1064",
-      "target": "11002",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1064",
-      "target": "11012",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1064",
-      "target": "3007",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1069",
-      "target": "2022",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1069",
-      "target": "2023",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1069",
-      "target": "2029",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1069",
-      "target": "2030",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1069",
-      "target": "2031",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1069",
-      "target": "2032",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1069",
-      "target": "2058",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1069",
+      "source": "1015",
       "target": "2084",
       "relationship": "supplies_material",
       "material": "lithium"
     },
     {
+      "source": "1018",
+      "target": "2117",
+      "relationship": "supplies_material",
+      "material": "graphite"
+    },
+    {
+      "source": "1018",
+      "target": "2013",
+      "relationship": "supplies_material",
+      "material": "graphite"
+    },
+    {
+      "source": "1018",
+      "target": "11002",
+      "relationship": "supplies_material",
+      "material": "graphite"
+    },
+    {
+      "source": "1018",
+      "target": "3007",
+      "relationship": "supplies_material",
+      "material": "graphite"
+    },
+    {
+      "source": "1018",
+      "target": "2133",
+      "relationship": "supplies_material",
+      "material": "graphite"
+    },
+    {
+      "source": "1018",
+      "target": "2132",
+      "relationship": "supplies_material",
+      "material": "graphite"
+    },
+    {
+      "source": "1025",
+      "target": "2017",
+      "relationship": "supplies_material",
+      "material": "graphite"
+    },
+    {
+      "source": "1025",
+      "target": "11012",
+      "relationship": "supplies_material",
+      "material": "graphite"
+    },
+    {
+      "source": "1025",
+      "target": "2004",
+      "relationship": "supplies_material",
+      "material": "graphite"
+    },
+    {
+      "source": "1025",
+      "target": "2116",
+      "relationship": "supplies_material",
+      "material": "graphite"
+    },
+    {
+      "source": "1025",
+      "target": "2115",
+      "relationship": "supplies_material",
+      "material": "graphite"
+    },
+    {
+      "source": "1025",
+      "target": "2093",
+      "relationship": "supplies_material",
+      "material": "graphite"
+    },
+    {
+      "source": "1027",
+      "target": "2147",
+      "relationship": "supplies_material",
+      "material": "nickel"
+    },
+    {
+      "source": "1027",
+      "target": "11008",
+      "relationship": "supplies_material",
+      "material": "nickel"
+    },
+    {
+      "source": "1027",
+      "target": "11009",
+      "relationship": "supplies_material",
+      "material": "nickel"
+    },
+    {
+      "source": "1027",
+      "target": "2142",
+      "relationship": "supplies_material",
+      "material": "nickel"
+    },
+    {
+      "source": "1027",
+      "target": "2029",
+      "relationship": "supplies_material",
+      "material": "nickel"
+    },
+    {
+      "source": "1027",
+      "target": "2030",
+      "relationship": "supplies_material",
+      "material": "nickel"
+    },
+    {
+      "source": "1028",
+      "target": "2148",
+      "relationship": "supplies_material",
+      "material": "cobalt"
+    },
+    {
+      "source": "1028",
+      "target": "11008",
+      "relationship": "supplies_material",
+      "material": "cobalt"
+    },
+    {
+      "source": "1028",
+      "target": "11009",
+      "relationship": "supplies_material",
+      "material": "cobalt"
+    },
+    {
+      "source": "1028",
+      "target": "11011",
+      "relationship": "supplies_material",
+      "material": "cobalt"
+    },
+    {
+      "source": "1028",
+      "target": "2142",
+      "relationship": "supplies_material",
+      "material": "cobalt"
+    },
+    {
+      "source": "1028",
+      "target": "2029",
+      "relationship": "supplies_material",
+      "material": "cobalt"
+    },
+    {
+      "source": "1029",
+      "target": "2147",
+      "relationship": "supplies_material",
+      "material": "nickel"
+    },
+    {
+      "source": "1029",
+      "target": "2142",
+      "relationship": "supplies_material",
+      "material": "nickel"
+    },
+    {
+      "source": "1029",
+      "target": "2029",
+      "relationship": "supplies_material",
+      "material": "nickel"
+    },
+    {
+      "source": "1029",
+      "target": "2030",
+      "relationship": "supplies_material",
+      "material": "nickel"
+    },
+    {
+      "source": "1029",
+      "target": "11008",
+      "relationship": "supplies_material",
+      "material": "nickel"
+    },
+    {
+      "source": "1029",
+      "target": "11009",
+      "relationship": "supplies_material",
+      "material": "nickel"
+    },
+    {
+      "source": "1030",
+      "target": "2148",
+      "relationship": "supplies_material",
+      "material": "cobalt"
+    },
+    {
+      "source": "1030",
+      "target": "2142",
+      "relationship": "supplies_material",
+      "material": "cobalt"
+    },
+    {
+      "source": "1030",
+      "target": "2029",
+      "relationship": "supplies_material",
+      "material": "cobalt"
+    },
+    {
+      "source": "1030",
+      "target": "2030",
+      "relationship": "supplies_material",
+      "material": "cobalt"
+    },
+    {
+      "source": "1030",
+      "target": "11008",
+      "relationship": "supplies_material",
+      "material": "cobalt"
+    },
+    {
+      "source": "1030",
+      "target": "11009",
+      "relationship": "supplies_material",
+      "material": "cobalt"
+    },
+    {
+      "source": "1044",
+      "target": "2029",
+      "relationship": "supplies_material",
+      "material": "nickel"
+    },
+    {
+      "source": "1044",
+      "target": "2030",
+      "relationship": "supplies_material",
+      "material": "nickel"
+    },
+    {
+      "source": "1044",
+      "target": "2147",
+      "relationship": "supplies_material",
+      "material": "nickel"
+    },
+    {
+      "source": "1044",
+      "target": "2142",
+      "relationship": "supplies_material",
+      "material": "nickel"
+    },
+    {
+      "source": "1044",
+      "target": "2032",
+      "relationship": "supplies_material",
+      "material": "nickel"
+    },
+    {
+      "source": "1044",
+      "target": "2101",
+      "relationship": "supplies_material",
+      "material": "nickel"
+    },
+    {
+      "source": "1045",
+      "target": "2029",
+      "relationship": "supplies_material",
+      "material": "nickel"
+    },
+    {
+      "source": "1045",
+      "target": "2030",
+      "relationship": "supplies_material",
+      "material": "nickel"
+    },
+    {
+      "source": "1045",
+      "target": "2147",
+      "relationship": "supplies_material",
+      "material": "nickel"
+    },
+    {
+      "source": "1045",
+      "target": "2142",
+      "relationship": "supplies_material",
+      "material": "nickel"
+    },
+    {
+      "source": "1045",
+      "target": "2032",
+      "relationship": "supplies_material",
+      "material": "nickel"
+    },
+    {
+      "source": "1045",
+      "target": "2101",
+      "relationship": "supplies_material",
+      "material": "nickel"
+    },
+    {
+      "source": "1050",
+      "target": "2119",
+      "relationship": "supplies_material",
+      "material": "cobalt"
+    },
+    {
+      "source": "1050",
+      "target": "2150",
+      "relationship": "supplies_material",
+      "material": "cobalt"
+    },
+    {
+      "source": "1050",
+      "target": "2148",
+      "relationship": "supplies_material",
+      "material": "cobalt"
+    },
+    {
+      "source": "1050",
+      "target": "11008",
+      "relationship": "supplies_material",
+      "material": "cobalt"
+    },
+    {
+      "source": "1050",
+      "target": "11009",
+      "relationship": "supplies_material",
+      "material": "cobalt"
+    },
+    {
+      "source": "1050",
+      "target": "11011",
+      "relationship": "supplies_material",
+      "material": "cobalt"
+    },
+    {
+      "source": "1051",
+      "target": "2101",
+      "relationship": "supplies_material",
+      "material": "cobalt"
+    },
+    {
+      "source": "1051",
+      "target": "2029",
+      "relationship": "supplies_material",
+      "material": "cobalt"
+    },
+    {
+      "source": "1051",
+      "target": "2030",
+      "relationship": "supplies_material",
+      "material": "cobalt"
+    },
+    {
+      "source": "1051",
+      "target": "2032",
+      "relationship": "supplies_material",
+      "material": "cobalt"
+    },
+    {
+      "source": "1051",
+      "target": "2142",
+      "relationship": "supplies_material",
+      "material": "cobalt"
+    },
+    {
+      "source": "1051",
+      "target": "2148",
+      "relationship": "supplies_material",
+      "material": "cobalt"
+    },
+    {
+      "source": "1062",
+      "target": "11012",
+      "relationship": "supplies_material",
+      "material": "graphite"
+    },
+    {
+      "source": "1062",
+      "target": "2017",
+      "relationship": "supplies_material",
+      "material": "graphite"
+    },
+    {
+      "source": "1062",
+      "target": "2093",
+      "relationship": "supplies_material",
+      "material": "graphite"
+    },
+    {
+      "source": "1062",
+      "target": "2004",
+      "relationship": "supplies_material",
+      "material": "graphite"
+    },
+    {
+      "source": "1062",
+      "target": "2116",
+      "relationship": "supplies_material",
+      "material": "graphite"
+    },
+    {
+      "source": "1062",
+      "target": "2115",
+      "relationship": "supplies_material",
+      "material": "graphite"
+    },
+    {
+      "source": "1064",
+      "target": "11012",
+      "relationship": "supplies_material",
+      "material": "graphite"
+    },
+    {
+      "source": "1064",
+      "target": "2017",
+      "relationship": "supplies_material",
+      "material": "graphite"
+    },
+    {
+      "source": "1064",
+      "target": "2116",
+      "relationship": "supplies_material",
+      "material": "graphite"
+    },
+    {
+      "source": "1064",
+      "target": "2093",
+      "relationship": "supplies_material",
+      "material": "graphite"
+    },
+    {
+      "source": "1064",
+      "target": "2115",
+      "relationship": "supplies_material",
+      "material": "graphite"
+    },
+    {
+      "source": "1064",
+      "target": "2004",
+      "relationship": "supplies_material",
+      "material": "graphite"
+    },
+    {
       "source": "1069",
-      "target": "2087",
+      "target": "3016",
       "relationship": "supplies_material",
       "material": "lithium"
     },
     {
       "source": "1069",
-      "target": "2095",
+      "target": "11002",
       "relationship": "supplies_material",
       "material": "lithium"
     },
     {
       "source": "1069",
-      "target": "2104",
+      "target": "3076",
       "relationship": "supplies_material",
       "material": "lithium"
     },
@@ -9313,135 +8306,15 @@
     },
     {
       "source": "1069",
-      "target": "2142",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1069",
-      "target": "11002",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1069",
-      "target": "11007",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1069",
-      "target": "11008",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1069",
-      "target": "11009",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1069",
-      "target": "11010",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1069",
-      "target": "11011",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1069",
-      "target": "3016",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1069",
-      "target": "3033",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1069",
-      "target": "3041",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1069",
-      "target": "3045",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1069",
-      "target": "3060",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1069",
-      "target": "3061",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1069",
-      "target": "3069",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1069",
-      "target": "3076",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1069",
       "target": "3082",
       "relationship": "supplies_material",
       "material": "lithium"
     },
     {
       "source": "1069",
-      "target": "3093",
+      "target": "2084",
       "relationship": "supplies_material",
       "material": "lithium"
-    },
-    {
-      "source": "1069",
-      "target": "3094",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1078",
-      "target": "2004",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1078",
-      "target": "2013",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1078",
-      "target": "2017",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1078",
-      "target": "2093",
-      "relationship": "supplies_material",
-      "material": "graphite"
     },
     {
       "source": "1078",
@@ -9457,19 +8330,7 @@
     },
     {
       "source": "1078",
-      "target": "2115",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1078",
-      "target": "2116",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1078",
-      "target": "2117",
+      "target": "4078",
       "relationship": "supplies_material",
       "material": "graphite"
     },
@@ -9482,24 +8343,6 @@
     {
       "source": "1078",
       "target": "2133",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1078",
-      "target": "4078",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1078",
-      "target": "11002",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1078",
-      "target": "11012",
       "relationship": "supplies_material",
       "material": "graphite"
     },
@@ -9547,115 +8390,7 @@
     },
     {
       "source": "1091",
-      "target": "2022",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1091",
-      "target": "2023",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1091",
-      "target": "2029",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1091",
-      "target": "2030",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1091",
-      "target": "2031",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1091",
-      "target": "2032",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1091",
-      "target": "2058",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1091",
-      "target": "2084",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1091",
-      "target": "2087",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1091",
-      "target": "2095",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1091",
-      "target": "2104",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1091",
-      "target": "2135",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1091",
-      "target": "2142",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1091",
       "target": "11002",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1091",
-      "target": "11007",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1091",
-      "target": "11008",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1091",
-      "target": "11009",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1091",
-      "target": "11010",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1091",
-      "target": "11011",
       "relationship": "supplies_material",
       "material": "lithium"
     },
@@ -9667,43 +8402,13 @@
     },
     {
       "source": "1091",
-      "target": "3033",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1091",
-      "target": "3041",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1091",
-      "target": "3045",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1091",
-      "target": "3060",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1091",
-      "target": "3061",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1091",
-      "target": "3069",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1091",
       "target": "3076",
+      "relationship": "supplies_material",
+      "material": "lithium"
+    },
+    {
+      "source": "1091",
+      "target": "2135",
       "relationship": "supplies_material",
       "material": "lithium"
     },
@@ -9715,55 +8420,13 @@
     },
     {
       "source": "1091",
-      "target": "3093",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "1091",
-      "target": "3094",
+      "target": "2084",
       "relationship": "supplies_material",
       "material": "lithium"
     },
     {
       "source": "1095",
-      "target": "2029",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1095",
-      "target": "2030",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1095",
-      "target": "2032",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1095",
-      "target": "2037",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1095",
-      "target": "2095",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1095",
-      "target": "2101",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1095",
-      "target": "2119",
+      "target": "2148",
       "relationship": "supplies_material",
       "material": "cobalt"
     },
@@ -9775,13 +8438,13 @@
     },
     {
       "source": "1095",
-      "target": "2148",
+      "target": "2029",
       "relationship": "supplies_material",
       "material": "cobalt"
     },
     {
       "source": "1095",
-      "target": "2150",
+      "target": "2030",
       "relationship": "supplies_material",
       "material": "cobalt"
     },
@@ -9798,8 +8461,14 @@
       "material": "cobalt"
     },
     {
-      "source": "1095",
-      "target": "11011",
+      "source": "1096",
+      "target": "2119",
+      "relationship": "supplies_material",
+      "material": "cobalt"
+    },
+    {
+      "source": "1096",
+      "target": "2148",
       "relationship": "supplies_material",
       "material": "cobalt"
     },
@@ -9817,121 +8486,13 @@
     },
     {
       "source": "1096",
-      "target": "2032",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1096",
-      "target": "2037",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1096",
-      "target": "2095",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1096",
-      "target": "2101",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1096",
-      "target": "2119",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1096",
       "target": "2142",
       "relationship": "supplies_material",
       "material": "cobalt"
     },
     {
       "source": "1096",
-      "target": "2148",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1096",
-      "target": "2150",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1096",
-      "target": "11008",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1096",
-      "target": "11009",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1096",
-      "target": "11011",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1097",
-      "target": "2029",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1097",
-      "target": "2030",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1097",
       "target": "2032",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1097",
-      "target": "2037",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1097",
-      "target": "2095",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1097",
-      "target": "2101",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1097",
-      "target": "2119",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1097",
-      "target": "2142",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "1097",
-      "target": "2148",
       "relationship": "supplies_material",
       "material": "cobalt"
     },
@@ -9960,44 +8521,20 @@
       "material": "cobalt"
     },
     {
-      "source": "1098",
-      "target": "2029",
+      "source": "1097",
+      "target": "2148",
       "relationship": "supplies_material",
-      "material": "nickel"
+      "material": "cobalt"
+    },
+    {
+      "source": "1097",
+      "target": "2142",
+      "relationship": "supplies_material",
+      "material": "cobalt"
     },
     {
       "source": "1098",
-      "target": "2030",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1098",
-      "target": "2032",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1098",
-      "target": "2092",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1098",
-      "target": "2095",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1098",
-      "target": "2101",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1098",
-      "target": "2118",
+      "target": "2147",
       "relationship": "supplies_material",
       "material": "nickel"
     },
@@ -10009,13 +8546,13 @@
     },
     {
       "source": "1098",
-      "target": "2147",
+      "target": "2029",
       "relationship": "supplies_material",
       "material": "nickel"
     },
     {
       "source": "1098",
-      "target": "2149",
+      "target": "2030",
       "relationship": "supplies_material",
       "material": "nickel"
     },
@@ -10033,6 +8570,18 @@
     },
     {
       "source": "1099",
+      "target": "2118",
+      "relationship": "supplies_material",
+      "material": "nickel"
+    },
+    {
+      "source": "1099",
+      "target": "2147",
+      "relationship": "supplies_material",
+      "material": "nickel"
+    },
+    {
+      "source": "1099",
       "target": "2029",
       "relationship": "supplies_material",
       "material": "nickel"
@@ -10045,115 +8594,13 @@
     },
     {
       "source": "1099",
-      "target": "2032",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1099",
-      "target": "2092",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1099",
-      "target": "2095",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1099",
-      "target": "2101",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1099",
-      "target": "2118",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1099",
       "target": "2142",
       "relationship": "supplies_material",
       "material": "nickel"
     },
     {
       "source": "1099",
-      "target": "2147",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1099",
-      "target": "2149",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1099",
-      "target": "11008",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1099",
-      "target": "11009",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1100",
-      "target": "2029",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1100",
-      "target": "2030",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1100",
       "target": "2032",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1100",
-      "target": "2092",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1100",
-      "target": "2095",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1100",
-      "target": "2101",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1100",
-      "target": "2118",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1100",
-      "target": "2142",
-      "relationship": "supplies_material",
-      "material": "nickel"
-    },
-    {
-      "source": "1100",
-      "target": "2147",
       "relationship": "supplies_material",
       "material": "nickel"
     },
@@ -10176,28 +8623,22 @@
       "material": "nickel"
     },
     {
-      "source": "1102",
-      "target": "2004",
+      "source": "1100",
+      "target": "2147",
       "relationship": "supplies_material",
-      "material": "graphite"
+      "material": "nickel"
     },
     {
-      "source": "1102",
-      "target": "2013",
+      "source": "1100",
+      "target": "2092",
       "relationship": "supplies_material",
-      "material": "graphite"
+      "material": "nickel"
     },
     {
-      "source": "1102",
-      "target": "2017",
+      "source": "1100",
+      "target": "2142",
       "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1102",
-      "target": "2093",
-      "relationship": "supplies_material",
-      "material": "graphite"
+      "material": "nickel"
     },
     {
       "source": "1102",
@@ -10213,19 +8654,7 @@
     },
     {
       "source": "1102",
-      "target": "2115",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1102",
-      "target": "2116",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1102",
-      "target": "2117",
+      "target": "4078",
       "relationship": "supplies_material",
       "material": "graphite"
     },
@@ -10238,24 +8667,6 @@
     {
       "source": "1102",
       "target": "2133",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1102",
-      "target": "4078",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1102",
-      "target": "11002",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "1102",
-      "target": "11012",
       "relationship": "supplies_material",
       "material": "graphite"
     },
@@ -10285,12 +8696,6 @@
     },
     {
       "source": "2004",
-      "target": "3013",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "2004",
       "target": "4035",
       "relationship": "supplies_material",
       "material": "graphite"
@@ -10302,38 +8707,14 @@
       "material": "graphite"
     },
     {
-      "source": "2006",
-      "target": "4015",
+      "source": "2004",
+      "target": "4110",
       "relationship": "supplies_material",
-      "material": "processed_material"
+      "material": "graphite"
     },
     {
       "source": "2006",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2006",
-      "target": "4093",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2006",
-      "target": "3013",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2006",
-      "target": "4081",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2006",
-      "target": "3003",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
@@ -10345,19 +8726,7 @@
     },
     {
       "source": "2013",
-      "target": "4011",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "2013",
       "target": "11021",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "2013",
-      "target": "4076",
       "relationship": "supplies_material",
       "material": "graphite"
     },
@@ -10369,7 +8738,19 @@
     },
     {
       "source": "2013",
-      "target": "3065",
+      "target": "4097",
+      "relationship": "supplies_material",
+      "material": "graphite"
+    },
+    {
+      "source": "2013",
+      "target": "4043",
+      "relationship": "supplies_material",
+      "material": "graphite"
+    },
+    {
+      "source": "2013",
+      "target": "4022",
       "relationship": "supplies_material",
       "material": "graphite"
     },
@@ -10387,19 +8768,7 @@
     },
     {
       "source": "2017",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "2017",
       "target": "4110",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "2017",
-      "target": "3013",
       "relationship": "supplies_material",
       "material": "graphite"
     },
@@ -10410,6 +8779,18 @@
       "material": "graphite"
     },
     {
+      "source": "2017",
+      "target": "4093",
+      "relationship": "supplies_material",
+      "material": "graphite"
+    },
+    {
+      "source": "2017",
+      "target": "4002",
+      "relationship": "supplies_material",
+      "material": "graphite"
+    },
+    {
       "source": "2022",
       "target": "4108",
       "relationship": "supplies_material",
@@ -10507,13 +8888,13 @@
     },
     {
       "source": "2029",
-      "target": "3013",
+      "target": "4110",
       "relationship": "supplies_material",
       "material": "nca"
     },
     {
       "source": "2029",
-      "target": "3017",
+      "target": "4028",
       "relationship": "supplies_material",
       "material": "nca"
     },
@@ -10543,13 +8924,13 @@
     },
     {
       "source": "2030",
-      "target": "3013",
+      "target": "4110",
       "relationship": "supplies_material",
       "material": "nmc"
     },
     {
       "source": "2030",
-      "target": "3017",
+      "target": "4028",
       "relationship": "supplies_material",
       "material": "nmc"
     },
@@ -10591,12 +8972,6 @@
     },
     {
       "source": "2032",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "nmc"
-    },
-    {
-      "source": "2032",
       "target": "4110",
       "relationship": "supplies_material",
       "material": "nmc"
@@ -10604,12 +8979,6 @@
     {
       "source": "2032",
       "target": "4093",
-      "relationship": "supplies_material",
-      "material": "nmc"
-    },
-    {
-      "source": "2032",
-      "target": "3013",
       "relationship": "supplies_material",
       "material": "nmc"
     },
@@ -10626,26 +8995,20 @@
       "material": "nmc"
     },
     {
-      "source": "2037",
-      "target": "4011",
+      "source": "2032",
+      "target": "4028",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "nmc"
     },
     {
-      "source": "2037",
-      "target": "4076",
+      "source": "2032",
+      "target": "4063",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "nmc"
     },
     {
       "source": "2037",
       "target": "4031",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "2037",
-      "target": "3065",
       "relationship": "supplies_material",
       "material": "cobalt"
     },
@@ -10662,146 +9025,44 @@
       "material": "cobalt"
     },
     {
-      "source": "2038",
-      "target": "4011",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2038",
-      "target": "4076",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2038",
-      "target": "3065",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2038",
-      "target": "3004",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2038",
+      "source": "2037",
       "target": "4097",
       "relationship": "supplies_material",
-      "material": "processed_material"
+      "material": "cobalt"
+    },
+    {
+      "source": "2037",
+      "target": "4043",
+      "relationship": "supplies_material",
+      "material": "cobalt"
+    },
+    {
+      "source": "2037",
+      "target": "4025",
+      "relationship": "supplies_material",
+      "material": "cobalt"
     },
     {
       "source": "2038",
-      "target": "4003",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
     {
       "source": "2039",
-      "target": "3004",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2039",
-      "target": "4097",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2039",
-      "target": "4003",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2039",
-      "target": "3003",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2039",
-      "target": "4015",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2039",
-      "target": "4011",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
     {
       "source": "2040",
-      "target": "3004",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2040",
-      "target": "4097",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2040",
-      "target": "4003",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2040",
-      "target": "3003",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2040",
-      "target": "4015",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2040",
-      "target": "4011",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
     {
       "source": "2057",
-      "target": "3003",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2057",
-      "target": "3004",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2057",
-      "target": "4097",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2057",
-      "target": "4003",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2057",
-      "target": "4015",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2057",
-      "target": "4093",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
@@ -10831,55 +9092,19 @@
     },
     {
       "source": "2058",
-      "target": "11020",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "lithium"
     },
     {
       "source": "2058",
-      "target": "4103",
+      "target": "4028",
       "relationship": "supplies_material",
       "material": "lithium"
     },
     {
       "source": "2065",
-      "target": "11020",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2065",
-      "target": "3065",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2065",
-      "target": "4076",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2065",
-      "target": "4003",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2065",
-      "target": "4097",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2065",
-      "target": "3004",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2068",
-      "target": "4081",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
@@ -10890,98 +9115,14 @@
       "material": "processed_material"
     },
     {
-      "source": "2068",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2068",
-      "target": "3013",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2068",
-      "target": "4093",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2068",
-      "target": "4015",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
       "source": "2070",
-      "target": "4003",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2070",
-      "target": "4097",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2070",
-      "target": "3004",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2070",
-      "target": "4076",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2070",
-      "target": "4011",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2070",
-      "target": "11020",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
     {
       "source": "2083",
-      "target": "11020",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2083",
-      "target": "4003",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2083",
-      "target": "4097",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2083",
-      "target": "3065",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2083",
-      "target": "3004",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2083",
-      "target": "4076",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
@@ -11029,12 +9170,6 @@
     },
     {
       "source": "2087",
-      "target": "4081",
-      "relationship": "supplies_material",
-      "material": "lfp"
-    },
-    {
-      "source": "2087",
       "target": "4028",
       "relationship": "supplies_material",
       "material": "lfp"
@@ -11053,51 +9188,21 @@
     },
     {
       "source": "2087",
-      "target": "3017",
+      "target": "4110",
       "relationship": "supplies_material",
       "material": "lfp"
     },
     {
-      "source": "2092",
-      "target": "4081",
+      "source": "2087",
+      "target": "4093",
       "relationship": "supplies_material",
-      "material": "processed_material"
+      "material": "lfp"
     },
     {
       "source": "2092",
       "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
-    },
-    {
-      "source": "2092",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2092",
-      "target": "3013",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2092",
-      "target": "4093",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2092",
-      "target": "4015",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2093",
-      "target": "4081",
-      "relationship": "supplies_material",
-      "material": "graphite"
     },
     {
       "source": "2093",
@@ -11130,14 +9235,14 @@
       "material": "graphite"
     },
     {
-      "source": "2095",
-      "target": "4091",
+      "source": "2093",
+      "target": "4028",
       "relationship": "supplies_material",
-      "material": "nca"
+      "material": "graphite"
     },
     {
       "source": "2095",
-      "target": "4081",
+      "target": "4091",
       "relationship": "supplies_material",
       "material": "nca"
     },
@@ -11161,7 +9266,13 @@
     },
     {
       "source": "2095",
-      "target": "3017",
+      "target": "4028",
+      "relationship": "supplies_material",
+      "material": "nca"
+    },
+    {
+      "source": "2095",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "nca"
     },
@@ -11185,12 +9296,6 @@
     },
     {
       "source": "2098",
-      "target": "4015",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "2098",
       "target": "4108",
       "relationship": "supplies_material",
       "material": "graphite"
@@ -11202,10 +9307,10 @@
       "material": "graphite"
     },
     {
-      "source": "2101",
-      "target": "4015",
+      "source": "2098",
+      "target": "4110",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "graphite"
     },
     {
       "source": "2101",
@@ -11216,12 +9321,6 @@
     {
       "source": "2101",
       "target": "4110",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "2101",
-      "target": "3017",
       "relationship": "supplies_material",
       "material": "cobalt"
     },
@@ -11238,14 +9337,20 @@
       "material": "cobalt"
     },
     {
-      "source": "2102",
-      "target": "4091",
+      "source": "2101",
+      "target": "4020",
       "relationship": "supplies_material",
-      "material": "separator"
+      "material": "cobalt"
+    },
+    {
+      "source": "2101",
+      "target": "4006",
+      "relationship": "supplies_material",
+      "material": "cobalt"
     },
     {
       "source": "2102",
-      "target": "4081",
+      "target": "4091",
       "relationship": "supplies_material",
       "material": "separator"
     },
@@ -11263,39 +9368,21 @@
     },
     {
       "source": "2102",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "separator"
-    },
-    {
-      "source": "2102",
       "target": "4108",
       "relationship": "supplies_material",
       "material": "separator"
     },
     {
-      "source": "2103",
-      "target": "4093",
+      "source": "2102",
+      "target": "4028",
       "relationship": "supplies_material",
-      "material": "processed_material"
+      "material": "separator"
     },
     {
-      "source": "2103",
-      "target": "3013",
+      "source": "2102",
+      "target": "4082",
       "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2103",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2103",
-      "target": "4015",
-      "relationship": "supplies_material",
-      "material": "processed_material"
+      "material": "separator"
     },
     {
       "source": "2103",
@@ -11304,12 +9391,6 @@
       "material": "processed_material"
     },
     {
-      "source": "2103",
-      "target": "4081",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
       "source": "2104",
       "target": "4108",
       "relationship": "supplies_material",
@@ -11377,19 +9458,13 @@
     },
     {
       "source": "2114",
-      "target": "4015",
+      "target": "4110",
       "relationship": "supplies_material",
       "material": "graphite"
     },
     {
       "source": "2115",
       "target": "4091",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "2115",
-      "target": "4081",
       "relationship": "supplies_material",
       "material": "graphite"
     },
@@ -11413,7 +9488,13 @@
     },
     {
       "source": "2115",
-      "target": "3017",
+      "target": "4028",
+      "relationship": "supplies_material",
+      "material": "graphite"
+    },
+    {
+      "source": "2115",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "graphite"
     },
@@ -11431,12 +9512,6 @@
     },
     {
       "source": "2116",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "2116",
       "target": "4028",
       "relationship": "supplies_material",
       "material": "graphite"
@@ -11449,7 +9524,13 @@
     },
     {
       "source": "2116",
-      "target": "4081",
+      "target": "4093",
+      "relationship": "supplies_material",
+      "material": "graphite"
+    },
+    {
+      "source": "2116",
+      "target": "4082",
       "relationship": "supplies_material",
       "material": "graphite"
     },
@@ -11461,25 +9542,7 @@
     },
     {
       "source": "2117",
-      "target": "4076",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "2117",
-      "target": "3065",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "2117",
       "target": "11021",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "2117",
-      "target": "4011",
       "relationship": "supplies_material",
       "material": "graphite"
     },
@@ -11490,56 +9553,32 @@
       "material": "graphite"
     },
     {
-      "source": "2118",
-      "target": "11020",
+      "source": "2117",
+      "target": "4013",
       "relationship": "supplies_material",
-      "material": "processed_material"
+      "material": "graphite"
+    },
+    {
+      "source": "2117",
+      "target": "4105",
+      "relationship": "supplies_material",
+      "material": "graphite"
+    },
+    {
+      "source": "2117",
+      "target": "4022",
+      "relationship": "supplies_material",
+      "material": "graphite"
     },
     {
       "source": "2118",
-      "target": "4003",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2118",
-      "target": "4097",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2118",
-      "target": "3004",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2118",
-      "target": "3065",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2118",
-      "target": "4076",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
     {
       "source": "2119",
       "target": "11016",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "2119",
-      "target": "11020",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "2119",
-      "target": "4003",
       "relationship": "supplies_material",
       "material": "cobalt"
     },
@@ -11557,115 +9596,37 @@
     },
     {
       "source": "2119",
-      "target": "3004",
+      "target": "4105",
+      "relationship": "supplies_material",
+      "material": "cobalt"
+    },
+    {
+      "source": "2119",
+      "target": "4083",
+      "relationship": "supplies_material",
+      "material": "cobalt"
+    },
+    {
+      "source": "2119",
+      "target": "4031",
       "relationship": "supplies_material",
       "material": "cobalt"
     },
     {
       "source": "2122",
-      "target": "11020",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2122",
-      "target": "4003",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2122",
-      "target": "4097",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2122",
-      "target": "3004",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2122",
-      "target": "3065",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2122",
-      "target": "4076",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
     {
       "source": "2126",
-      "target": "3065",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2126",
-      "target": "4076",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2126",
-      "target": "4011",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2126",
-      "target": "11020",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2126",
-      "target": "4003",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2126",
-      "target": "4097",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
     {
       "source": "2131",
-      "target": "4015",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2131",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2131",
-      "target": "4093",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2131",
-      "target": "3013",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2131",
-      "target": "3003",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2131",
-      "target": "4081",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
@@ -11678,12 +9639,6 @@
     {
       "source": "2132",
       "target": "4063",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "2132",
-      "target": "4015",
       "relationship": "supplies_material",
       "material": "graphite"
     },
@@ -11702,6 +9657,12 @@
     {
       "source": "2132",
       "target": "4082",
+      "relationship": "supplies_material",
+      "material": "graphite"
+    },
+    {
+      "source": "2132",
+      "target": "4002",
       "relationship": "supplies_material",
       "material": "graphite"
     },
@@ -11731,13 +9692,13 @@
     },
     {
       "source": "2133",
-      "target": "4015",
+      "target": "4082",
       "relationship": "supplies_material",
       "material": "graphite"
     },
     {
       "source": "2133",
-      "target": "4082",
+      "target": "4002",
       "relationship": "supplies_material",
       "material": "graphite"
     },
@@ -11761,12 +9722,6 @@
     },
     {
       "source": "2135",
-      "target": "3003",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "2135",
       "target": "4083",
       "relationship": "supplies_material",
       "material": "lithium"
@@ -11778,46 +9733,16 @@
       "material": "lithium"
     },
     {
-      "source": "2141",
-      "target": "4015",
+      "source": "2135",
+      "target": "4006",
       "relationship": "supplies_material",
-      "material": "processed_material"
+      "material": "lithium"
     },
     {
       "source": "2141",
-      "target": "3003",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
-    },
-    {
-      "source": "2141",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2141",
-      "target": "4081",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2141",
-      "target": "4093",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2141",
-      "target": "3013",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2142",
-      "target": "3013",
-      "relationship": "supplies_material",
-      "material": "nca"
     },
     {
       "source": "2142",
@@ -11828,12 +9753,6 @@
     {
       "source": "2142",
       "target": "4077",
-      "relationship": "supplies_material",
-      "material": "nca"
-    },
-    {
-      "source": "2142",
-      "target": "3017",
       "relationship": "supplies_material",
       "material": "nca"
     },
@@ -11850,10 +9769,16 @@
       "material": "nca"
     },
     {
-      "source": "2147",
-      "target": "3013",
+      "source": "2142",
+      "target": "4029",
       "relationship": "supplies_material",
-      "material": "processed_material"
+      "material": "nca"
+    },
+    {
+      "source": "2142",
+      "target": "4063",
+      "relationship": "supplies_material",
+      "material": "nca"
     },
     {
       "source": "2147",
@@ -11862,38 +9787,8 @@
       "material": "processed_material"
     },
     {
-      "source": "2147",
-      "target": "4093",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2147",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2147",
-      "target": "4081",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2147",
-      "target": "4015",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
       "source": "2148",
       "target": "4028",
-      "relationship": "supplies_material",
-      "material": "cobalt"
-    },
-    {
-      "source": "2148",
-      "target": "3013",
       "relationship": "supplies_material",
       "material": "cobalt"
     },
@@ -11922,50 +9817,20 @@
       "material": "cobalt"
     },
     {
-      "source": "2149",
-      "target": "4103",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2149",
-      "target": "4081",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2149",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2149",
-      "target": "3013",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2149",
-      "target": "4093",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2149",
-      "target": "4015",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "2150",
-      "target": "4103",
+      "source": "2148",
+      "target": "4063",
       "relationship": "supplies_material",
       "material": "cobalt"
     },
     {
+      "source": "2149",
+      "target": "4103",
+      "relationship": "supplies_material",
+      "material": "processed_material"
+    },
+    {
       "source": "2150",
-      "target": "4081",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "cobalt"
     },
@@ -11990,6 +9855,12 @@
     {
       "source": "2150",
       "target": "4110",
+      "relationship": "supplies_material",
+      "material": "cobalt"
+    },
+    {
+      "source": "2150",
+      "target": "4093",
       "relationship": "supplies_material",
       "material": "cobalt"
     },
@@ -12031,7 +9902,7 @@
     },
     {
       "source": "4001",
-      "target": "5051",
+      "target": "5003",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -12073,19 +9944,19 @@
     },
     {
       "source": "4002",
-      "target": "5074",
+      "target": "5160",
+      "relationship": "supplies_cells",
+      "material": "battery_cells"
+    },
+    {
+      "source": "4002",
+      "target": "5051",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "4002",
       "target": "5125",
-      "relationship": "supplies_cells",
-      "material": "battery_cells"
-    },
-    {
-      "source": "4002",
-      "target": "5154",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -12121,19 +9992,19 @@
     },
     {
       "source": "4003",
-      "target": "5247",
+      "target": "5072",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "4003",
-      "target": "5054",
+      "target": "5043",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "4003",
-      "target": "5117",
+      "target": "5221",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -12169,13 +10040,13 @@
     },
     {
       "source": "4004",
-      "target": "5199",
+      "target": "5209",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "4004",
-      "target": "5257",
+      "target": "5177",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -12217,7 +10088,7 @@
     },
     {
       "source": "4006",
-      "target": "5184",
+      "target": "5153",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -12229,7 +10100,7 @@
     },
     {
       "source": "4006",
-      "target": "5171",
+      "target": "5066",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -12265,19 +10136,19 @@
     },
     {
       "source": "4011",
-      "target": "5159",
+      "target": "5150",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "4011",
-      "target": "5106",
+      "target": "5123",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "4011",
-      "target": "5152",
+      "target": "5168",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -12313,7 +10184,7 @@
     },
     {
       "source": "4013",
-      "target": "5247",
+      "target": "5072",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -12325,7 +10196,7 @@
     },
     {
       "source": "4013",
-      "target": "5144",
+      "target": "5002",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -12361,13 +10232,13 @@
     },
     {
       "source": "4015",
-      "target": "5234",
+      "target": "5034",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "4015",
-      "target": "5182",
+      "target": "5209",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -12421,7 +10292,7 @@
     },
     {
       "source": "4017",
-      "target": "5121",
+      "target": "5257",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -12469,7 +10340,7 @@
     },
     {
       "source": "4020",
-      "target": "5099",
+      "target": "5086",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -12505,7 +10376,7 @@
     },
     {
       "source": "4022",
-      "target": "5123",
+      "target": "5001",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -12517,7 +10388,7 @@
     },
     {
       "source": "4022",
-      "target": "5092",
+      "target": "5173",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -12553,19 +10424,19 @@
     },
     {
       "source": "4024",
-      "target": "5248",
+      "target": "5044",
+      "relationship": "supplies_cells",
+      "material": "battery_cells"
+    },
+    {
+      "source": "4024",
+      "target": "5257",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "4024",
       "target": "5116",
-      "relationship": "supplies_cells",
-      "material": "battery_cells"
-    },
-    {
-      "source": "4024",
-      "target": "5228",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -12607,13 +10478,13 @@
     },
     {
       "source": "4025",
-      "target": "5049",
+      "target": "5202",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "4025",
-      "target": "5193",
+      "target": "5234",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -12655,13 +10526,13 @@
     },
     {
       "source": "4026",
-      "target": "5123",
+      "target": "5016",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "4026",
-      "target": "5093",
+      "target": "5138",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -12697,19 +10568,19 @@
     },
     {
       "source": "4028",
+      "target": "5171",
+      "relationship": "supplies_cells",
+      "material": "battery_cells"
+    },
+    {
+      "source": "4028",
       "target": "5227",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "4028",
-      "target": "5198",
-      "relationship": "supplies_cells",
-      "material": "battery_cells"
-    },
-    {
-      "source": "4028",
-      "target": "5155",
+      "target": "5229",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -12751,13 +10622,13 @@
     },
     {
       "source": "4029",
-      "target": "5188",
+      "target": "5150",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "4029",
-      "target": "5257",
+      "target": "5177",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -12793,19 +10664,19 @@
     },
     {
       "source": "4031",
-      "target": "5155",
+      "target": "5175",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "4031",
-      "target": "5254",
+      "target": "5041",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "4031",
-      "target": "5111",
+      "target": "5248",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -12841,7 +10712,7 @@
     },
     {
       "source": "4033",
-      "target": "5135",
+      "target": "5221",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -12853,7 +10724,7 @@
     },
     {
       "source": "4033",
-      "target": "5120",
+      "target": "5117",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -12937,51 +10808,21 @@
     },
     {
       "source": "4043",
-      "target": "5119",
+      "target": "5127",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "4043",
-      "target": "5022",
+      "target": "5195",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "4043",
-      "target": "5256",
+      "target": "5063",
       "relationship": "supplies_cells",
       "material": "battery_cells"
-    },
-    {
-      "source": "4045",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "4045",
-      "target": "3013",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "4045",
-      "target": "4093",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "4045",
-      "target": "4081",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "4045",
-      "target": "4015",
-      "relationship": "supplies_material",
-      "material": "processed_material"
     },
     {
       "source": "4045",
@@ -13033,7 +10874,7 @@
     },
     {
       "source": "4063",
-      "target": "5220",
+      "target": "5197",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -13069,19 +10910,19 @@
     },
     {
       "source": "4068",
-      "target": "5026",
+      "target": "5035",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "4068",
-      "target": "5049",
+      "target": "5097",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "4068",
-      "target": "5118",
+      "target": "5212",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -13117,55 +10958,25 @@
     },
     {
       "source": "4069",
-      "target": "5234",
+      "target": "5053",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "4069",
-      "target": "5203",
+      "target": "5042",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "4069",
-      "target": "5048",
+      "target": "5154",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "4073",
-      "target": "4093",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "4073",
-      "target": "4015",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "4073",
-      "target": "3003",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "4073",
-      "target": "3013",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "4073",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "4073",
-      "target": "4003",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
@@ -13201,19 +11012,19 @@
     },
     {
       "source": "4076",
-      "target": "5198",
+      "target": "5142",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "4076",
-      "target": "5019",
+      "target": "5052",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "4076",
-      "target": "5091",
+      "target": "5158",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -13387,7 +11198,7 @@
     },
     {
       "source": "4082",
-      "target": "5171",
+      "target": "5223",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -13429,21 +11240,42 @@
     },
     {
       "source": "4083",
-      "target": "5101",
+      "target": "5095",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "4083",
-      "target": "5241",
+      "target": "5155",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "4083",
-      "target": "5086",
+      "target": "5135",
       "relationship": "supplies_cells",
       "material": "battery_cells"
+    },
+    {
+      "source": "4083",
+      "target": "5235",
+      "relationship": "verified_real_supply",
+      "material": "battery_cells",
+      "citation": "Panasonic De Soto, KS built primarily to supply Tesla — InsideEVs, https://insideevs.com/news/765796/panasonic-worlds-largest-battery-plant-tesla-kansas/"
+    },
+    {
+      "source": "4083",
+      "target": "5242",
+      "relationship": "verified_real_supply",
+      "material": "battery_cells",
+      "citation": "Panasonic De Soto, KS also supplies Toyota — InsideEVs, https://insideevs.com/news/765796/panasonic-worlds-largest-battery-plant-tesla-kansas/"
+    },
+    {
+      "source": "4083",
+      "target": "5159",
+      "relationship": "verified_real_supply",
+      "material": "battery_cells",
+      "citation": "Panasonic De Soto, KS also supplies Lucid Motors — InsideEVs, https://insideevs.com/news/765796/panasonic-worlds-largest-battery-plant-tesla-kansas/"
     },
     {
       "source": "4090",
@@ -13477,7 +11309,7 @@
     },
     {
       "source": "4090",
-      "target": "5213",
+      "target": "5197",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -13525,7 +11357,7 @@
     },
     {
       "source": "4091",
-      "target": "5150",
+      "target": "5018",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -13543,37 +11375,7 @@
     },
     {
       "source": "4092",
-      "target": "3065",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "4092",
-      "target": "4076",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "4092",
-      "target": "4011",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "4092",
-      "target": "11020",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "4092",
-      "target": "3004",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "4092",
-      "target": "4097",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
@@ -13609,6 +11411,12 @@
     },
     {
       "source": "4093",
+      "target": "5059",
+      "relationship": "supplies_cells",
+      "material": "battery_cells"
+    },
+    {
+      "source": "4093",
       "target": "5129",
       "relationship": "supplies_cells",
       "material": "battery_cells"
@@ -13616,12 +11424,6 @@
     {
       "source": "4093",
       "target": "5002",
-      "relationship": "supplies_cells",
-      "material": "battery_cells"
-    },
-    {
-      "source": "4093",
-      "target": "5123",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -13657,7 +11459,7 @@
     },
     {
       "source": "4095",
-      "target": "5142",
+      "target": "5209",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -13669,7 +11471,7 @@
     },
     {
       "source": "4095",
-      "target": "5136",
+      "target": "5216",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -13705,19 +11507,19 @@
     },
     {
       "source": "4097",
-      "target": "5026",
-      "relationship": "supplies_cells",
-      "material": "battery_cells"
-    },
-    {
-      "source": "4097",
-      "target": "5042",
-      "relationship": "supplies_cells",
-      "material": "battery_cells"
-    },
-    {
-      "source": "4097",
       "target": "5092",
+      "relationship": "supplies_cells",
+      "material": "battery_cells"
+    },
+    {
+      "source": "4097",
+      "target": "5119",
+      "relationship": "supplies_cells",
+      "material": "battery_cells"
+    },
+    {
+      "source": "4097",
+      "target": "5231",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -13765,7 +11567,7 @@
     },
     {
       "source": "4103",
-      "target": "5207",
+      "target": "5171",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -13801,7 +11603,7 @@
     },
     {
       "source": "4105",
-      "target": "5049",
+      "target": "5195",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -13813,7 +11615,7 @@
     },
     {
       "source": "4105",
-      "target": "5061",
+      "target": "5023",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -13849,19 +11651,19 @@
     },
     {
       "source": "4107",
-      "target": "5197",
+      "target": "5101",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "4107",
-      "target": "5170",
+      "target": "5061",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "4107",
-      "target": "5129",
+      "target": "5067",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -13897,7 +11699,7 @@
     },
     {
       "source": "4108",
-      "target": "5016",
+      "target": "5003",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -13912,6 +11714,13 @@
       "target": "5248",
       "relationship": "supplies_cells",
       "material": "battery_cells"
+    },
+    {
+      "source": "4108",
+      "target": "5242",
+      "relationship": "verified_real_supply",
+      "material": "battery_cells",
+      "citation": "Toyota Battery Manufacturing North Carolina (TBMNC) ships batteries to Toyota's Georgetown, KY assembly plant — Automotive Logistics, https://www.automotivelogistics.media/nearshoring/toyota-is-making-its-own-batteries-at-a-plant-in-north-carolina-and-will-be-begin-local-supply-in-april/213940"
     },
     {
       "source": "4109",
@@ -13999,7 +11808,7 @@
     },
     {
       "source": "4110",
-      "target": "5100",
+      "target": "5229",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -14011,73 +11820,13 @@
     },
     {
       "source": "4111",
-      "target": "11020",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "4111",
       "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
     {
-      "source": "4111",
-      "target": "3013",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "4111",
-      "target": "4081",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "4111",
-      "target": "4093",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "4111",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
       "source": "11001",
-      "target": "4076",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "11001",
-      "target": "4011",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "11001",
-      "target": "3065",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "11001",
-      "target": "3004",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "11001",
-      "target": "4097",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "11001",
-      "target": "4003",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
@@ -14085,71 +11834,41 @@
       "source": "11002",
       "target": "4069",
       "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "11002",
-      "target": "4011",
-      "relationship": "supplies_material",
-      "material": "graphite"
+      "material": "electrolyte"
     },
     {
       "source": "11002",
       "target": "11021",
       "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "11002",
-      "target": "4076",
-      "relationship": "supplies_material",
-      "material": "graphite"
+      "material": "electrolyte"
     },
     {
       "source": "11002",
       "target": "4031",
       "relationship": "supplies_material",
-      "material": "graphite"
+      "material": "electrolyte"
     },
     {
       "source": "11002",
-      "target": "3065",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "11003",
-      "target": "4011",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "11003",
-      "target": "4076",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "11003",
-      "target": "3065",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "11003",
-      "target": "3004",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "11003",
       "target": "4097",
       "relationship": "supplies_material",
-      "material": "processed_material"
+      "material": "electrolyte"
+    },
+    {
+      "source": "11002",
+      "target": "4043",
+      "relationship": "supplies_material",
+      "material": "electrolyte"
+    },
+    {
+      "source": "11002",
+      "target": "4022",
+      "relationship": "supplies_material",
+      "material": "electrolyte"
     },
     {
       "source": "11003",
-      "target": "4003",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
@@ -14185,7 +11904,7 @@
     },
     {
       "source": "11004",
-      "target": "5112",
+      "target": "5027",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -14197,7 +11916,7 @@
     },
     {
       "source": "11004",
-      "target": "5121",
+      "target": "5158",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -14215,12 +11934,6 @@
     },
     {
       "source": "11007",
-      "target": "4081",
-      "relationship": "supplies_material",
-      "material": "electrolyte"
-    },
-    {
-      "source": "11007",
       "target": "4029",
       "relationship": "supplies_material",
       "material": "electrolyte"
@@ -14233,7 +11946,13 @@
     },
     {
       "source": "11007",
-      "target": "3017",
+      "target": "4110",
+      "relationship": "supplies_material",
+      "material": "electrolyte"
+    },
+    {
+      "source": "11007",
+      "target": "4093",
       "relationship": "supplies_material",
       "material": "electrolyte"
     },
@@ -14251,12 +11970,6 @@
     },
     {
       "source": "11008",
-      "target": "4081",
-      "relationship": "supplies_material",
-      "material": "nmc"
-    },
-    {
-      "source": "11008",
       "target": "4029",
       "relationship": "supplies_material",
       "material": "nmc"
@@ -14269,7 +11982,13 @@
     },
     {
       "source": "11008",
-      "target": "3017",
+      "target": "4110",
+      "relationship": "supplies_material",
+      "material": "nmc"
+    },
+    {
+      "source": "11008",
+      "target": "4093",
       "relationship": "supplies_material",
       "material": "nmc"
     },
@@ -14287,12 +12006,6 @@
     },
     {
       "source": "11009",
-      "target": "4081",
-      "relationship": "supplies_material",
-      "material": "nca"
-    },
-    {
-      "source": "11009",
       "target": "4029",
       "relationship": "supplies_material",
       "material": "nca"
@@ -14305,7 +12018,13 @@
     },
     {
       "source": "11009",
-      "target": "3017",
+      "target": "4110",
+      "relationship": "supplies_material",
+      "material": "nca"
+    },
+    {
+      "source": "11009",
+      "target": "4093",
       "relationship": "supplies_material",
       "material": "nca"
     },
@@ -14323,12 +12042,6 @@
     },
     {
       "source": "11010",
-      "target": "4081",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "11010",
       "target": "4029",
       "relationship": "supplies_material",
       "material": "lithium"
@@ -14341,7 +12054,13 @@
     },
     {
       "source": "11010",
-      "target": "3017",
+      "target": "4110",
+      "relationship": "supplies_material",
+      "material": "lithium"
+    },
+    {
+      "source": "11010",
+      "target": "4093",
       "relationship": "supplies_material",
       "material": "lithium"
     },
@@ -14349,37 +12068,37 @@
       "source": "11011",
       "target": "4103",
       "relationship": "supplies_material",
-      "material": "lithium"
+      "material": "cobalt"
     },
     {
       "source": "11011",
       "target": "4028",
       "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "11011",
-      "target": "4081",
-      "relationship": "supplies_material",
-      "material": "lithium"
+      "material": "cobalt"
     },
     {
       "source": "11011",
       "target": "4029",
       "relationship": "supplies_material",
-      "material": "lithium"
+      "material": "cobalt"
     },
     {
       "source": "11011",
       "target": "4091",
       "relationship": "supplies_material",
-      "material": "lithium"
+      "material": "cobalt"
     },
     {
       "source": "11011",
-      "target": "3017",
+      "target": "4110",
       "relationship": "supplies_material",
-      "material": "lithium"
+      "material": "cobalt"
+    },
+    {
+      "source": "11011",
+      "target": "4093",
+      "relationship": "supplies_material",
+      "material": "cobalt"
     },
     {
       "source": "11012",
@@ -14401,12 +12120,6 @@
     },
     {
       "source": "11012",
-      "target": "4081",
-      "relationship": "supplies_material",
-      "material": "graphite"
-    },
-    {
-      "source": "11012",
       "target": "4029",
       "relationship": "supplies_material",
       "material": "graphite"
@@ -14418,6 +12131,12 @@
       "material": "graphite"
     },
     {
+      "source": "11012",
+      "target": "4110",
+      "relationship": "supplies_material",
+      "material": "graphite"
+    },
+    {
       "source": "11014",
       "target": "5198",
       "relationship": "supplies_cells",
@@ -14449,19 +12168,19 @@
     },
     {
       "source": "11014",
-      "target": "5174",
+      "target": "5183",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "11014",
-      "target": "5235",
+      "target": "5084",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "11014",
-      "target": "5248",
+      "target": "5069",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -14497,19 +12216,19 @@
     },
     {
       "source": "11015",
-      "target": "5207",
+      "target": "5001",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "11015",
-      "target": "5148",
+      "target": "5227",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "11015",
-      "target": "5118",
+      "target": "5165",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -14551,13 +12270,13 @@
     },
     {
       "source": "11016",
-      "target": "5129",
+      "target": "5212",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "11016",
-      "target": "5130",
+      "target": "5092",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -14593,19 +12312,19 @@
     },
     {
       "source": "11017",
-      "target": "5063",
+      "target": "5085",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "11017",
-      "target": "5170",
+      "target": "5095",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "11017",
-      "target": "5161",
+      "target": "5138",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -14641,19 +12360,19 @@
     },
     {
       "source": "11018",
-      "target": "5250",
+      "target": "5209",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "11018",
-      "target": "5130",
+      "target": "5092",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "11018",
-      "target": "5059",
+      "target": "5155",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -14701,7 +12420,7 @@
     },
     {
       "source": "11019",
-      "target": "5190",
+      "target": "5229",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -14737,19 +12456,19 @@
     },
     {
       "source": "11020",
-      "target": "5144",
+      "target": "5247",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "11020",
-      "target": "5155",
+      "target": "5123",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "11020",
-      "target": "5014",
+      "target": "5047",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -14785,91 +12504,31 @@
     },
     {
       "source": "11021",
-      "target": "5123",
+      "target": "5050",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "11021",
-      "target": "5095",
+      "target": "5027",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "11021",
-      "target": "5142",
+      "target": "5188",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "3001",
-      "target": "4015",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3001",
-      "target": "3003",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3001",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3001",
-      "target": "4093",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3001",
-      "target": "3013",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3001",
-      "target": "4081",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
     {
       "source": "3002",
-      "target": "4093",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3002",
-      "target": "4015",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3002",
-      "target": "3003",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3002",
-      "target": "3013",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3002",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3002",
-      "target": "4003",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
@@ -14905,13 +12564,13 @@
     },
     {
       "source": "3003",
-      "target": "5213",
+      "target": "5243",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "3003",
-      "target": "5112",
+      "target": "5113",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -14953,55 +12612,25 @@
     },
     {
       "source": "3004",
-      "target": "5203",
+      "target": "5204",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "3004",
-      "target": "5175",
+      "target": "5254",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "3004",
-      "target": "5134",
+      "target": "5092",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "3005",
-      "target": "3065",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3005",
-      "target": "4076",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3005",
-      "target": "4011",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3005",
-      "target": "11020",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3005",
-      "target": "3004",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3005",
-      "target": "4097",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
@@ -15079,67 +12708,7 @@
     },
     {
       "source": "3011",
-      "target": "4015",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3011",
-      "target": "3003",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3011",
-      "target": "4093",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3011",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3011",
-      "target": "3013",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3011",
-      "target": "4081",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3012",
-      "target": "4093",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3012",
-      "target": "3013",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3012",
-      "target": "4015",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3012",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3012",
-      "target": "3003",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
@@ -15181,55 +12750,25 @@
     },
     {
       "source": "3013",
-      "target": "5171",
+      "target": "5223",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "3013",
-      "target": "5150",
+      "target": "5183",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "3013",
-      "target": "5146",
+      "target": "5247",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "3014",
-      "target": "4015",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3014",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3014",
-      "target": "4093",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3014",
-      "target": "3013",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3014",
-      "target": "3003",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3014",
-      "target": "4081",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
@@ -15283,25 +12822,25 @@
     },
     {
       "source": "3016",
-      "target": "3065",
-      "relationship": "supplies_material",
-      "material": "electrolyte"
-    },
-    {
-      "source": "3016",
       "target": "4031",
       "relationship": "supplies_material",
       "material": "electrolyte"
     },
     {
       "source": "3016",
-      "target": "4076",
+      "target": "11021",
       "relationship": "supplies_material",
       "material": "electrolyte"
     },
     {
       "source": "3016",
-      "target": "11021",
+      "target": "4069",
+      "relationship": "supplies_material",
+      "material": "electrolyte"
+    },
+    {
+      "source": "3016",
+      "target": "11015",
       "relationship": "supplies_material",
       "material": "electrolyte"
     },
@@ -15337,7 +12876,7 @@
     },
     {
       "source": "3017",
-      "target": "5177",
+      "target": "5136",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -15355,55 +12894,7 @@
     },
     {
       "source": "3018",
-      "target": "3003",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3018",
-      "target": "3004",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3018",
-      "target": "4097",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3018",
-      "target": "4003",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3018",
-      "target": "4015",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3018",
-      "target": "4011",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3019",
-      "target": "3013",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3019",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3019",
-      "target": "4093",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
@@ -15414,194 +12905,32 @@
       "material": "processed_material"
     },
     {
-      "source": "3019",
-      "target": "4081",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3019",
-      "target": "4015",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
       "source": "3020",
-      "target": "3003",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3020",
-      "target": "4015",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3020",
-      "target": "4093",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3020",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3020",
-      "target": "3013",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3020",
-      "target": "3004",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
     {
       "source": "3021",
-      "target": "3003",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3021",
-      "target": "4015",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3021",
-      "target": "4093",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3021",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3021",
-      "target": "3004",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3021",
-      "target": "3013",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
     {
       "source": "3022",
-      "target": "3003",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3022",
-      "target": "3004",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3022",
-      "target": "4097",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3022",
-      "target": "4003",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3022",
-      "target": "4015",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3022",
-      "target": "4011",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
     {
       "source": "3025",
-      "target": "3004",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3025",
-      "target": "4097",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3025",
-      "target": "4003",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3025",
-      "target": "3003",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3025",
-      "target": "4015",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3025",
-      "target": "4011",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
     {
       "source": "3029",
-      "target": "4076",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3029",
-      "target": "4011",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3029",
-      "target": "3065",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3029",
-      "target": "3004",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3029",
-      "target": "4097",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3029",
-      "target": "4003",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
@@ -15679,55 +13008,13 @@
     },
     {
       "source": "3032",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3032",
-      "target": "3013",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3032",
-      "target": "4093",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3032",
-      "target": "4081",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3032",
-      "target": "4015",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3032",
       "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
-    },
-    {
-      "source": "3033",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "electrolyte"
     },
     {
       "source": "3033",
       "target": "4110",
-      "relationship": "supplies_material",
-      "material": "electrolyte"
-    },
-    {
-      "source": "3033",
-      "target": "3013",
       "relationship": "supplies_material",
       "material": "electrolyte"
     },
@@ -15750,110 +13037,32 @@
       "material": "electrolyte"
     },
     {
-      "source": "3036",
-      "target": "4015",
+      "source": "3033",
+      "target": "4035",
       "relationship": "supplies_material",
-      "material": "processed_material"
+      "material": "electrolyte"
+    },
+    {
+      "source": "3033",
+      "target": "4029",
+      "relationship": "supplies_material",
+      "material": "electrolyte"
     },
     {
       "source": "3036",
-      "target": "3003",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3036",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3036",
-      "target": "4093",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3036",
-      "target": "3013",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3036",
-      "target": "4081",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
     {
       "source": "3037",
-      "target": "4015",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3037",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3037",
-      "target": "4081",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3037",
-      "target": "4093",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3037",
-      "target": "3013",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3037",
-      "target": "3003",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3040",
-      "target": "4093",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3040",
-      "target": "3013",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3040",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3040",
-      "target": "4015",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3040",
       "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
     {
       "source": "3040",
-      "target": "4081",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
@@ -15877,55 +13086,25 @@
     },
     {
       "source": "3041",
-      "target": "4015",
-      "relationship": "supplies_material",
-      "material": "electrolyte"
-    },
-    {
-      "source": "3041",
       "target": "4108",
       "relationship": "supplies_material",
       "material": "electrolyte"
     },
     {
       "source": "3041",
-      "target": "3003",
+      "target": "4090",
+      "relationship": "supplies_material",
+      "material": "electrolyte"
+    },
+    {
+      "source": "3041",
+      "target": "4024",
       "relationship": "supplies_material",
       "material": "electrolyte"
     },
     {
       "source": "3042",
-      "target": "4081",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3042",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3042",
       "target": "4103",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3042",
-      "target": "3013",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3042",
-      "target": "4093",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3042",
-      "target": "4015",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
@@ -15961,7 +13140,7 @@
     },
     {
       "source": "3045",
-      "target": "4015",
+      "target": "4110",
       "relationship": "supplies_material",
       "material": "electrolyte"
     },
@@ -15985,12 +13164,6 @@
     },
     {
       "source": "3051",
-      "target": "11020",
-      "relationship": "supplies_material",
-      "material": "separator"
-    },
-    {
-      "source": "3051",
       "target": "4022",
       "relationship": "supplies_material",
       "material": "separator"
@@ -15998,6 +13171,12 @@
     {
       "source": "3051",
       "target": "4105",
+      "relationship": "supplies_material",
+      "material": "separator"
+    },
+    {
+      "source": "3051",
+      "target": "4068",
       "relationship": "supplies_material",
       "material": "separator"
     },
@@ -16021,55 +13200,25 @@
     },
     {
       "source": "3054",
-      "target": "4011",
+      "target": "4022",
       "relationship": "supplies_material",
       "material": "separator"
     },
     {
       "source": "3054",
-      "target": "4076",
+      "target": "4105",
       "relationship": "supplies_material",
       "material": "separator"
     },
     {
       "source": "3054",
-      "target": "3065",
+      "target": "4097",
       "relationship": "supplies_material",
       "material": "separator"
     },
     {
       "source": "3056",
-      "target": "4015",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3056",
-      "target": "3003",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3056",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3056",
-      "target": "4093",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3056",
-      "target": "3013",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3056",
-      "target": "4081",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
@@ -16111,37 +13260,7 @@
     },
     {
       "source": "3059",
-      "target": "4015",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3059",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3059",
-      "target": "4093",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3059",
-      "target": "3013",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3059",
-      "target": "4081",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3059",
-      "target": "3003",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
@@ -16159,25 +13278,25 @@
     },
     {
       "source": "3060",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "electrolyte"
-    },
-    {
-      "source": "3060",
       "target": "4110",
       "relationship": "supplies_material",
       "material": "electrolyte"
     },
     {
       "source": "3060",
-      "target": "3013",
+      "target": "4093",
       "relationship": "supplies_material",
       "material": "electrolyte"
     },
     {
       "source": "3060",
-      "target": "4093",
+      "target": "4103",
+      "relationship": "supplies_material",
+      "material": "electrolyte"
+    },
+    {
+      "source": "3060",
+      "target": "4002",
       "relationship": "supplies_material",
       "material": "electrolyte"
     },
@@ -16219,73 +13338,13 @@
     },
     {
       "source": "3063",
-      "target": "3003",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3063",
-      "target": "4015",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3063",
-      "target": "3004",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3063",
-      "target": "4097",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3063",
-      "target": "4003",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3063",
-      "target": "4093",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
     {
       "source": "3064",
-      "target": "4015",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3064",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3064",
-      "target": "4081",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3064",
-      "target": "4093",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3064",
-      "target": "3013",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3064",
-      "target": "3003",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
@@ -16321,55 +13380,25 @@
     },
     {
       "source": "3065",
-      "target": "5168",
+      "target": "5077",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "3065",
-      "target": "5135",
+      "target": "5239",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "3065",
-      "target": "5143",
+      "target": "5232",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
     {
       "source": "3067",
-      "target": "4015",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3067",
-      "target": "3003",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3067",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3067",
-      "target": "4093",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3067",
-      "target": "3013",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3067",
-      "target": "4081",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
@@ -16387,18 +13416,6 @@
     },
     {
       "source": "3069",
-      "target": "3013",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "3069",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "lithium"
-    },
-    {
-      "source": "3069",
       "target": "4110",
       "relationship": "supplies_material",
       "material": "lithium"
@@ -16410,38 +13427,20 @@
       "material": "lithium"
     },
     {
-      "source": "3071",
-      "target": "4015",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3071",
+      "source": "3069",
       "target": "4093",
       "relationship": "supplies_material",
-      "material": "processed_material"
+      "material": "lithium"
     },
     {
-      "source": "3071",
-      "target": "3017",
+      "source": "3069",
+      "target": "4002",
       "relationship": "supplies_material",
-      "material": "processed_material"
+      "material": "lithium"
     },
     {
       "source": "3071",
-      "target": "3003",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3071",
-      "target": "3013",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3071",
-      "target": "4081",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
@@ -16465,12 +13464,6 @@
     },
     {
       "source": "3076",
-      "target": "3003",
-      "relationship": "supplies_material",
-      "material": "electrolyte"
-    },
-    {
-      "source": "3076",
       "target": "4083",
       "relationship": "supplies_material",
       "material": "electrolyte"
@@ -16478,6 +13471,12 @@
     {
       "source": "3076",
       "target": "4109",
+      "relationship": "supplies_material",
+      "material": "electrolyte"
+    },
+    {
+      "source": "3076",
+      "target": "4006",
       "relationship": "supplies_material",
       "material": "electrolyte"
     },
@@ -16495,19 +13494,7 @@
     },
     {
       "source": "3078",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "separator"
-    },
-    {
-      "source": "3078",
       "target": "4110",
-      "relationship": "supplies_material",
-      "material": "separator"
-    },
-    {
-      "source": "3078",
-      "target": "3013",
       "relationship": "supplies_material",
       "material": "separator"
     },
@@ -16518,68 +13505,20 @@
       "material": "separator"
     },
     {
-      "source": "3080",
-      "target": "3003",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3080",
-      "target": "4015",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3080",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3080",
+      "source": "3078",
       "target": "4093",
       "relationship": "supplies_material",
-      "material": "processed_material"
+      "material": "separator"
+    },
+    {
+      "source": "3078",
+      "target": "4002",
+      "relationship": "supplies_material",
+      "material": "separator"
     },
     {
       "source": "3080",
-      "target": "3013",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3080",
-      "target": "4081",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3081",
-      "target": "4093",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3081",
-      "target": "3013",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3081",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3081",
-      "target": "4015",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3081",
-      "target": "3003",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
@@ -16627,67 +13566,7 @@
     },
     {
       "source": "3084",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3084",
-      "target": "3013",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3084",
-      "target": "4093",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3084",
-      "target": "4081",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3084",
       "target": "4103",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3084",
-      "target": "4015",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3085",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3085",
-      "target": "3013",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3085",
-      "target": "4093",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3085",
-      "target": "4081",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3085",
-      "target": "4015",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
@@ -16699,73 +13578,13 @@
     },
     {
       "source": "3086",
-      "target": "3065",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3086",
-      "target": "4076",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3086",
-      "target": "4011",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3086",
-      "target": "11020",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3086",
-      "target": "4003",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3086",
-      "target": "4097",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
     {
       "source": "3087",
-      "target": "3065",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3087",
-      "target": "4076",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3087",
-      "target": "4011",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3087",
-      "target": "11020",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3087",
-      "target": "3004",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3087",
-      "target": "4097",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "processed_material"
     },
@@ -16801,7 +13620,7 @@
     },
     {
       "source": "3088",
-      "target": "5070",
+      "target": "5183",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -16813,7 +13632,7 @@
     },
     {
       "source": "3088",
-      "target": "5177",
+      "target": "5120",
       "relationship": "supplies_cells",
       "material": "battery_cells"
     },
@@ -16849,7 +13668,7 @@
     },
     {
       "source": "3093",
-      "target": "3013",
+      "target": "4063",
       "relationship": "supplies_material",
       "material": "electrolyte"
     },
@@ -16879,79 +13698,19 @@
     },
     {
       "source": "3094",
-      "target": "11020",
+      "target": "4103",
       "relationship": "supplies_material",
       "material": "electrolyte"
     },
     {
       "source": "3094",
-      "target": "4103",
+      "target": "4028",
       "relationship": "supplies_material",
       "material": "electrolyte"
     },
     {
       "source": "3097",
-      "target": "4081",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3097",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3097",
       "target": "4103",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3097",
-      "target": "3013",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3097",
-      "target": "4093",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3097",
-      "target": "4015",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3098",
-      "target": "3017",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3098",
-      "target": "4093",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3098",
-      "target": "3013",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3098",
-      "target": "4015",
-      "relationship": "supplies_material",
-      "material": "processed_material"
-    },
-    {
-      "source": "3098",
-      "target": "4081",
       "relationship": "supplies_material",
       "material": "processed_material"
     },

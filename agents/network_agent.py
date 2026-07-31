@@ -13,6 +13,7 @@ Output (written to PipelineState):
   downstream_fanout : dict[str, int]
 """
 
+import difflib
 import json
 from collections import deque
 from pathlib import Path
@@ -70,6 +71,11 @@ def _load_graph() -> nx.DiGraph:
 # ── Match helpers ─────────────────────────────────────────────────────────────
 
 def _material_match(node_attrs: dict[str, Any], material: str) -> bool:
+    # Guard: an empty material string is a substring of everything in Python
+    # ("" in "anything" is True), so without this an empty/missing material would
+    # match every node — turning "no material identified" into "match all materials".
+    if not material:
+        return False
     kws = str(node_attrs.get("material_keywords", "")).lower()
     return material.lower() in kws
 
@@ -79,7 +85,7 @@ def _region_match(node_attrs: dict[str, Any], region: str) -> bool:
     True if the node's import_origin_region overlaps with the event region.
     Only meaningful for nodes where import_dependency=True.
     """
-    if not node_attrs.get("import_dependency", False):
+    if not region or not node_attrs.get("import_dependency", False):
         return False
     origin = str(node_attrs.get("import_origin_region", "")).lower()
     region_lower = region.lower()
@@ -169,6 +175,88 @@ def _find_root_seeds(G: nx.DiGraph, candidates: list[str]) -> list[str]:
     return [c for c in candidates if c not in reached_by_other]
 
 
+def _entity_match_seeds(
+    all_nodes: dict[str, dict],
+    mentioned_company: Optional[str],
+    mentioned_location: Optional[str],
+) -> tuple[list[str], Optional[str]]:
+    """
+    Strategy B: facility-specific disruption seeding (e.g. "Fire at Panasonic Kansas
+    plant"). Fuzzy-matches mentioned_company against node `company` fields — a
+    facility-specific event doesn't need import_dependency/region at all, it's a
+    direct hit on a named entity.
+
+    Scoped as "Version 1" (see architecture.md "Vorschlag: Multi-Strategie Seed
+    Generator" and the todo-strategy-b-entity-matching memory): no alias/synonym table
+    (e.g. "GM" -> "Ultium Cells LLC") — that's unbounded maintenance work and a
+    distraction from the supply-chain-risk-modeling core of the project. If a company
+    has multiple facilities (common in this dataset — e.g. Vale Canada has 10), the
+    mentioned_location must narrow it down to exactly one; if it can't, this deliberately
+    does NOT guess — returns ("entity_ambiguous", []) instead of picking a candidate.
+
+    Returns (seed_ids, status) where status is "entity_matched" | "entity_ambiguous" |
+    "entity_non_material" | None (None = mentioned_company was empty, Strategy B simply
+    didn't apply).
+    """
+    if not mentioned_company:
+        return [], None
+
+    def _all_non_material(nids: list[str]) -> bool:
+        # non_active_material marks mechanical/safety/BMS component suppliers (2026-07-31,
+        # docs/open_issues.md P16) — this system's material-flow risk model doesn't apply
+        # to them, so they must not be treated as a real supply-chain risk seed.
+        return all(all_nodes[nid].get("material_keywords") == "non_active_material" for nid in nids)
+
+    company_names = sorted({
+        attrs.get("company", "") for attrs in all_nodes.values() if attrs.get("company")
+    })
+
+    matches = difflib.get_close_matches(mentioned_company, company_names, n=1, cutoff=0.6)
+    if not matches:
+        # Fuzzy ratio can miss short/abbreviated names ("GM" vs "General Motors Company") —
+        # fall back to a substring check, but only accept it if it's unambiguous.
+        mc_lower = mentioned_company.lower()
+        substring_hits = [
+            c for c in company_names if mc_lower in c.lower() or c.lower() in mc_lower
+        ]
+        if len(substring_hits) == 1:
+            matches = substring_hits
+        else:
+            return [], "entity_ambiguous"
+
+    matched_company = matches[0]
+    candidates = [nid for nid, attrs in all_nodes.items() if attrs.get("company") == matched_company]
+
+    def _site_key(nid: str) -> tuple:
+        a = all_nodes[nid]
+        return (a.get("company"), a.get("city"), a.get("state"))
+
+    # NAATBatt records one row per company/material-product-line, not per physical
+    # site (same pattern as the Top-3 duplicate bug, synthesis_agent.py) — multiple
+    # candidate rows at the SAME (company, city, state) are one physical site, not an
+    # ambiguity to resolve.
+    if len({_site_key(nid) for nid in candidates}) == 1:
+        if _all_non_material(candidates):
+            return [], "entity_non_material"
+        return candidates, "entity_matched"
+
+    if mentioned_location:
+        loc_lower = mentioned_location.lower()
+        narrowed = [
+            nid for nid in candidates
+            if loc_lower in str(all_nodes[nid].get("city", "")).lower()
+            or loc_lower in str(all_nodes[nid].get("state", "")).lower()
+        ]
+        if narrowed and len({_site_key(nid) for nid in narrowed}) == 1:
+            if _all_non_material(narrowed):
+                return [], "entity_non_material"
+            return narrowed, "entity_matched"
+
+    # Multiple distinct physical sites under this company, location missing or
+    # didn't narrow to exactly one — do not guess.
+    return [], "entity_ambiguous"
+
+
 def _downstream_fanout(G: nx.DiGraph, node_id: str) -> int:
     """Number of Downstream-segment nodes reachable from node_id."""
     reachable = _bfs_descendants(G, [node_id])
@@ -212,13 +300,33 @@ def run_network_agent(state: PipelineState) -> PipelineState:
         nid for nid, attrs in all_nodes.items()
         if _material_match(attrs, material) and _region_match(attrs, region)
     ]
-    seed_ids: list[str] = _find_root_seeds(G, candidate_ids)
+    rule_seed_ids: list[str] = _find_root_seeds(G, candidate_ids)
+
+    # Strategy B: facility-specific disruption (e.g. "Fire at Panasonic Kansas plant").
+    # Independent of Strategy A — a news item can name a specific company instead of
+    # (or in addition to) matching the material+region import-dependency pattern.
+    entity_seed_ids, entity_status = _entity_match_seeds(
+        all_nodes,
+        state.get("mentioned_company"),
+        state.get("mentioned_location"),
+    )
+
+    seed_ids: list[str] = list(set(rule_seed_ids) | set(entity_seed_ids))
 
     # "no_seed_found" must NOT be read as "no NA exposure" — see SeedGenerationStatus
-    # docstring in state.py. Currently only Strategy A (rule matching) exists, so this
-    # fires for any event type this system doesn't yet model (facility-specific,
-    # tier-wide domestic, logistics/port — see architecture.md).
-    seed_generation_status: str = "rule_matched" if seed_ids else "no_seed_found"
+    # docstring in state.py. Only Strategy A (rule matching) and Strategy B (entity
+    # matching) exist so far, so this fires for any event type this system doesn't yet
+    # model (tier-wide domestic, logistics/port — see architecture.md).
+    if entity_status == "entity_matched":
+        seed_generation_status: str = "entity_matched"
+    elif rule_seed_ids:
+        seed_generation_status = "rule_matched"
+    elif entity_status == "entity_non_material":
+        seed_generation_status = "entity_non_material"
+    elif entity_status == "entity_ambiguous":
+        seed_generation_status = "entity_ambiguous"
+    else:
+        seed_generation_status = "no_seed_found"
 
     # ── Step 2: BFS expansion — all nodes reachable from seeds ───────────────
     reachable, predecessor = _bfs_with_predecessors(G, seed_ids)
@@ -280,6 +388,7 @@ def run_network_agent(state: PipelineState) -> PipelineState:
             import_dependency=bool(attrs.get("import_dependency", False)),
             import_origin_region=attrs.get("import_origin_region", ""),
             lead_time_weeks=int(attrs.get("lead_time_weeks", 0)),
+            cell_supplier_count=G.in_degree(nid),
         )
 
     affected_nodes = [to_node(nid) for nid in sorted(affected_ids)]

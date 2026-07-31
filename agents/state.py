@@ -46,18 +46,36 @@ propagated → Facility wurde erst über BFS-Traversierung im Wissensgraphen err
              (nachgelagert zu einem Seed-Node); Pfadlänge > 1.
 """
 
-SeedGenerationStatus = Literal["rule_matched", "no_seed_found"]
+SeedGenerationStatus = Literal[
+    "rule_matched", "entity_matched", "entity_ambiguous", "no_seed_found",
+    "entity_non_material"
+]
 """
-rule_matched   → mindestens ein Root-Seed über Material+Region-Matching gefunden (Strategy A).
-no_seed_found  → kein Seed gefunden. WICHTIG: das ist NICHT gleichbedeutend mit "keine
-                 NA-Exposition" — der aktuelle Matching-Mechanismus deckt nur einen
-                 Ereignistyp ab (importabhängige Rohstoffstörung, siehe architecture.md
-                 "Bekannte Grenzen des Seeding-Mechanismus"). "no_seed_found" bedeutet
-                 häufig "dieser Ereignistyp wird vom System nicht erkannt", nicht
-                 "geprüft und für unbedenklich befunden". Muss im Bericht/UI explizit
-                 von einem echten Nullbefund unterschieden werden.
-(Weitere Werte "entity_matched"/"llm_fallback" vorgesehen, sobald Strategy B/C
- umgesetzt sind — siehe architecture.md "Vorschlag: Multi-Strategie Seed Generator".)
+rule_matched         → mindestens ein Root-Seed über Material+Region-Matching gefunden (Strategy A).
+entity_matched       → mindestens ein Seed über Firmennamen-Matching gefunden (Strategy B) —
+                       facility-spezifisches Ereignis (z.B. "Fire at Panasonic Kansas plant"),
+                       unabhängig von import_dependency/Region.
+entity_ambiguous     → eine Firma wurde im Text erkannt, aber sie hat mehrere Anlagen im Graph
+                       und der genannte Ort (falls vorhanden) reicht nicht aus, um EINE eindeutig
+                       zu bestimmen. Bewusst NICHT geraten — siehe architecture.md "Vorschlag:
+                       Multi-Strategie Seed Generator", Punkt "nicht raten".
+no_seed_found        → kein Seed gefunden (weder Strategy A noch B). WICHTIG: das ist NICHT
+                       gleichbedeutend mit "keine NA-Exposition" — der aktuelle Matching-Mechanismus
+                       deckt nur zwei Ereignistypen ab (importabhängige Rohstoffstörung; benannte
+                       Anlagenstörung), siehe architecture.md "Bekannte Grenzen des
+                       Seeding-Mechanismus". Muss im Bericht/UI explizit von einem echten
+                       Nullbefund unterschieden werden.
+entity_non_material  → Strategy B hat die genannte Firma eindeutig einer Anlage zugeordnet, aber
+                       diese Anlage ist als `non_active_material` markiert (mechanischer/
+                       sicherheitstechnischer Komponentenlieferant, z.B. Klebstoffe, Dichtungen,
+                       BMS-Module — kein Verarbeiter von cobalt/lithium/nickel/graphite/manganese).
+                       Das Materialfluss-Risikomodell dieses Systems ist auf diese Anlage nicht
+                       anwendbar (2026-07-31, docs/open_issues.md P16). Bewusst NICHT wie
+                       entity_matched behandelt, sonst würde z.B. "Brand bei ArlanXEO" eine
+                       Batterie-Rohstoff-Risikoausbreitung vortäuschen, obwohl ArlanXEO keine
+                       Risikomaterialien verarbeitet.
+(Weiterer Wert "llm_fallback" vorgesehen, sobald Strategy C umgesetzt ist — siehe
+ architecture.md "Vorschlag: Multi-Strategie Seed Generator".)
 """
 
 
@@ -88,6 +106,12 @@ class Node(TypedDict):
     import_dependency: bool       # [literaturbasierte Regel] True wenn Material import-abhängig UND Segment != Upstream (USGS NIR)
     import_origin_region: str     # [simuliert] z.B. "Africa/DRC", "South America / Australia"
     lead_time_weeks: int          # [simuliert] Vorlaufzeit: Upstream=12W, BGM=8W, Cell=6W, Downstream=4W
+    cell_supplier_count: int      # In-Degree im Graph = Anzahl verbundener Midstream-Cell-Knoten.
+                                   # Nur für Downstream-Knoten strukturell aussagekräftig (siehe
+                                   # single_source_dependency in FacilityData); für andere Segmente
+                                   # bedeutungslos/ungenutzt. NA-Graph-Umfang: reflektiert nur die im
+                                   # NAATBatt-Datensatz enthaltenen (nordamerikanischen) Cell-Lieferanten,
+                                   # nicht reale globale Lieferantenzahl (2026-07-31).
 
 
 class FacilityData(TypedDict):
@@ -102,6 +126,19 @@ class FacilityData(TypedDict):
     import_dep: bool
     lead_time_norm: float         # lead_time_weeks / 12, normiert auf 0–1
     capacity_share: float         # Rohanteil an Gesamtkapazität (0–1); 0 wenn unbekannt oder nicht vergleichbar
+    single_source_dependency: float  # [2026-07-31] Nur für Downstream: 1 / cell_supplier_count (0 wenn
+                                      # cell_supplier_count=0 oder Segment != Downstream). Ersetzt
+                                      # capacity_share im Vulnerability-Term NUR für Downstream-Knoten
+                                      # (siehe synthesis_agent.py::_compute_scores) — CapacityShare selbst
+                                      # ist dort strukturell nicht berechenbar (Downstream-Kapazitätswerte
+                                      # sind Fahrzeug-/Pack-Stückzahlen, keine mit Upstream/Cell
+                                      # vergleichbare Einheit). Nutzt stattdessen die bereits im Graph
+                                      # vorhandene Struktur: je weniger Cell-Lieferanten ein Downstream-
+                                      # Knoten im Graph hat, desto stärker ist er von jedem einzelnen
+                                      # abhängig. WICHTIG: reflektiert nur NA-Graph-Konnektivität — ein
+                                      # Downstream-Standort kann in der Realität zusätzliche, hier nicht
+                                      # erfasste außer-nordamerikanische Lieferanten haben (gleiche
+                                      # Nordamerika-Scope-Einschränkung wie an anderer Stelle dokumentiert).
     resilience_discount: float    # 0–0.5 (basiert auf AltCapacityRatio)
 
 
@@ -177,6 +214,8 @@ class PipelineState(TypedDict, total=False):
     region: str                        # Betroffene Region, z.B. "Africa/DRC"
     keywords: list[str]
     filtered_text: str                 # Bereinigter, relevanter Nachrichtentext
+    mentioned_company: Optional[str]   # Konkret genannte Firma bei Facility-Ereignissen, sonst None
+    mentioned_location: Optional[str]  # Stadt/Bundesstaat neben der Firma genannt, sonst None
 
     # ── [R] Risk Assessment Agent — LLM ─────────────────────────────────────
     severity: int                      # 1 (gering) – 5 (kritisch)

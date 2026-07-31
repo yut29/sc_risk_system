@@ -36,11 +36,12 @@ SAMPLES = {
         "affects roughly 30% of global lithium carbonate supply destined for North American "
         "battery manufacturers."
     ),
-    "S3 — Port disruption (Vancouver)": (
-        "A major cyberattack has disrupted operations at the Port of Vancouver, halting "
-        "shipments of battery-grade graphite and lithium carbonate destined for US cell "
-        "manufacturers. Authorities estimate a 2-week delay minimum before normal "
-        "operations resume."
+    "S3 — Facility disruption (Panasonic, Kansas)": (
+        "A fire has broken out at Panasonic's battery cell manufacturing plant in De "
+        "Soto, Kansas, halting production indefinitely. The facility, one of the "
+        "largest EV battery plants in North America, supplies cells to Tesla, Toyota, "
+        "and Lucid Motors. Local officials say it is too early to estimate how long "
+        "the shutdown will last."
     ),
     "User query (Trigger B)": (
         "What happens to North American battery supply if China bans graphite exports?"
@@ -151,15 +152,41 @@ k2.metric("Risk Type", RISK_TYPE_LABEL.get(risk_type, risk_type))
 k3.metric("Material", material.capitalize())
 k4.metric("Region", region)
 
-if result.get("seed_generation_status") == "no_seed_found":
+_seed_status = result.get("seed_generation_status")
+if _seed_status == "no_seed_found":
     st.error(
         "⚠️ **Not classifiable by this system — this is NOT a \"no risk found\" result.** "
-        "The system currently only detects import-dependent raw-material disruptions abroad "
-        "(a North American facility importing the affected material from the affected region). "
-        "This event didn't match that pattern — it may be a facility-specific incident, a "
-        "domestic tier-wide issue, or a logistics/port event, none of which this system can "
-        "currently classify. **Treat any numbers below as not meaningful and review this case "
-        "manually** — do not read the absence of results as evidence of no exposure."
+        "The system currently only detects (1) import-dependent raw-material disruptions abroad, "
+        "or (2) facility-specific disruptions at a named, uniquely-identifiable company. "
+        "This event didn't match either pattern — it may be a domestic tier-wide issue or a "
+        "logistics/port event, neither of which this system can currently classify. "
+        "**Treat any numbers below as not meaningful and review this case manually** — do not "
+        "read the absence of results as evidence of no exposure."
+    )
+elif _seed_status == "entity_ambiguous":
+    _company = result.get("mentioned_company", "this company")
+    st.warning(
+        f"⚠️ **Facility reference ambiguous — this is NOT a \"no risk found\" result.** "
+        f"\"{_company}\" was recognized, but it has multiple facilities in the network and the "
+        f"location mentioned (if any) wasn't enough to identify exactly one. The system "
+        f"deliberately does not guess which site is meant. **Treat any numbers below as not "
+        f"meaningful** — re-run with a more specific location if possible."
+    )
+elif _seed_status == "entity_non_material":
+    _company = result.get("mentioned_company", "this company")
+    st.warning(
+        f"⚠️ **\"{_company}\" resolved to a non-material facility — this is NOT a \"no risk "
+        f"found\" result.** The named company was matched uniquely, but it is a mechanical/"
+        f"safety/component supplier (e.g. adhesives, thermal systems, BMS modules) that doesn't "
+        f"process any of the raw materials this system tracks. This system models raw-material "
+        f"supply-chain risk, not general component/BOM disruption. **Treat any numbers below as "
+        f"not meaningful.**"
+    )
+elif _seed_status == "entity_matched":
+    st.success(
+        f"✅ Seed identified via facility-name matching: **{result.get('mentioned_company', '')}**"
+        + (f" ({result.get('mentioned_location')})" if result.get("mentioned_location") else "")
+        + " — not via the material/region import-dependency rule."
     )
 
 st.divider()
@@ -334,7 +361,7 @@ if top3:
         if f.get("supply_path"):
             label = "🔴 Primary" if f.get("exposure_type") == "direct" else "🔀 Propagated"
             st.markdown(f"{i}. [{label}] {f['supply_path']}")
-elif result.get("seed_generation_status") == "no_seed_found":
+elif result.get("seed_generation_status") in ("no_seed_found", "entity_ambiguous", "entity_non_material"):
     st.caption("No candidate facilities generated. Please refer to the system limitation notice above.")
 else:
     st.caption("No high-risk facilities identified — this event matched the supported pattern "

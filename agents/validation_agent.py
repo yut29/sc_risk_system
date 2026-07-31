@@ -166,13 +166,14 @@ def run_validation_agent(state: PipelineState) -> PipelineState:
     """
     iteration = state.get("iteration", 0) + 1
 
-    # The "no_seed_found" report (see synthesis_agent._no_seed_found_report) is a fixed,
-    # non-generative notice — there's no risk claim, entity reference, or capacity figure
-    # to validate. Judging it against normal-report expectations produces spurious
-    # complaints (observed: "missing Top-3 justification") that would trigger a wasted
-    # retry loop back to Risk Assessment Agent, which would just reproduce the same
-    # no_seed_found result deterministically.
-    if state.get("seed_generation_status") == "no_seed_found":
+    # The "no_seed_found" / "entity_ambiguous" / "entity_non_material" reports (see
+    # synthesis_agent.py's _no_seed_found_report / _entity_ambiguous_report /
+    # _entity_non_material_report) are fixed, non-generative notices — there's no risk
+    # claim, entity reference, or capacity figure to validate. Judging them against
+    # normal-report expectations produces spurious complaints (observed: "missing Top-3
+    # justification") that would trigger a wasted retry loop back to Risk Assessment
+    # Agent, which would just reproduce the same result deterministically.
+    if state.get("seed_generation_status") in ("no_seed_found", "entity_ambiguous", "entity_non_material"):
         return {
             **state,
             "valid":        True,
