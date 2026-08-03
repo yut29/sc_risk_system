@@ -106,12 +106,16 @@ class Node(TypedDict):
     import_dependency: bool       # [literaturbasierte Regel] True wenn Material import-abhängig UND Segment != Upstream (USGS NIR)
     import_origin_region: str     # [simuliert] z.B. "Africa/DRC", "South America / Australia"
     lead_time_weeks: int          # [simuliert] Vorlaufzeit: Upstream=12W, BGM=8W, Cell=6W, Downstream=4W
-    cell_supplier_count: int      # In-Degree im Graph = Anzahl verbundener Midstream-Cell-Knoten.
-                                   # Nur für Downstream-Knoten strukturell aussagekräftig (siehe
-                                   # single_source_dependency in FacilityData); für andere Segmente
-                                   # bedeutungslos/ungenutzt. NA-Graph-Umfang: reflektiert nur die im
-                                   # NAATBatt-Datensatz enthaltenen (nordamerikanischen) Cell-Lieferanten,
-                                   # nicht reale globale Lieferantenzahl (2026-07-31).
+    direct_supplier_count: int    # In-Degree im Graph = Anzahl direkt verbundener Knoten der
+                                   # jeweils vorgelagerten Stufe (Downstream→Cell, Midstream-BGM→
+                                   # Upstream; Upstream/Midstream-Cell haben eigene, kapazitätsbasierte
+                                   # Kennzahlen und nutzen dieses Feld nicht — siehe
+                                   # single_source_dependency in FacilityData). Bis 2026-07-31 nur für
+                                   # Downstream verwendet (damals noch "cell_supplier_count" genannt),
+                                   # seit 2026-08-03 auch für Midstream-BGM (siehe FacilityData).
+                                   # NA-Graph-Umfang: reflektiert nur die im NAATBatt-Datensatz
+                                   # enthaltenen (nordamerikanischen) Lieferanten der Vorstufe, nicht
+                                   # die reale globale Lieferantenzahl.
 
 
 class FacilityData(TypedDict):
@@ -125,21 +129,42 @@ class FacilityData(TypedDict):
     supplier_concentration: bool
     import_dep: bool
     lead_time_norm: float         # lead_time_weeks / 12, normiert auf 0–1
-    capacity_share: float         # Rohanteil an Gesamtkapazität (0–1); 0 wenn unbekannt oder nicht vergleichbar
-    single_source_dependency: float  # [2026-07-31] Nur für Downstream: 1 / cell_supplier_count (0 wenn
-                                      # cell_supplier_count=0 oder Segment != Downstream). Ersetzt
-                                      # capacity_share im Vulnerability-Term NUR für Downstream-Knoten
-                                      # (siehe synthesis_agent.py::_compute_scores) — CapacityShare selbst
-                                      # ist dort strukturell nicht berechenbar (Downstream-Kapazitätswerte
-                                      # sind Fahrzeug-/Pack-Stückzahlen, keine mit Upstream/Cell
-                                      # vergleichbare Einheit). Nutzt stattdessen die bereits im Graph
-                                      # vorhandene Struktur: je weniger Cell-Lieferanten ein Downstream-
-                                      # Knoten im Graph hat, desto stärker ist er von jedem einzelnen
-                                      # abhängig. WICHTIG: reflektiert nur NA-Graph-Konnektivität — ein
-                                      # Downstream-Standort kann in der Realität zusätzliche, hier nicht
-                                      # erfasste außer-nordamerikanische Lieferanten haben (gleiche
+    capacity_share: float         # Rohanteil an Gesamtkapazität (0–1); nur Upstream/Midstream-
+                                   # Cell mit capacity_known=True; sonst 1.0 (Worst-Case-Default,
+                                   # nicht 0 — siehe data_retrieval_agent.py). Seit 2026-08-03
+                                   # NICHT mehr Teil von Vulnerability, sondern alleinige
+                                   # Grundlage von resilience_discount (siehe unten) — Wechsel
+                                   # löst die alte Richtungsspannung auf ("großer Marktanteil =
+                                   # großes Vulnerability" brauchte die umständliche Erklärung
+                                   # "systemischer Schaden, nicht Eigenrobustheit"; als
+                                   # Resilience-Frage gestellt ist die Richtung intuitiv: großer
+                                   # Marktanteil = niemand kann einspringen = kleiner Rabatt).
+    single_source_dependency: float  # [2026-07-31, seit 2026-08-03 für ALLE vier Tiers]
+                                      # 1 / direct_supplier_count (0 wenn direct_supplier_count=0,
+                                      # strukturell immer der Fall bei Upstream — Graph-Wurzel, kein
+                                      # Vorstufen-Lieferant). Seit 2026-08-03 Teil von Vulnerability
+                                      # (0.25 Gewicht, siehe VULNERABILITY_WEIGHTS) — eigene
+                                      # Lieferantenanzahl ist ein Selbstbezug-Fragilitätssignal
+                                      # ("hängt DIESE Anlage an wenigen Lieferanten"), nicht ein
+                                      # Systemwiederherstellungssignal (das übernimmt jetzt
+                                      # capacity_share/resilience_discount, siehe oben/unten).
+                                      # WICHTIG: reflektiert nur NA-Graph-Konnektivität — ein Standort
+                                      # kann in der Realität zusätzliche, hier nicht erfasste
+                                      # außer-nordamerikanische Lieferanten haben (gleiche
                                       # Nordamerika-Scope-Einschränkung wie an anderer Stelle dokumentiert).
-    resilience_discount: float    # 0–0.5 (basiert auf AltCapacityRatio)
+    resilience_discount: float    # 0–0.5, alle vier Tiers einheitlich, seit 2026-08-03 (gleicher
+                                   # Tag) CapacityShare-basiert statt SingleSourceDependency-basiert:
+                                   # (1 − capacity_share) / 2. Kein Sonderfall für "unbekannt" nötig
+                                   # (anders als die alte SSD-Version mit ihrem
+                                   # `if single_source_dependency > 0`-Guard): capacity_share ist
+                                   # schon immer in [0,1] UND ihr eigener Worst-Case-Default (1.0)
+                                   # ergibt hier automatisch (1-1)/2=0.0 — genau das gewünschte
+                                   # "kein Rabatt bei Unklarheit"-Verhalten, ohne extra Verzweigung.
+                                   # Kein min(...,0.5)-Cap nötig: capacity_share in [0,1] garantiert
+                                   # (1-capacity_share)/2 liegt schon von selbst in [0,0.5]. Ersetzt
+                                   # die frühere AltCapacityRatio-Methode (globaler
+                                   # Alternativkapazitäts-Pool), die für propagierte Knoten die
+                                   # falsche Frage beantwortete.
 
 
 class Facility(TypedDict):
@@ -244,7 +269,12 @@ class PipelineState(TypedDict, total=False):
     top3_facilities: list[Facility]    # Absteigend nach risk_score_normalized
     risk_scores: dict[str, float]      # {facility_id: risk_score_normalized (0–100)}
     global_metrics: GlobalMetrics
-    risk_tier_counts: dict[str, int]   # {"high"/"medium"/"low": count} — quantile-based, siehe compute_risk_tiers()
+    risk_score_stats: dict[str, float]  # {"max"/"median": RiskScore} — reale Verteilungswerte, siehe
+                                         # _compute_risk_score_stats() in synthesis_agent.py. Ersetzt
+                                         # 2026-08-03 das alte risk_tier_counts (High/Medium/Low): jene
+                                         # Funktion las nie die tatsächlichen Score-Werte, sondern nur
+                                         # len(risk_scores) — lieferte für jedes Ereignis eine fixe
+                                         # ~20/30/50-Aufteilung unabhängig von der echten Verteilung.
 
     # ── [V] Validation Agent — LLM ───────────────────────────────────────────
     valid: bool
@@ -280,15 +310,28 @@ def compute_tier_weight(facility_segment: Segment, origin_tier: Segment) -> floa
 VULNERABILITY_WEIGHTS: dict[str, float] = {
     "import_dependency":  0.30,
     "supplier_concentration": 0.30,
-    "capacity_share":     0.25,
+    "single_source_dependency": 0.25,   # was "capacity_share" — swapped 2026-08-03, see
+                                         # data_retrieval_agent.py's resilience_discount comment
     "lead_time_norm":     0.15,
 }
+# Weights rank each factor's real-world driving power for supply chain risk (not our
+# confidence in the underlying data): ImportDep/SupplierConcentration are the two biggest
+# levers (geopolitical exposure, market concentration); SingleSourceDependency is real but
+# narrower in scope (this facility's own supplier count, not the whole material market);
+# LeadTime_norm is the weakest/most-derived signal (a rule-based proxy for recovery time, not
+# a driver of whether disruption happens at all).
 
-LEAD_TIME_NORM_DIVISOR: float = 12.0
-# lead_time_norm = lead_time_weeks / LEAD_TIME_NORM_DIVISOR
-
-RESILIENCE_DISCOUNT_CAP: float = 0.5
-# ResilienceDiscount = min(AltCapacityRatio / 2, RESILIENCE_DISCOUNT_CAP)
+LEAD_TIME_NORM_DIVISOR: float = 21.0
+# lead_time_norm = min(lead_time_weeks / LEAD_TIME_NORM_DIVISOR, 1.0)
+# Raised from 12.0 to 21.0 (2026-08-03): 12 was the old segment-only max (Upstream base).
+# Since lead_time_weeks now also adds material/region/data-quality adjustments (see
+# MATERIAL_LEAD_TIME_ADJUSTMENT in build_facilities.py), the real max is
+# 12 (Upstream) + 4 (cobalt) + 3 (Africa/China region) + 2 (unknown capacity) = 21. Using
+# the OLD divisor of 12 here would have saturated every high-adjustment combination (e.g.
+# Midstream-BGM + cobalt: 8+4+3=15, already > 12) to the same capped 1.0 — re-collapsing
+# exactly the differentiation this refinement was meant to add. The min(...,1.0) cap still
+# applies for defense-in-depth, but with the divisor matching the true max it should no
+# longer trigger in practice.
 
 RISK_SCORE_MAX_THEORETICAL: float = 5.0
 # Severity(5) × TierWeight(1.0) × Vulnerability(1.0) × (1−0) = 5.0
@@ -309,3 +352,30 @@ USGS_GLOBAL_PRODUCTION_MT: dict[str, float] = {
 }
 # Verwendung: betroffene_kapazitaet_global_pct = Σ affected_capacity / USGS_GLOBAL_PRODUCTION_MT[material] × 100
 # Hinweis: NAATBatt-Kapazitäten decken nur nordamerikanische Anlagen ab → global% ist ein konservativer Untergrenzenwert.
+
+# ── Material-level classification (2026-08-03) ──────────────────────────────────
+# Mirrors data_prep/build_facilities.py's IMPORT_MATERIALS / HIGH_CONCENTRATION_MATERIALS
+# (kept duplicated rather than cross-imported — build_facilities.py is a standalone offline
+# script run from data_prep/, importing agents.state there would need extra sys.path setup
+# for a small win; MUST be kept in sync manually if either list changes).
+#
+# Used by synthesis_agent.py's _compute_scores() to give PROPAGATED facilities (exposed only
+# via graph traversal, not by their own material_keywords) a correct ImportDep/
+# SupplierConcentration value for the EVENT's actual affected_material, instead of either (a)
+# checking the facility's own keywords — which will be empty/irrelevant for a facility several
+# tiers downstream of the real material (e.g. Tesla doesn't carry a "cobalt" keyword, but IS
+# exposed to a cobalt event through its battery supply chain) — or (b) blanket-assuming True
+# for every propagated facility regardless of what material is even involved (an earlier,
+# looser version of this fix — see git history — that conflated "the event's material is
+# genuinely import-dependent" with "we don't know, so assume the worst", losing real signal
+# for the common S1/S2-style material-driven case).
+IMPORT_MATERIALS: set[str] = {"cobalt", "nickel", "lithium", "manganese", "graphite"}
+HIGH_CONCENTRATION_MATERIALS: set[str] = {"cobalt", "nmc", "nca"}
+# The full controlled vocabulary intake_agent.py's LLM is instructed to choose `material` from
+# (see its SYSTEM_PROMPT) — used to distinguish "a real tracked material that just isn't
+# import-dependent/concentrated" (currently only copper) from "not a recognized material at
+# all" (e.g. a Strategy B facility-specific event's free-text label like "battery cells", which
+# was never given a literature classification one way or the other). Only the latter falls
+# back to the precautionary "unknown -> True" default; a real "False" (like copper) is kept as
+# a real fact, not silently overridden.
+KNOWN_MATERIALS: set[str] = IMPORT_MATERIALS | {"copper"}

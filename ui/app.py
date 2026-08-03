@@ -222,7 +222,7 @@ _prop_pct = (propagated_count / len(affected_nodes) * 100) if affected_nodes els
 with st.container(border=True):
     st.subheader("Supply chain exposure")
     st.caption("How much of the entire North American battery supply chain network (all materials) this event "
-               "structurally reaches — reachability, not severity (see Risk Level below for that).")
+               "structurally reaches — reachability, not severity.")
     st.metric(
         "Potentially exposed facilities (share of full network)",
         f"{len(affected_nodes)} / {total_network}",
@@ -233,32 +233,36 @@ with st.container(border=True):
 
 with st.container(border=True):
     st.subheader(f"{material_label} network impact")
-    st.caption(f"Within just the {material_label.lower()} sub-network (facilities that handle "
-               f"{material_label.lower()} or sit downstream of one that does): how deep did this event reach?")
-    mc1, mc2 = st.columns(2)
-    mc1.metric(
-        "Potentially exposed nodes", f"{len(affected_nodes)} / {len(material_nodes)}",
-        delta=f"{_mat_pct:.1f}% penetration", delta_color="inverse",
-        help=f"Potentially exposed / total facilities within the {material_label} sub-network specifically "
-             f"(a much smaller, more relevant denominator than the full {total_network}-facility dataset).",
-    )
-    mc2.metric(
-        "Potentially exposed manufacturers", f"{len(affected_companies)} / {len(material_companies)}",
-        help="Same, but counted by distinct company (one company can own several facilities).",
-    )
-
-with st.container(border=True):
-    st.subheader("Risk level")
-    st.caption("Reachable ≠ high-risk. RiskScore already discounts facilities by distance from the event's "
-               "origin tier (TierWeight) — most potentially-exposed facilities end up Low tier once that's "
-               "applied. Tiers are quantile-based (top 20% / next 30% / bottom 50% of THIS event's own "
-               "RiskScore distribution), not a fixed 0-100 scale.")
-    tiers = result.get("risk_tier_counts", {"high": 0, "medium": 0, "low": 0})
-    t1, t2, t3 = st.columns(3)
-    t1.metric("🔴 High", tiers.get("high", 0), help="Top 20% of RiskScore among potentially exposed facilities.")
-    t2.metric("🟠 Medium", tiers.get("medium", 0), help="Next 30% of RiskScore.")
-    t3.metric("🟢 Low", tiers.get("low", 0), help="Bottom 50% of RiskScore — typically discounted hard by "
-              "TierWeight distance from the event's origin tier.")
+    if _seed_status == "entity_matched":
+        # Facility-specific (Strategy B) events: affected_material is a free-text LLM label
+        # (e.g. "battery cells"), not one of the six material_keywords this sub-network is
+        # built from (cobalt/lithium/nickel/manganese/graphite/copper) — network_agent.py's
+        # _material_match() therefore never matches anything, so alt_nodes is always empty
+        # and material_nodes == affected_nodes exactly. Showing "N / N, 100% penetration"
+        # here would be a tautology (denominator always equals numerator), not a real
+        # measurement — same class of issue as the removed "Risk level" card. Skipped
+        # entirely for this event type rather than displaying a misleading always-100%.
+        st.caption("Not applicable for a facility-specific event — there is no material "
+                   "sub-network to compare against here (see help below).",
+                   help="This module compares the event's reach against all facilities that "
+                        "handle the same raw material anywhere in the network. Facility-"
+                        "specific disruptions (like this one) aren't matched by material, "
+                        "so that comparison denominator doesn't exist — every facility this "
+                        "event reaches is already counted under 'Supply chain exposure' above.")
+    else:
+        st.caption(f"Within just the {material_label.lower()} sub-network (facilities that handle "
+                   f"{material_label.lower()} or sit downstream of one that does): how deep did this event reach?")
+        mc1, mc2 = st.columns(2)
+        mc1.metric(
+            "Potentially exposed facilities", f"{len(affected_nodes)} / {len(material_nodes)}",
+            delta=f"{_mat_pct:.1f}% penetration", delta_color="inverse",
+            help=f"Potentially exposed / total facilities within the {material_label} sub-network specifically "
+                 f"(a much smaller, more relevant denominator than the full {total_network}-facility dataset).",
+        )
+        mc2.metric(
+            "Potentially exposed companies", f"{len(affected_companies)} / {len(material_companies)}",
+            help="Same, but counted by distinct company (one company can own several facilities).",
+        )
 
 with st.container(border=True):
     st.subheader("Risk propagation")
@@ -278,24 +282,31 @@ with st.container(border=True):
              "exposed because they depend on it, not because they import from the affected region themselves.",
     )
 
-    st.markdown("**Potentially exposed facilities by supply chain stage** (within the material sub-network above)")
-    seg_order = ["Upstream", "Midstream-BGM", "Midstream-Cell", "Downstream"]
-    seg_help = {
-        "Upstream":       "Mining / raw material extraction.",
-        "Midstream-BGM":  "Battery-grade material processing (cathode/anode active materials, electrolyte, separators).",
-        "Midstream-Cell": "Cell manufacturing (cylindrical, prismatic, pouch cells).",
-        "Downstream":     "Module/pack assembly, EV/ESS manufacturers.",
-    }
-    seg_affected: dict[str, int] = {s: 0 for s in seg_order}
-    seg_total:    dict[str, int] = {s: 0 for s in seg_order}
-    for n in affected_nodes:
-        seg_affected[n.get("segment", "unknown")] = seg_affected.get(n.get("segment", "unknown"), 0) + 1
-    for n in material_nodes:
-        seg_total[n.get("segment", "unknown")] = seg_total.get(n.get("segment", "unknown"), 0) + 1
+    if _seed_status == "entity_matched":
+        # Same root cause as the skipped "network impact" card above: material_nodes ==
+        # affected_nodes exactly for facility-specific events, so every segment here would
+        # show a tautological "N / N" (always 100%) rather than a real comparison.
+        st.caption("Segment breakdown vs. the material sub-network is not applicable here — "
+                   "see the note above.")
+    else:
+        st.markdown("**Potentially exposed facilities by supply chain stage** (within the material sub-network above)")
+        seg_order = ["Upstream", "Midstream-BGM", "Midstream-Cell", "Downstream"]
+        seg_help = {
+            "Upstream":       "Mining / raw material extraction.",
+            "Midstream-BGM":  "Battery-grade material processing (cathode/anode active materials, electrolyte, separators).",
+            "Midstream-Cell": "Cell manufacturing (cylindrical, prismatic, pouch cells).",
+            "Downstream":     "Module/pack assembly, EV/ESS manufacturers.",
+        }
+        seg_affected: dict[str, int] = {s: 0 for s in seg_order}
+        seg_total:    dict[str, int] = {s: 0 for s in seg_order}
+        for n in affected_nodes:
+            seg_affected[n.get("segment", "unknown")] = seg_affected.get(n.get("segment", "unknown"), 0) + 1
+        for n in material_nodes:
+            seg_total[n.get("segment", "unknown")] = seg_total.get(n.get("segment", "unknown"), 0) + 1
 
-    seg_cols = st.columns(4)
-    for col, seg in zip(seg_cols, seg_order):
-        col.metric(seg, f"{seg_affected[seg]} / {seg_total[seg]}", help=seg_help[seg])
+        seg_cols = st.columns(4)
+        for col, seg in zip(seg_cols, seg_order):
+            col.metric(seg, f"{seg_affected[seg]} / {seg_total[seg]}", help=seg_help[seg])
 
 st.divider()
 
@@ -303,14 +314,20 @@ st.divider()
 # "North American Upstream Mining Capacity" module hidden (2026-07-20) — Upstream-only
 # scope made this near-always 0%/100% for import-driven events (see architecture.md /
 # risk_model.md discussion), which read as confusing or contradictory next to the
-# Supply Chain Exposure / Risk Level cards above. gm is kept available in `result` for
-# the LLM report (Capacity Impact section) even though the UI no longer surfaces it
-# as its own card.
+# Supply Chain Exposure card above. gm is kept available in `result` for the LLM report
+# (Capacity Impact section) even though the UI no longer surfaces it as its own card.
+#
+# "Risk level" (High/Medium/Low quantile card) removed 2026-08-03 — turned out
+# compute_risk_tiers() never read the actual RiskScore values, only len(risk_scores),
+# so its "proportion" was a fixed ~20/30/50 split of facility count for every event,
+# regardless of how risky it actually was. Replaced everywhere (incl. the LLM prompts
+# that ground Synthesis/Validation against hallucinated tier claims) with
+# risk_score_stats — the real max/median of the RiskScore distribution.
 gm = result.get("global_metrics", {})
 
 # ── Top 3 + Map ───────────────────────────────────────────────────────────────
 
-st.subheader("Top 3 High-Risk Facilities")
+st.subheader("Top 3 Risk Facilities")
 
 top3 = result.get("top3_facilities", [])
 
@@ -322,6 +339,7 @@ if top3:
         for i, f in enumerate(top3, 1):
             rows.append({
                 "Rank":      i,
+                "Facility":  f.get("facility_name") or f["company"],
                 "Company":   f["company"],
                 "Segment":   f["segment"],
                 "Location":  f"{f.get('city', '')}, {f.get('state', '')}, {f['country']}",
@@ -337,7 +355,7 @@ if top3:
             {
                 "lat": f["latitude"],
                 "lon": f["longitude"],
-                "name": f["company"],
+                "name": f"{f.get('facility_name') or f['company']} ({f['company']})",
             }
             for f in top3
             if f.get("latitude") and f.get("longitude")

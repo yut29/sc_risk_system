@@ -287,6 +287,7 @@ def build_graph(df: pd.DataFrame):
                             "north-carolina-and-will-be-begin-local-supply-in-april/213940",
         },
     ]
+    verified_source_ids: set[str] = set()
     for link in VERIFIED_REAL_SUPPLY_LINKS:
         src_rows = cell[(cell["company"].str.strip() == link["source_company"]) &
                          (cell["city"] == link["source_city"])]
@@ -306,6 +307,26 @@ def build_graph(df: pd.DataFrame):
                                             # 2026-07-31 while adding this exact edge).
         )
         edge_count["cell_down"] += 1
+        verified_source_ids.add(src_id)
+
+    # Prune the simulated (keyword+geography) Cell->Downstream edges for any source facility
+    # that now has at least one verified_real_supply edge (2026-08-03). Rationale: once we have
+    # real, documented customer data for a facility (Panasonic De Soto -> Tesla/Toyota/Lucid
+    # Motors; Toyota Liberty NC(TBMNC) -> Toyota Georgetown), the simulated edges from that SAME
+    # facility to unrelated companies (e.g. Panasonic De Soto also had 8 simulated
+    # "supplies_cells" edges to Morgan Advanced Materials, EaglePicher, etc.) are strictly worse
+    # information, not a complementary approximation — they'd make the S3 demo scenario's
+    # propagation claims ("Panasonic's fire affects X") mix verified fact with unverified
+    # simulation for the exact facility we went out of our way to verify. Scoped to only these
+    # source facilities, not a general graph-wide methodology change — the rest of the graph's
+    # ~380 facilities keep their simulated edges as before.
+    for src_id in verified_source_ids:
+        stale_edges = [
+            (u, v) for u, v, data in G.out_edges(src_id, data=True)
+            if data.get("relationship") != "verified_real_supply"
+        ]
+        G.remove_edges_from(stale_edges)
+        edge_count["cell_down"] -= len(stale_edges)
 
     return G, edge_count
 

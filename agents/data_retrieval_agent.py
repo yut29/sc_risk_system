@@ -21,7 +21,6 @@ from agents.state import (
     CapacitySource,
     FacilityData,
     LEAD_TIME_NORM_DIVISOR,
-    RESILIENCE_DISCOUNT_CAP,
     VULNERABILITY_WEIGHTS,
     PipelineState,
 )
@@ -51,25 +50,14 @@ def _parse_capacity(raw) -> float:
 
 
 def _capacity_share(facility_capacity: float, total_capacity: float) -> float:
+    # 2026-08-03 (explicit instruction): a zero/unknown denominator (e.g. no material set at
+    # all — Strategy B facility-specific events — or no other facility in this tier/material
+    # has known capacity) means CapacityShare genuinely can't be computed, same "unknown"
+    # class as the segment-level default in run_data_retrieval_agent() below. Precautionary
+    # default is 1.0 (max/worst-case), not 0.0.
     if total_capacity <= 0:
-        return 0.0
+        return 1.0
     return min(facility_capacity / total_capacity, 1.0)
-
-
-def _alt_capacity_ratio(facility_id: str, alt_node_ids: set[str],
-                        facility_capacities: dict[str, float],
-                        facility_capacity: float,
-                        capacity_known: bool) -> float:
-    """
-    AltCapacityRatio = Σ alt_capacity / facility_capacity.
-    Only computed when the facility has known capacity (naatbatt only).
-    If capacity is unknown, returns 0.0 → ResilienceDiscount = 0 (conservative).
-    Unknown capacity is NOT treated as zero capacity.
-    """
-    if not capacity_known or facility_capacity <= 0:
-        return 0.0
-    alt_total = sum(facility_capacities.get(nid, 0.0) for nid in alt_node_ids)
-    return alt_total / facility_capacity
 
 
 # ── Main agent function ───────────────────────────────────────────────────────
@@ -123,8 +111,6 @@ def run_data_retrieval_agent(state: PipelineState) -> PipelineState:
         else:
             facility_capacities[nid] = 0.0
 
-    alt_node_ids = {n["id"] for n in alt_nodes}
-
     # ── Build FacilityData per node ───────────────────────────────────────────
     facility_data: dict[str, FacilityData] = {}
 
@@ -152,7 +138,15 @@ def run_data_retrieval_agent(state: PipelineState) -> PipelineState:
             import_dep             = node.get("import_dependency", False)
             lead_time_w            = node.get("lead_time_weeks", 0)
 
-        lead_time_norm = lead_time_w / LEAD_TIME_NORM_DIVISOR
+        # Capped at 1.0 (2026-08-03): lead_time_weeks can now exceed 12 once material/
+        # region/capacity-data adjustments are added on top of the segment base (see
+        # MATERIAL_LEAD_TIME_ADJUSTMENT in build_facilities.py) — without this cap,
+        # Vulnerability (and hence RiskScore_normalized) could exceed its documented 0-1
+        # (resp. 0-100) ceiling. risk_model.md already documented this cap as intended
+        # behavior; it was never actually enforced in code because 12 was previously the
+        # highest possible raw value (Upstream's own uncapped segment base), so the
+        # missing min() never mattered until now.
+        lead_time_norm = min(lead_time_w / LEAD_TIME_NORM_DIVISOR, 1.0)
 
         capacity_known = cap_source == "naatbatt"
         seg = node.get("segment", "")
@@ -161,34 +155,62 @@ def run_data_retrieval_agent(state: PipelineState) -> PipelineState:
         # Upstream: MT/yr (consistent). Midstream-Cell: GWh/yr (90%, after
         # MWh→GWh conversion and exclusion of non-comparable records in build_facilities).
         # Midstream-BGM (MT/mm²/GWh mixed) and Downstream excluded.
+        #
+        # 2026-08-03 (explicit instruction): default changed from 0.0 to 1.0 (max/worst-case)
+        # whenever this can't be computed — wrong segment (BGM/Downstream) OR capacity_known
+        # =False (Upstream/Cell with no NAATBatt value). Precautionary principle: "we don't
+        # know this facility's market share" should read as "assume it could be large", not
+        # "assume it's negligible". This is a deliberate reversal of the previous
+        # conservative-low default — see synthesis_agent.py::_compute_scores for the
+        # corresponding Vulnerability-term comment.
         if seg in ("Upstream", "Midstream-Cell") and capacity_known:
             cap_share = _capacity_share(capacity, total_capacity_by_segment[seg])
         else:
-            cap_share = 0.0
+            cap_share = 1.0
 
-        # SingleSourceDependency (2026-07-31): Downstream has no comparable capacity unit
-        # for CapacityShare (see above), so that Vulnerability slot sits idle at 0.0 for
-        # every Downstream facility. Substitutes graph connectivity instead — how many
-        # distinct Midstream-Cell suppliers does this Downstream node have in the graph.
-        # Fewer suppliers = more exposed if any one of them is disrupted. NA-graph-scope
-        # caveat applies (see FacilityData docstring in state.py) — only used in place of
-        # capacity_share for Downstream in synthesis_agent.py::_compute_scores.
-        if seg == "Downstream":
-            supplier_count = node.get("cell_supplier_count", 0)
-            single_source_dependency = 1.0 / supplier_count if supplier_count > 0 else 0.0
-        else:
-            single_source_dependency = 0.0
+        # SingleSourceDependency — now computed for ALL segments (2026-08-03), not just
+        # Downstream/Midstream-BGM, because ResilienceDiscount now uses it uniformly (see
+        # below). direct_supplier_count = in-degree from the immediately upstream tier.
+        # KNOWN DEGENERATE CASE for Upstream: network_agent.py's graph is a directed chain
+        # Upstream->BGM->Cell->Downstream, so Upstream nodes are always the graph's roots —
+        # in-degree is structurally 0 for every one of the 29 Upstream facilities, always,
+        # with no exceptions (verified). That makes single_source_dependency=0.0 for every
+        # Upstream facility unconditionally — which the `if single_source_dependency > 0`
+        # guard below then routes to resilience_discount=0.0 (the same conservative default
+        # used for "no known suppliers"/unknown data), NOT the maximum 0.5 (verified with a
+        # real Upstream facility, Albemarle Corporation/Silver Peak: ssd=0.0 ->
+        # resilience_discount=0.0). The real consequence is milder than "always-maximal" but
+        # still a loss of signal: every Upstream facility now gets a flat 0.0 discount
+        # regardless of whether real alternative capacity exists, instead of the genuine
+        # AltCapacityRatio-based value (which could legitimately be anywhere in 0-0.5) it had
+        # before this change. Only affects facilities scored via Strategy B (entity-matched)
+        # disruptions at an Upstream-tier NAATBatt facility — Strategy A (material+region)
+        # can never seed an Upstream node (import_dependency is always False there), so
+        # today's S1/S2/S3 scenarios never exercise this case.
+        supplier_count = node.get("direct_supplier_count", 0)
+        single_source_dependency = 1.0 / supplier_count if supplier_count > 0 else 0.0
 
-        # AltCapacityRatio: same tier comparability rule as CapacityShare.
-        # Upstream (MT/yr) and Midstream-Cell (GWh/yr) are comparable within tier.
-        # Unknown capacity or incompatible tier → ResilienceDiscount = 0 (conservative).
-        if seg in ("Upstream", "Midstream-Cell"):
-            alt_ratio = _alt_capacity_ratio(nid, alt_node_ids,
-                                            facility_capacities, capacity,
-                                            capacity_known)
-        else:
-            alt_ratio = 0.0
-        resilience_discount = min(alt_ratio / 2.0, RESILIENCE_DISCOUNT_CAP)
+        # ResilienceDiscount — swapped to CapacityShare-based (2026-08-03, same day, on top of
+        # the earlier SingleSourceDependency-based unification above). Rationale: this
+        # resolves the CapacityShare direction tension that used to live in Vulnerability
+        # ("big market share = big Vulnerability score" required the awkward "systemic impact,
+        # not the facility's own fragility" caveat). Framed as a resilience question instead,
+        # the direction is intuitive with no caveat needed: a facility that commands most of
+        # its tier's capacity has, by definition, no one else who can cover for it if it goes
+        # down -> small discount. A facility that's a small player has plenty of alternative
+        # capacity elsewhere -> large discount. SingleSourceDependency moved the other
+        # direction, into Vulnerability (own-supplier-count fragility is a self-related
+        # vulnerability signal, not a system-recoverability one) — see VULNERABILITY_WEIGHTS.
+        #
+        # No unknown-data guard needed (unlike the old SSD-based version's
+        # `if single_source_dependency > 0` check): cap_share is already guaranteed in [0, 1]
+        # by _capacity_share()/the "capacity_known" branch above, AND its own default for the
+        # inapplicable/unknown case is already 1.0 (worst-case, precautionary default set
+        # above) — which naturally maps to (1-1)/2 = 0.0 discount here, exactly the
+        # conservative "no discount when we don't know" behavior we want, with no extra
+        # branching. Also no min(...,0.5) cap needed for the same reason as before: cap_share
+        # in [0,1] guarantees (1-cap_share)/2 is already in [0, 0.5].
+        resilience_discount = (1.0 - cap_share) / 2.0
 
         facility_data[nid] = FacilityData(
             capacity=capacity,

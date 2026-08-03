@@ -1,8 +1,8 @@
 {
   "metadata": {
     "total_nodes": 386,
-    "total_edges": 996,
-    "created_at": "2026-07-31",
+    "total_edges": 980,
+    "created_at": "2026-08-03",
     "edge_params": {
       "K_NEAR": 5,
       "K_FAR": 3,
@@ -35,8 +35,8 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": false,
-      "import_origin_region": "Australia",
-      "lead_time_weeks": 12
+      "import_origin_region": "NV",
+      "lead_time_weeks": 14
     },
     {
       "id": "1004",
@@ -55,8 +55,8 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": false,
-      "import_origin_region": "South America (Chile/Argentina)",
-      "lead_time_weeks": 12
+      "import_origin_region": "NC",
+      "lead_time_weeks": 14
     },
     {
       "id": "1015",
@@ -75,8 +75,8 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": false,
-      "import_origin_region": "South America (Chile/Argentina)",
-      "lead_time_weeks": 12
+      "import_origin_region": "UT",
+      "lead_time_weeks": 14
     },
     {
       "id": "1018",
@@ -95,8 +95,8 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": false,
-      "import_origin_region": "Asia (China)",
-      "lead_time_weeks": 12
+      "import_origin_region": "BC",
+      "lead_time_weeks": 15
     },
     {
       "id": "1025",
@@ -115,8 +115,8 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": false,
-      "import_origin_region": "Africa (Mozambique, Madagascar, Tanzania)",
-      "lead_time_weeks": 12
+      "import_origin_region": "ON",
+      "lead_time_weeks": 15
     },
     {
       "id": "1026",
@@ -135,8 +135,8 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": false,
-      "import_origin_region": "nan",
-      "lead_time_weeks": 12
+      "import_origin_region": "TN",
+      "lead_time_weeks": 13
     },
     {
       "id": "1027",
@@ -155,8 +155,8 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": false,
-      "import_origin_region": "Asia (Indonesia)",
-      "lead_time_weeks": 12
+      "import_origin_region": "QC",
+      "lead_time_weeks": 14
     },
     {
       "id": "1028",
@@ -175,8 +175,8 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": true,
       "import_dependency": false,
-      "import_origin_region": "Asia (Indonesia)",
-      "lead_time_weeks": 12
+      "import_origin_region": "QC",
+      "lead_time_weeks": 17
     },
     {
       "id": "1029",
@@ -195,8 +195,8 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": false,
-      "import_origin_region": "Asia (Indonesia)",
-      "lead_time_weeks": 12
+      "import_origin_region": "ON",
+      "lead_time_weeks": 14
     },
     {
       "id": "1030",
@@ -215,8 +215,8 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": true,
       "import_dependency": false,
-      "import_origin_region": "Africa (DRC)",
-      "lead_time_weeks": 12
+      "import_origin_region": "ON",
+      "lead_time_weeks": 17
     },
     {
       "id": "1037",
@@ -235,8 +235,8 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": false,
-      "import_origin_region": "nan",
-      "lead_time_weeks": 12
+      "import_origin_region": "UT",
+      "lead_time_weeks": 13
     },
     {
       "id": "1044",
@@ -255,8 +255,8 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": false,
-      "import_origin_region": "Asia (Indonesia)",
-      "lead_time_weeks": 12
+      "import_origin_region": "MI",
+      "lead_time_weeks": 14
     },
     {
       "id": "1045",
@@ -275,8 +275,8 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": false,
-      "import_origin_region": "Asia (Indonesia)",
-      "lead_time_weeks": 12
+      "import_origin_region": "MI",
+      "lead_time_weeks": 14
     },
     {
       "id": "1050",
@@ -295,8 +295,8 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": true,
       "import_dependency": false,
-      "import_origin_region": "Africa (DRC)",
-      "lead_time_weeks": 12
+      "import_origin_region": "Baja California Sur",
+      "lead_time_weeks": 17
     },
     {
       "id": "1051",
@@ -315,8 +315,8 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": true,
       "import_dependency": false,
-      "import_origin_region": "Africa (DRC)",
-      "lead_time_weeks": 12
+      "import_origin_region": "MO",
+      "lead_time_weeks": 17
     },
     {
       "id": "1062",
@@ -335,8 +335,8 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": false,
-      "import_origin_region": "Asia (China)",
-      "lead_time_weeks": 12
+      "import_origin_region": "QC",
+      "lead_time_weeks": 15
     },
     {
       "id": "1064",
@@ -355,8 +355,8 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": false,
-      "import_origin_region": "Africa (Mozambique, Madagascar, Tanzania)",
-      "lead_time_weeks": 12
+      "import_origin_region": "QC",
+      "lead_time_weeks": 15
     },
     {
       "id": "1069",
@@ -375,8 +375,8 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": false,
-      "import_origin_region": "South America (Chile/Argentina)",
-      "lead_time_weeks": 12
+      "import_origin_region": "CA",
+      "lead_time_weeks": 14
     },
     {
       "id": "1072",
@@ -395,8 +395,8 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": false,
-      "import_origin_region": "nan",
-      "lead_time_weeks": 12
+      "import_origin_region": "QC",
+      "lead_time_weeks": 13
     },
     {
       "id": "1078",
@@ -415,8 +415,8 @@
       "capacity_source": "unknown",
       "supplier_concentration": false,
       "import_dependency": false,
-      "import_origin_region": "Asia (China)",
-      "lead_time_weeks": 12
+      "import_origin_region": "AL",
+      "lead_time_weeks": 17
     },
     {
       "id": "1079",
@@ -435,8 +435,8 @@
       "capacity_source": "unknown",
       "supplier_concentration": false,
       "import_dependency": false,
-      "import_origin_region": "Asia / Pacific (Australia)",
-      "lead_time_weeks": 12
+      "import_origin_region": "AZ",
+      "lead_time_weeks": 17
     },
     {
       "id": "1091",
@@ -455,8 +455,8 @@
       "capacity_source": "unknown",
       "supplier_concentration": false,
       "import_dependency": false,
-      "import_origin_region": "Other / Diversified",
-      "lead_time_weeks": 12
+      "import_origin_region": "NV",
+      "lead_time_weeks": 16
     },
     {
       "id": "1095",
@@ -475,8 +475,8 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": true,
       "import_dependency": false,
-      "import_origin_region": "Africa (DRC)",
-      "lead_time_weeks": 12
+      "import_origin_region": "ON",
+      "lead_time_weeks": 17
     },
     {
       "id": "1096",
@@ -495,8 +495,8 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": true,
       "import_dependency": false,
-      "import_origin_region": "Other / Diversified",
-      "lead_time_weeks": 12
+      "import_origin_region": "MB",
+      "lead_time_weeks": 17
     },
     {
       "id": "1097",
@@ -515,8 +515,8 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": true,
       "import_dependency": false,
-      "import_origin_region": "Africa (DRC)",
-      "lead_time_weeks": 12
+      "import_origin_region": "NL",
+      "lead_time_weeks": 17
     },
     {
       "id": "1098",
@@ -535,8 +535,8 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": false,
-      "import_origin_region": "Other / Diversified",
-      "lead_time_weeks": 12
+      "import_origin_region": "ON",
+      "lead_time_weeks": 14
     },
     {
       "id": "1099",
@@ -555,8 +555,8 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": false,
-      "import_origin_region": "Asia (Indonesia)",
-      "lead_time_weeks": 12
+      "import_origin_region": "MB",
+      "lead_time_weeks": 14
     },
     {
       "id": "1100",
@@ -575,8 +575,8 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": false,
-      "import_origin_region": "Asia (Indonesia)",
-      "lead_time_weeks": 12
+      "import_origin_region": "NL",
+      "lead_time_weeks": 14
     },
     {
       "id": "1102",
@@ -595,8 +595,8 @@
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
       "import_dependency": false,
-      "import_origin_region": "Asia (China)",
-      "lead_time_weeks": 12
+      "import_origin_region": "AL",
+      "lead_time_weeks": 15
     },
     {
       "id": "2004",
@@ -616,7 +616,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "Asia (China)",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 15
     },
     {
       "id": "2006",
@@ -636,7 +636,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "2013",
@@ -656,7 +656,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "Asia (China)",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 13
     },
     {
       "id": "2017",
@@ -676,7 +676,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "Africa (Mozambique, Madagascar, Tanzania)",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 13
     },
     {
       "id": "2022",
@@ -696,7 +696,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "South America (Chile/Argentina)",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "2023",
@@ -716,7 +716,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "Australia",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 10
     },
     {
       "id": "2029",
@@ -736,7 +736,7 @@
       "supplier_concentration": true,
       "import_dependency": true,
       "import_origin_region": "Africa (DRC)",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 15
     },
     {
       "id": "2030",
@@ -756,7 +756,7 @@
       "supplier_concentration": true,
       "import_dependency": true,
       "import_origin_region": "Africa (DRC)",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 15
     },
     {
       "id": "2031",
@@ -776,7 +776,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "Australia",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "2032",
@@ -796,7 +796,7 @@
       "supplier_concentration": true,
       "import_dependency": true,
       "import_origin_region": "Africa (DRC)",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 15
     },
     {
       "id": "2037",
@@ -816,7 +816,7 @@
       "supplier_concentration": true,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 13
     },
     {
       "id": "2038",
@@ -836,7 +836,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 9
     },
     {
       "id": "2039",
@@ -856,7 +856,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "2040",
@@ -876,7 +876,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "2057",
@@ -896,7 +896,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "2058",
@@ -916,7 +916,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "South America (Chile/Argentina)",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 13
     },
     {
       "id": "2065",
@@ -936,7 +936,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 9
     },
     {
       "id": "2068",
@@ -956,7 +956,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "2070",
@@ -976,7 +976,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 9
     },
     {
       "id": "2083",
@@ -996,7 +996,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "2084",
@@ -1016,7 +1016,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "South America (Chile/Argentina)",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "2087",
@@ -1036,7 +1036,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "South America (Chile/Argentina)",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "2092",
@@ -1056,7 +1056,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "Asia / Pacific (Philippines)",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "2093",
@@ -1076,7 +1076,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "Asia (China)",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 15
     },
     {
       "id": "2095",
@@ -1096,7 +1096,7 @@
       "supplier_concentration": true,
       "import_dependency": true,
       "import_origin_region": "South America (Chile/Argentina)",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 16
     },
     {
       "id": "2098",
@@ -1116,7 +1116,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "Asia (China)",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 13
     },
     {
       "id": "2101",
@@ -1136,7 +1136,7 @@
       "supplier_concentration": true,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 13
     },
     {
       "id": "2102",
@@ -1156,7 +1156,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 9
     },
     {
       "id": "2103",
@@ -1176,7 +1176,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "2104",
@@ -1196,7 +1196,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "Other / Diversified",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 10
     },
     {
       "id": "2114",
@@ -1216,7 +1216,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "Asia (China)",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 13
     },
     {
       "id": "2115",
@@ -1236,7 +1236,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "Asia (China)",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 15
     },
     {
       "id": "2116",
@@ -1256,7 +1256,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "Asia (China)",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 15
     },
     {
       "id": "2117",
@@ -1276,7 +1276,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "Asia (China)",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 15
     },
     {
       "id": "2118",
@@ -1294,9 +1294,9 @@
       "production_units": "MT finished Ni/yr",
       "capacity_source": "naatbatt",
       "supplier_concentration": false,
-      "import_dependency": false,
-      "import_origin_region": "Caribbean / Africa (non-DRC)",
-      "lead_time_weeks": 8
+      "import_dependency": true,
+      "import_origin_region": "Cuba / Madagascar",
+      "lead_time_weeks": 10
     },
     {
       "id": "2119",
@@ -1314,9 +1314,9 @@
       "production_units": "MT finished Co/yr",
       "capacity_source": "naatbatt",
       "supplier_concentration": true,
-      "import_dependency": false,
-      "import_origin_region": "Caribbean / Africa (non-DRC)",
-      "lead_time_weeks": 8
+      "import_dependency": true,
+      "import_origin_region": "Cuba / Madagascar",
+      "lead_time_weeks": 13
     },
     {
       "id": "2122",
@@ -1336,7 +1336,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 9
     },
     {
       "id": "2126",
@@ -1356,7 +1356,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 9
     },
     {
       "id": "2131",
@@ -1376,7 +1376,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "2132",
@@ -1396,7 +1396,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "Asia (China)",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 15
     },
     {
       "id": "2133",
@@ -1416,7 +1416,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "Other / Diversified",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 13
     },
     {
       "id": "2135",
@@ -1436,7 +1436,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "South America (Chile/Argentina)",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 13
     },
     {
       "id": "2141",
@@ -1456,7 +1456,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "2142",
@@ -1476,7 +1476,7 @@
       "supplier_concentration": true,
       "import_dependency": true,
       "import_origin_region": "Asia (Indonesia)",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 14
     },
     {
       "id": "2147",
@@ -1496,7 +1496,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "Asia / Pacific (Philippines)",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "2148",
@@ -1516,7 +1516,7 @@
       "supplier_concentration": true,
       "import_dependency": true,
       "import_origin_region": "Africa (DRC)",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 15
     },
     {
       "id": "2149",
@@ -1536,7 +1536,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "Asia / Pacific (Philippines)",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "2150",
@@ -1556,7 +1556,7 @@
       "supplier_concentration": true,
       "import_dependency": true,
       "import_origin_region": "Africa (DRC)",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 15
     },
     {
       "id": "4001",
@@ -1576,7 +1576,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "South America (Chile/Argentina)",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 11
     },
     {
       "id": "4002",
@@ -1596,7 +1596,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "Australia",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 8
     },
     {
       "id": "4003",
@@ -1616,7 +1616,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "Australia",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 10
     },
     {
       "id": "4004",
@@ -1636,7 +1636,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 9
     },
     {
       "id": "4006",
@@ -1656,7 +1656,7 @@
       "supplier_concentration": true,
       "import_dependency": true,
       "import_origin_region": "Africa (DRC)",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 13
     },
     {
       "id": "4011",
@@ -1676,7 +1676,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "South America (Chile/Argentina)",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 9
     },
     {
       "id": "4013",
@@ -1696,7 +1696,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "Asia (China)",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 11
     },
     {
       "id": "4015",
@@ -1716,7 +1716,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "South America (Chile/Argentina)",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 9
     },
     {
       "id": "4017",
@@ -1736,7 +1736,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "Australia",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 8
     },
     {
       "id": "4020",
@@ -1756,7 +1756,7 @@
       "supplier_concentration": true,
       "import_dependency": true,
       "import_origin_region": "Africa (DRC)",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 13
     },
     {
       "id": "4022",
@@ -1776,7 +1776,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 7
     },
     {
       "id": "4024",
@@ -1796,7 +1796,7 @@
       "supplier_concentration": true,
       "import_dependency": true,
       "import_origin_region": "Africa (DRC)",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 15
     },
     {
       "id": "4025",
@@ -1816,7 +1816,7 @@
       "supplier_concentration": true,
       "import_dependency": true,
       "import_origin_region": "Africa (DRC)",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 13
     },
     {
       "id": "4026",
@@ -1836,7 +1836,7 @@
       "supplier_concentration": true,
       "import_dependency": true,
       "import_origin_region": "Africa (DRC)",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 15
     },
     {
       "id": "4028",
@@ -1856,7 +1856,7 @@
       "supplier_concentration": true,
       "import_dependency": true,
       "import_origin_region": "Africa (DRC)",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 13
     },
     {
       "id": "4029",
@@ -1876,7 +1876,7 @@
       "supplier_concentration": true,
       "import_dependency": true,
       "import_origin_region": "Africa (DRC)",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 13
     },
     {
       "id": "4031",
@@ -1896,7 +1896,7 @@
       "supplier_concentration": true,
       "import_dependency": true,
       "import_origin_region": "Other / Diversified",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 13
     },
     {
       "id": "4033",
@@ -1916,7 +1916,7 @@
       "supplier_concentration": true,
       "import_dependency": true,
       "import_origin_region": "Other / Diversified",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 11
     },
     {
       "id": "4035",
@@ -1936,7 +1936,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "Australia",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 10
     },
     {
       "id": "4043",
@@ -1956,7 +1956,7 @@
       "supplier_concentration": true,
       "import_dependency": true,
       "import_origin_region": "Africa (DRC)",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 15
     },
     {
       "id": "4045",
@@ -1976,7 +1976,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 9
     },
     {
       "id": "4063",
@@ -1996,7 +1996,7 @@
       "supplier_concentration": true,
       "import_dependency": true,
       "import_origin_region": "Africa (DRC)",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 13
     },
     {
       "id": "4068",
@@ -2016,7 +2016,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "South America (Chile/Argentina)",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 11
     },
     {
       "id": "4069",
@@ -2036,7 +2036,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "Australia",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 8
     },
     {
       "id": "4073",
@@ -2056,7 +2056,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 9
     },
     {
       "id": "4076",
@@ -2076,7 +2076,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "Other / Diversified",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 8
     },
     {
       "id": "4077",
@@ -2096,7 +2096,7 @@
       "supplier_concentration": true,
       "import_dependency": true,
       "import_origin_region": "Africa (DRC)",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 13
     },
     {
       "id": "4078",
@@ -2116,7 +2116,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "Asia (China)",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 15
     },
     {
       "id": "4081",
@@ -2136,7 +2136,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "South America (Chile/Argentina)",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 9
     },
     {
       "id": "4082",
@@ -2156,7 +2156,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "South America (Chile/Argentina)",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 9
     },
     {
       "id": "4083",
@@ -2176,7 +2176,7 @@
       "supplier_concentration": true,
       "import_dependency": true,
       "import_origin_region": "Africa (DRC)",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 13
     },
     {
       "id": "4090",
@@ -2196,7 +2196,7 @@
       "supplier_concentration": true,
       "import_dependency": true,
       "import_origin_region": "Asia (Indonesia)",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 12
     },
     {
       "id": "4091",
@@ -2216,7 +2216,7 @@
       "supplier_concentration": true,
       "import_dependency": true,
       "import_origin_region": "Asia (Indonesia)",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 12
     },
     {
       "id": "4092",
@@ -2236,7 +2236,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "4093",
@@ -2256,7 +2256,7 @@
       "supplier_concentration": true,
       "import_dependency": true,
       "import_origin_region": "South America (Chile/Argentina)",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 14
     },
     {
       "id": "4095",
@@ -2276,7 +2276,7 @@
       "supplier_concentration": true,
       "import_dependency": true,
       "import_origin_region": "Africa (DRC)",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 13
     },
     {
       "id": "4097",
@@ -2296,7 +2296,7 @@
       "supplier_concentration": true,
       "import_dependency": true,
       "import_origin_region": "South America (Chile/Argentina)",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 12
     },
     {
       "id": "4103",
@@ -2316,7 +2316,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 9
     },
     {
       "id": "4105",
@@ -2336,7 +2336,7 @@
       "supplier_concentration": true,
       "import_dependency": true,
       "import_origin_region": "Africa (DRC)",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 13
     },
     {
       "id": "4107",
@@ -2356,7 +2356,7 @@
       "supplier_concentration": true,
       "import_dependency": true,
       "import_origin_region": "Asia (Indonesia)",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 12
     },
     {
       "id": "4108",
@@ -2376,7 +2376,7 @@
       "supplier_concentration": true,
       "import_dependency": true,
       "import_origin_region": "Africa (DRC)",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 13
     },
     {
       "id": "4109",
@@ -2396,7 +2396,7 @@
       "supplier_concentration": true,
       "import_dependency": true,
       "import_origin_region": "Asia (Indonesia)",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 12
     },
     {
       "id": "4110",
@@ -2416,7 +2416,7 @@
       "supplier_concentration": true,
       "import_dependency": true,
       "import_origin_region": "Africa (DRC)",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 13
     },
     {
       "id": "4111",
@@ -2436,7 +2436,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 9
     },
     {
       "id": "5001",
@@ -2456,7 +2456,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5002",
@@ -2476,7 +2476,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5003",
@@ -2496,7 +2496,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5004",
@@ -2516,7 +2516,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5007",
@@ -2536,7 +2536,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5009",
@@ -2556,7 +2556,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5013",
@@ -2576,7 +2576,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5014",
@@ -2596,7 +2596,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5015",
@@ -2616,7 +2616,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 5
     },
     {
       "id": "5016",
@@ -2636,7 +2636,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 5
     },
     {
       "id": "5018",
@@ -2656,7 +2656,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5019",
@@ -2676,7 +2676,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5020",
@@ -2696,7 +2696,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5021",
@@ -2716,7 +2716,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5022",
@@ -2736,7 +2736,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5023",
@@ -2756,7 +2756,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5026",
@@ -2776,7 +2776,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5027",
@@ -2796,7 +2796,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5028",
@@ -2816,7 +2816,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5031",
@@ -2836,7 +2836,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5032",
@@ -2856,7 +2856,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5033",
@@ -2876,7 +2876,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5034",
@@ -2896,7 +2896,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5035",
@@ -2916,7 +2916,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5036",
@@ -2936,7 +2936,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5040",
@@ -2956,7 +2956,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 5
     },
     {
       "id": "5041",
@@ -2976,7 +2976,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5042",
@@ -2996,7 +2996,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 5
     },
     {
       "id": "5043",
@@ -3016,7 +3016,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5044",
@@ -3036,7 +3036,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5045",
@@ -3056,7 +3056,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5047",
@@ -3076,7 +3076,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5048",
@@ -3096,7 +3096,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5049",
@@ -3116,7 +3116,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "South America (Chile/Argentina)",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 9
     },
     {
       "id": "5050",
@@ -3136,7 +3136,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5051",
@@ -3156,7 +3156,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5052",
@@ -3176,7 +3176,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5053",
@@ -3196,7 +3196,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5054",
@@ -3216,7 +3216,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5058",
@@ -3236,7 +3236,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5059",
@@ -3256,7 +3256,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5061",
@@ -3276,7 +3276,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5063",
@@ -3296,7 +3296,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5064",
@@ -3316,7 +3316,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5066",
@@ -3336,7 +3336,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5067",
@@ -3356,7 +3356,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5068",
@@ -3376,7 +3376,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5069",
@@ -3396,7 +3396,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5070",
@@ -3416,7 +3416,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5072",
@@ -3436,7 +3436,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5074",
@@ -3456,7 +3456,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5077",
@@ -3476,7 +3476,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5078",
@@ -3496,7 +3496,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5080",
@@ -3516,7 +3516,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5082",
@@ -3536,7 +3536,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5084",
@@ -3556,7 +3556,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5085",
@@ -3576,7 +3576,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5086",
@@ -3596,7 +3596,7 @@
       "supplier_concentration": true,
       "import_dependency": true,
       "import_origin_region": "Africa (DRC)",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 13
     },
     {
       "id": "5091",
@@ -3616,7 +3616,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5092",
@@ -3636,7 +3636,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5093",
@@ -3656,7 +3656,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5094",
@@ -3676,7 +3676,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5095",
@@ -3696,7 +3696,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5096",
@@ -3716,7 +3716,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5097",
@@ -3736,7 +3736,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5099",
@@ -3756,7 +3756,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5100",
@@ -3776,7 +3776,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5101",
@@ -3796,7 +3796,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5105",
@@ -3816,7 +3816,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5106",
@@ -3836,7 +3836,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 5
     },
     {
       "id": "5110",
@@ -3856,7 +3856,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5111",
@@ -3876,7 +3876,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5112",
@@ -3896,7 +3896,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5113",
@@ -3916,7 +3916,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5115",
@@ -3936,7 +3936,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5116",
@@ -3956,7 +3956,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 5
     },
     {
       "id": "5117",
@@ -3976,7 +3976,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 5
     },
     {
       "id": "5118",
@@ -3996,7 +3996,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5119",
@@ -4016,7 +4016,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5120",
@@ -4036,7 +4036,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 5
     },
     {
       "id": "5121",
@@ -4056,7 +4056,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 5
     },
     {
       "id": "5123",
@@ -4076,7 +4076,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5125",
@@ -4096,7 +4096,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5126",
@@ -4116,7 +4116,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5127",
@@ -4136,7 +4136,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5129",
@@ -4156,7 +4156,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 5
     },
     {
       "id": "5130",
@@ -4176,7 +4176,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5132",
@@ -4196,7 +4196,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5134",
@@ -4216,7 +4216,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5135",
@@ -4236,7 +4236,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5136",
@@ -4256,7 +4256,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 5
     },
     {
       "id": "5138",
@@ -4276,7 +4276,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5141",
@@ -4296,7 +4296,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5142",
@@ -4316,7 +4316,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5143",
@@ -4336,7 +4336,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5144",
@@ -4356,7 +4356,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5146",
@@ -4376,7 +4376,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 5
     },
     {
       "id": "5148",
@@ -4396,7 +4396,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 5
     },
     {
       "id": "5150",
@@ -4416,7 +4416,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5151",
@@ -4436,7 +4436,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5152",
@@ -4456,7 +4456,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5153",
@@ -4476,7 +4476,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5154",
@@ -4496,7 +4496,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5155",
@@ -4516,7 +4516,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "Australia",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 8
     },
     {
       "id": "5156",
@@ -4536,7 +4536,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5157",
@@ -4556,7 +4556,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5158",
@@ -4576,7 +4576,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5159",
@@ -4596,7 +4596,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 5
     },
     {
       "id": "5160",
@@ -4616,7 +4616,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5161",
@@ -4636,7 +4636,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5163",
@@ -4656,7 +4656,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5165",
@@ -4676,7 +4676,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5168",
@@ -4696,7 +4696,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5170",
@@ -4716,7 +4716,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5171",
@@ -4736,7 +4736,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5173",
@@ -4756,7 +4756,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5174",
@@ -4776,7 +4776,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5175",
@@ -4796,7 +4796,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5176",
@@ -4816,7 +4816,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5177",
@@ -4836,7 +4836,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5178",
@@ -4856,7 +4856,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5182",
@@ -4876,7 +4876,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5183",
@@ -4896,7 +4896,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5184",
@@ -4916,7 +4916,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5185",
@@ -4936,7 +4936,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5187",
@@ -4956,7 +4956,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 5
     },
     {
       "id": "5188",
@@ -4976,7 +4976,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 5
     },
     {
       "id": "5190",
@@ -4996,7 +4996,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 5
     },
     {
       "id": "5191",
@@ -5016,7 +5016,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5192",
@@ -5036,7 +5036,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5193",
@@ -5056,7 +5056,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 5
     },
     {
       "id": "5195",
@@ -5076,7 +5076,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5196",
@@ -5096,7 +5096,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5197",
@@ -5116,7 +5116,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5198",
@@ -5136,7 +5136,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5199",
@@ -5156,7 +5156,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5202",
@@ -5176,7 +5176,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 5
     },
     {
       "id": "5203",
@@ -5196,7 +5196,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5204",
@@ -5216,7 +5216,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5205",
@@ -5236,7 +5236,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 5
     },
     {
       "id": "5206",
@@ -5256,7 +5256,7 @@
       "supplier_concentration": true,
       "import_dependency": true,
       "import_origin_region": "Other / Diversified",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 11
     },
     {
       "id": "5207",
@@ -5276,7 +5276,7 @@
       "supplier_concentration": true,
       "import_dependency": true,
       "import_origin_region": "Other / Diversified",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 11
     },
     {
       "id": "5208",
@@ -5296,7 +5296,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5209",
@@ -5316,7 +5316,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5210",
@@ -5336,7 +5336,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5211",
@@ -5356,7 +5356,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5212",
@@ -5376,7 +5376,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5213",
@@ -5396,7 +5396,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5214",
@@ -5416,7 +5416,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5215",
@@ -5436,7 +5436,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5216",
@@ -5456,7 +5456,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5217",
@@ -5476,7 +5476,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5219",
@@ -5496,7 +5496,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 5
     },
     {
       "id": "5220",
@@ -5516,7 +5516,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5221",
@@ -5536,7 +5536,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 5
     },
     {
       "id": "5222",
@@ -5556,7 +5556,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 5
     },
     {
       "id": "5223",
@@ -5576,7 +5576,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 5
     },
     {
       "id": "5226",
@@ -5596,7 +5596,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 5
     },
     {
       "id": "5227",
@@ -5616,7 +5616,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5228",
@@ -5636,7 +5636,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5229",
@@ -5656,7 +5656,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5231",
@@ -5676,7 +5676,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5232",
@@ -5696,7 +5696,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5233",
@@ -5716,7 +5716,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5234",
@@ -5736,7 +5736,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5235",
@@ -5756,7 +5756,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 5
     },
     {
       "id": "5236",
@@ -5776,7 +5776,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 5
     },
     {
       "id": "5237",
@@ -5796,7 +5796,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 5
     },
     {
       "id": "5239",
@@ -5816,7 +5816,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 5
     },
     {
       "id": "5241",
@@ -5836,7 +5836,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5242",
@@ -5856,7 +5856,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5243",
@@ -5876,7 +5876,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 5
     },
     {
       "id": "5244",
@@ -5896,7 +5896,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5246",
@@ -5916,7 +5916,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5247",
@@ -5936,7 +5936,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5248",
@@ -5956,7 +5956,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5249",
@@ -5976,7 +5976,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 5
     },
     {
       "id": "5250",
@@ -5996,7 +5996,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5251",
@@ -6016,7 +6016,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5252",
@@ -6036,7 +6036,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5253",
@@ -6056,7 +6056,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 5
     },
     {
       "id": "5254",
@@ -6076,7 +6076,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5255",
@@ -6096,7 +6096,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5256",
@@ -6116,7 +6116,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5257",
@@ -6136,7 +6136,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5264",
@@ -6156,7 +6156,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5265",
@@ -6176,7 +6176,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "5266",
@@ -6196,7 +6196,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "11001",
@@ -6216,7 +6216,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "11002",
@@ -6236,7 +6236,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "Africa (Mozambique, Madagascar, Tanzania)",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 15
     },
     {
       "id": "11003",
@@ -6256,7 +6256,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "11004",
@@ -6276,7 +6276,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "Other / Diversified",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 10
     },
     {
       "id": "11007",
@@ -6296,7 +6296,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "11008",
@@ -6316,7 +6316,7 @@
       "supplier_concentration": true,
       "import_dependency": true,
       "import_origin_region": "Other / Diversified",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 15
     },
     {
       "id": "11009",
@@ -6336,7 +6336,7 @@
       "supplier_concentration": true,
       "import_dependency": true,
       "import_origin_region": "Africa (DRC)",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 17
     },
     {
       "id": "11010",
@@ -6356,7 +6356,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "South America (Chile/Argentina)",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 14
     },
     {
       "id": "11011",
@@ -6376,7 +6376,7 @@
       "supplier_concentration": true,
       "import_dependency": true,
       "import_origin_region": "Other / Diversified",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 15
     },
     {
       "id": "11012",
@@ -6396,7 +6396,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "Asia (China)",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 15
     },
     {
       "id": "11013",
@@ -6416,7 +6416,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 4
+      "lead_time_weeks": 7
     },
     {
       "id": "11014",
@@ -6436,7 +6436,7 @@
       "supplier_concentration": true,
       "import_dependency": true,
       "import_origin_region": "Africa (DRC)",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 15
     },
     {
       "id": "11015",
@@ -6456,7 +6456,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "Australia",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 10
     },
     {
       "id": "11016",
@@ -6476,7 +6476,7 @@
       "supplier_concentration": true,
       "import_dependency": true,
       "import_origin_region": "Africa (DRC)",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 15
     },
     {
       "id": "11017",
@@ -6496,7 +6496,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "South America (Chile/Argentina)",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 12
     },
     {
       "id": "11018",
@@ -6516,7 +6516,7 @@
       "supplier_concentration": true,
       "import_dependency": true,
       "import_origin_region": "Africa (DRC)",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 15
     },
     {
       "id": "11019",
@@ -6536,7 +6536,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "Australia",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 10
     },
     {
       "id": "11020",
@@ -6556,7 +6556,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 9
     },
     {
       "id": "11021",
@@ -6576,7 +6576,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "Australia",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 10
     },
     {
       "id": "3001",
@@ -6596,7 +6596,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "3002",
@@ -6616,7 +6616,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "3003",
@@ -6636,7 +6636,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 9
     },
     {
       "id": "3004",
@@ -6656,7 +6656,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 9
     },
     {
       "id": "3005",
@@ -6676,7 +6676,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 9
     },
     {
       "id": "3006",
@@ -6696,7 +6696,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 9
     },
     {
       "id": "3007",
@@ -6716,7 +6716,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "Asia (China)",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 13
     },
     {
       "id": "3011",
@@ -6736,7 +6736,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "3012",
@@ -6756,7 +6756,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "3013",
@@ -6776,7 +6776,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 9
     },
     {
       "id": "3014",
@@ -6796,7 +6796,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "3015",
@@ -6816,7 +6816,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "3016",
@@ -6836,7 +6836,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "3017",
@@ -6856,7 +6856,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 9
     },
     {
       "id": "3018",
@@ -6876,7 +6876,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "3019",
@@ -6896,7 +6896,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "3020",
@@ -6916,7 +6916,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "3021",
@@ -6936,7 +6936,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "3022",
@@ -6956,7 +6956,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 9
     },
     {
       "id": "3025",
@@ -6976,7 +6976,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "3029",
@@ -6996,7 +6996,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "3030",
@@ -7016,7 +7016,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 9
     },
     {
       "id": "3031",
@@ -7036,7 +7036,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 9
     },
     {
       "id": "3032",
@@ -7056,7 +7056,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 9
     },
     {
       "id": "3033",
@@ -7076,7 +7076,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "3036",
@@ -7096,7 +7096,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 9
     },
     {
       "id": "3037",
@@ -7116,7 +7116,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 9
     },
     {
       "id": "3040",
@@ -7136,7 +7136,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "3041",
@@ -7156,7 +7156,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 9
     },
     {
       "id": "3042",
@@ -7176,7 +7176,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "3045",
@@ -7196,7 +7196,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 9
     },
     {
       "id": "3051",
@@ -7216,7 +7216,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 9
     },
     {
       "id": "3054",
@@ -7236,7 +7236,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 9
     },
     {
       "id": "3056",
@@ -7256,7 +7256,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 9
     },
     {
       "id": "3057",
@@ -7276,7 +7276,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 9
     },
     {
       "id": "3059",
@@ -7296,7 +7296,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 9
     },
     {
       "id": "3060",
@@ -7316,7 +7316,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "3061",
@@ -7336,7 +7336,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "South America (Chile/Argentina)",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 13
     },
     {
       "id": "3063",
@@ -7356,7 +7356,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 9
     },
     {
       "id": "3064",
@@ -7376,7 +7376,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "3065",
@@ -7396,7 +7396,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 9
     },
     {
       "id": "3067",
@@ -7416,7 +7416,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "3069",
@@ -7436,7 +7436,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "Other / Diversified",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 12
     },
     {
       "id": "3071",
@@ -7456,7 +7456,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 9
     },
     {
       "id": "3076",
@@ -7476,7 +7476,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 9
     },
     {
       "id": "3078",
@@ -7496,7 +7496,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 9
     },
     {
       "id": "3080",
@@ -7516,7 +7516,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "3081",
@@ -7536,7 +7536,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "3082",
@@ -7556,7 +7556,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "3084",
@@ -7576,7 +7576,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "3085",
@@ -7596,7 +7596,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "3086",
@@ -7616,7 +7616,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 9
     },
     {
       "id": "3087",
@@ -7636,7 +7636,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "3088",
@@ -7656,7 +7656,7 @@
       "supplier_concentration": false,
       "import_dependency": true,
       "import_origin_region": "Asia (Indonesia)",
-      "lead_time_weeks": 6
+      "lead_time_weeks": 10
     },
     {
       "id": "3093",
@@ -7676,7 +7676,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 9
     },
     {
       "id": "3094",
@@ -7696,7 +7696,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 9
     },
     {
       "id": "3097",
@@ -7716,7 +7716,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     },
     {
       "id": "3098",
@@ -7736,7 +7736,7 @@
       "supplier_concentration": false,
       "import_dependency": false,
       "import_origin_region": "nan",
-      "lead_time_weeks": 8
+      "lead_time_weeks": 11
     }
   ],
   "edges": [
@@ -9166,37 +9166,37 @@
       "source": "2087",
       "target": "4103",
       "relationship": "supplies_material",
-      "material": "lfp"
+      "material": "lithium"
     },
     {
       "source": "2087",
       "target": "4028",
       "relationship": "supplies_material",
-      "material": "lfp"
+      "material": "lithium"
     },
     {
       "source": "2087",
       "target": "4029",
       "relationship": "supplies_material",
-      "material": "lfp"
+      "material": "lithium"
     },
     {
       "source": "2087",
       "target": "4091",
       "relationship": "supplies_material",
-      "material": "lfp"
+      "material": "lithium"
     },
     {
       "source": "2087",
       "target": "4110",
       "relationship": "supplies_material",
-      "material": "lfp"
+      "material": "lithium"
     },
     {
       "source": "2087",
       "target": "4093",
       "relationship": "supplies_material",
-      "material": "lfp"
+      "material": "lithium"
     },
     {
       "source": "2092",
@@ -9244,37 +9244,37 @@
       "source": "2095",
       "target": "4091",
       "relationship": "supplies_material",
-      "material": "nca"
+      "material": "lithium"
     },
     {
       "source": "2095",
       "target": "4029",
       "relationship": "supplies_material",
-      "material": "nca"
+      "material": "lithium"
     },
     {
       "source": "2095",
       "target": "4110",
       "relationship": "supplies_material",
-      "material": "nca"
+      "material": "lithium"
     },
     {
       "source": "2095",
       "target": "4108",
       "relationship": "supplies_material",
-      "material": "nca"
+      "material": "lithium"
     },
     {
       "source": "2095",
       "target": "4028",
       "relationship": "supplies_material",
-      "material": "nca"
+      "material": "lithium"
     },
     {
       "source": "2095",
       "target": "4103",
       "relationship": "supplies_material",
-      "material": "nca"
+      "material": "lithium"
     },
     {
       "source": "2098",
@@ -11210,54 +11210,6 @@
     },
     {
       "source": "4083",
-      "target": "5174",
-      "relationship": "supplies_cells",
-      "material": "battery_cells"
-    },
-    {
-      "source": "4083",
-      "target": "5068",
-      "relationship": "supplies_cells",
-      "material": "battery_cells"
-    },
-    {
-      "source": "4083",
-      "target": "5067",
-      "relationship": "supplies_cells",
-      "material": "battery_cells"
-    },
-    {
-      "source": "4083",
-      "target": "5173",
-      "relationship": "supplies_cells",
-      "material": "battery_cells"
-    },
-    {
-      "source": "4083",
-      "target": "5035",
-      "relationship": "supplies_cells",
-      "material": "battery_cells"
-    },
-    {
-      "source": "4083",
-      "target": "5095",
-      "relationship": "supplies_cells",
-      "material": "battery_cells"
-    },
-    {
-      "source": "4083",
-      "target": "5155",
-      "relationship": "supplies_cells",
-      "material": "battery_cells"
-    },
-    {
-      "source": "4083",
-      "target": "5135",
-      "relationship": "supplies_cells",
-      "material": "battery_cells"
-    },
-    {
-      "source": "4083",
       "target": "5235",
       "relationship": "verified_real_supply",
       "material": "battery_cells",
@@ -11669,54 +11621,6 @@
     },
     {
       "source": "4108",
-      "target": "5219",
-      "relationship": "supplies_cells",
-      "material": "battery_cells"
-    },
-    {
-      "source": "4108",
-      "target": "5233",
-      "relationship": "supplies_cells",
-      "material": "battery_cells"
-    },
-    {
-      "source": "4108",
-      "target": "5195",
-      "relationship": "supplies_cells",
-      "material": "battery_cells"
-    },
-    {
-      "source": "4108",
-      "target": "5069",
-      "relationship": "supplies_cells",
-      "material": "battery_cells"
-    },
-    {
-      "source": "4108",
-      "target": "5156",
-      "relationship": "supplies_cells",
-      "material": "battery_cells"
-    },
-    {
-      "source": "4108",
-      "target": "5003",
-      "relationship": "supplies_cells",
-      "material": "battery_cells"
-    },
-    {
-      "source": "4108",
-      "target": "5130",
-      "relationship": "supplies_cells",
-      "material": "battery_cells"
-    },
-    {
-      "source": "4108",
-      "target": "5248",
-      "relationship": "supplies_cells",
-      "material": "battery_cells"
-    },
-    {
-      "source": "4108",
       "target": "5242",
       "relationship": "verified_real_supply",
       "material": "battery_cells",
@@ -11996,37 +11900,37 @@
       "source": "11009",
       "target": "4103",
       "relationship": "supplies_material",
-      "material": "nca"
+      "material": "lithium"
     },
     {
       "source": "11009",
       "target": "4028",
       "relationship": "supplies_material",
-      "material": "nca"
+      "material": "lithium"
     },
     {
       "source": "11009",
       "target": "4029",
       "relationship": "supplies_material",
-      "material": "nca"
+      "material": "lithium"
     },
     {
       "source": "11009",
       "target": "4091",
       "relationship": "supplies_material",
-      "material": "nca"
+      "material": "lithium"
     },
     {
       "source": "11009",
       "target": "4110",
       "relationship": "supplies_material",
-      "material": "nca"
+      "material": "lithium"
     },
     {
       "source": "11009",
       "target": "4093",
       "relationship": "supplies_material",
-      "material": "nca"
+      "material": "lithium"
     },
     {
       "source": "11010",
@@ -12068,37 +11972,37 @@
       "source": "11011",
       "target": "4103",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "lithium"
     },
     {
       "source": "11011",
       "target": "4028",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "lithium"
     },
     {
       "source": "11011",
       "target": "4029",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "lithium"
     },
     {
       "source": "11011",
       "target": "4091",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "lithium"
     },
     {
       "source": "11011",
       "target": "4110",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "lithium"
     },
     {
       "source": "11011",
       "target": "4093",
       "relationship": "supplies_material",
-      "material": "cobalt"
+      "material": "lithium"
     },
     {
       "source": "11012",
@@ -13304,37 +13208,37 @@
       "source": "3061",
       "target": "4108",
       "relationship": "supplies_material",
-      "material": "electrolyte"
+      "material": "lithium"
     },
     {
       "source": "3061",
       "target": "4095",
       "relationship": "supplies_material",
-      "material": "electrolyte"
+      "material": "lithium"
     },
     {
       "source": "3061",
       "target": "4090",
       "relationship": "supplies_material",
-      "material": "electrolyte"
+      "material": "lithium"
     },
     {
       "source": "3061",
       "target": "4006",
       "relationship": "supplies_material",
-      "material": "electrolyte"
+      "material": "lithium"
     },
     {
       "source": "3061",
       "target": "4109",
       "relationship": "supplies_material",
-      "material": "electrolyte"
+      "material": "lithium"
     },
     {
       "source": "3061",
       "target": "4091",
       "relationship": "supplies_material",
-      "material": "electrolyte"
+      "material": "lithium"
     },
     {
       "source": "3063",

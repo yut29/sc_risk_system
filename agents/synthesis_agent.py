@@ -13,17 +13,20 @@ Output (written to PipelineState):
   global_metrics  : GlobalMetrics
 """
 
-import os
 from pathlib import Path
 from typing import Optional
 
 from dotenv import load_dotenv
+from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.messages import SystemMessage, HumanMessage
-from langchain_groq import ChatGroq
 
+from agents.llm_utils import get_llm
 from agents.state import (
     Facility,
     GlobalMetrics,
+    HIGH_CONCENTRATION_MATERIALS,
+    IMPORT_MATERIALS,
+    KNOWN_MATERIALS,
     PipelineState,
     RISK_SCORE_MAX_THEORETICAL,
     USGS_GLOBAL_PRODUCTION_MT,
@@ -32,19 +35,13 @@ from agents.state import (
 
 load_dotenv(Path(__file__).parent.parent / ".env")
 
-_llm: Optional[ChatGroq] = None
+_llm: Optional[BaseChatModel] = None
 
 
-def _get_llm() -> ChatGroq:
+def _get_llm() -> BaseChatModel:
     global _llm
     if _llm is None:
-        _llm = ChatGroq(
-            model="llama-3.1-8b-instant",
-            api_key=os.environ["GROQ_API_KEY"],
-            temperature=0.2,
-            request_timeout=20,
-            max_retries=1,
-        )
+        _llm = get_llm(temperature=0.2)
     return _llm
 
 
@@ -67,6 +64,7 @@ def _compute_scores(state: PipelineState) -> tuple[dict[str, float], list[Facili
     tier_weights   = state.get("tier_weights", {})
     supply_chain_paths = state.get("supply_chain_paths", {})
     severity       = state.get("severity", 3)
+    affected_material = (state.get("affected_material") or "").lower()
 
     node_by_id = {n["id"]: n for n in affected_nodes}
     risk_scores: dict[str, float] = {}
@@ -80,31 +78,68 @@ def _compute_scores(state: PipelineState) -> tuple[dict[str, float], list[Facili
 
         tw = tier_weights.get(nid, 0.35)
 
-        # Downstream has no comparable capacity unit for CapacityShare (vehicle/pack
-        # counts, not MT or GWh — see data_retrieval_agent.py), so that slot would
-        # otherwise sit at a dead 0.0 for every Downstream facility, making them
-        # indistinguishable from each other. Substitutes SingleSourceDependency (2026-07-31,
-        # 1/cell_supplier_count — see FacilityData docstring in state.py) in the same
-        # weighted slot for Downstream only; Upstream/Midstream-Cell keep the original
-        # CapacityShare, Midstream-BGM keeps the existing 0.0 (still not comparable).
-        capacity_term = (
-            float(fd.get("single_source_dependency", 0.0)) if node.get("segment") == "Downstream"
-            else float(fd["capacity_share"])
-        )
-        vulnerability = (
-            VULNERABILITY_WEIGHTS["import_dependency"]  * float(fd["import_dep"])
-            + VULNERABILITY_WEIGHTS["supplier_concentration"] * float(fd["supplier_concentration"])
-            + VULNERABILITY_WEIGHTS["capacity_share"]     * capacity_term
-            + VULNERABILITY_WEIGHTS["lead_time_norm"]     * float(fd["lead_time_norm"])
-        )
-
-        rd = float(fd.get("resilience_discount", 0.0))
-        raw_score = severity * tw * vulnerability * (1 - rd)
-        normalized = round(raw_score / RISK_SCORE_MAX_THEORETICAL * 100, 2)
-
         path_ids = supply_chain_paths.get(nid, [nid])
         supply_path = _format_supply_path(path_ids, node_by_id)
         exposure_type = "direct" if len(path_ids) == 1 else "propagated"
+
+        # 2026-08-03 (corrected same day — see state.py's KNOWN_MATERIALS comment for the
+        # full rationale): propagated facilities inherit ImportDep/SupplierConcentration from
+        # the EVENT's own affected_material classification, NOT the facility's own
+        # material_keywords (which is right for a PRIMARY-exposure facility that directly
+        # handles the material, but empty/irrelevant for a PROPAGATED one several tiers
+        # downstream — e.g. Tesla/Toyota/Lucid Motors carry no "cobalt" keyword themselves,
+        # yet ARE exposed to a cobalt event through their battery supply chain).
+        #
+        # An earlier version of this fix just set both to True unconditionally for any
+        # propagated facility — too blunt: it discarded the real, literature-backed material
+        # classification for the common S1/S2-style case (cobalt genuinely IS import-
+        # dependent/concentrated — that's a fact worth keeping, not overriding), and it
+        # doesn't even correctly express what ImportDep is defined to mean ("is NA import-
+        # reliant on THIS material" — a material-level fact, not a per-facility one).
+        #
+        # Now: look up the event's own material against the same IMPORT_MATERIALS/
+        # HIGH_CONCENTRATION_MATERIALS tables every other facility is classified against. Only
+        # falls back to the precautionary "unknown -> True" default when affected_material
+        # isn't one of the tracked materials at all (KNOWN_MATERIALS) — e.g. a Strategy B
+        # facility-specific event's free-text label like "battery cells", which was never
+        # given a real classification either way.
+        if exposure_type == "propagated":
+            if affected_material in KNOWN_MATERIALS:
+                import_dep_term = 1.0 if affected_material in IMPORT_MATERIALS else 0.0
+                supplier_conc_term = 1.0 if affected_material in HIGH_CONCENTRATION_MATERIALS else 0.0
+            else:
+                import_dep_term = 1.0
+                supplier_conc_term = 1.0
+        else:
+            import_dep_term = float(fd["import_dep"])
+            supplier_conc_term = float(fd["supplier_concentration"])
+
+        # 2026-08-03 (swap, same day as the CapacityShare<->SingleSourceDependency direction
+        # discussion): Vulnerability now uses SingleSourceDependency (self-related: does THIS
+        # facility depend on very few of its own suppliers), not CapacityShare (moved to
+        # ResilienceDiscount below — a system-recoverability question, not a self-fragility
+        # one). No unknown-data default subtlety here: single_source_dependency is already 0.0
+        # (not "unknown", just "no known suppliers in the NA graph, e.g. Upstream root nodes")
+        # whenever it can't be computed, which is the correct low-vulnerability-contribution
+        # value for this term regardless of tier.
+        ssd_term = float(fd["single_source_dependency"])
+        vulnerability = (
+            VULNERABILITY_WEIGHTS["import_dependency"]  * import_dep_term
+            + VULNERABILITY_WEIGHTS["supplier_concentration"] * supplier_conc_term
+            + VULNERABILITY_WEIGHTS["single_source_dependency"] * ssd_term
+            + VULNERABILITY_WEIGHTS["lead_time_norm"]     * float(fd["lead_time_norm"])
+        )
+
+        # ResilienceDiscount (2026-08-03, swapped to CapacityShare-based): a facility that
+        # commands most of its tier's capacity has no one to cover for it if it goes down ->
+        # small discount; a small player has plenty of alternative capacity elsewhere -> large
+        # discount. Unknown/inapplicable cases already default to capacity_share=1.0
+        # (worst-case) in data_retrieval_agent.py, which naturally yields resilience_discount=
+        # 0.0 (no discount) here — same precautionary direction as the "unknown -> max" rule,
+        # just arriving there via capacity_share's own default rather than a separate guard.
+        rd = float(fd.get("resilience_discount", 0.0))
+        raw_score = severity * tw * vulnerability * (1 - rd)
+        normalized = round(raw_score / RISK_SCORE_MAX_THEORETICAL * 100, 2)
 
         risk_scores[nid] = normalized
         facility_objects.append({
@@ -199,10 +234,27 @@ One paragraph: what happened, where, when. End with: "Source: NAATBatt facility 
 One sentence: material, origin tier, risk type.
 
 ## Capacity Impact (North America)
-Two bullet points using the provided percentages:
-- Affected NA capacity: X%
-- Alternative NA capacity: X%
-- Affected global capacity (USGS basis): X% [only if > 0]
+These percentages measure NAATBatt-tracked NORTH AMERICAN domestic mining/production capacity
+only — NAATBatt has no coverage outside the US/Canada/Mexico, so a foreign mine or refinery (e.g.
+a DRC cobalt mine, an Australian lithium operation) is never itself a node in this graph. They are
+NOT a measurement of the disrupted facility's own output or its share of world production — do not
+treat them as verifying, contradicting, or needing to reconcile with any percentage the source event
+text itself claims (e.g. "8% of global output"). That claim is unverified input, not something this
+system computes or can confirm — if you mention it, attribute it to the source ("as reported") and
+do not imply the capacity metrics below confirm or refute it.
+This metric ONLY applies when origin_tier is "Upstream" — it measures raw-material mining/
+production capacity, which structurally cannot be affected by a disruption starting at any other
+tier (Midstream-BGM/Cell/Downstream events can never propagate backward to Upstream in this graph).
+- If origin_tier is "Upstream": two bullet points using the provided percentages —
+  Affected NA capacity: X%; Alternative NA capacity: X%; Affected global capacity (USGS basis): X%
+  [only if > 0]. A 0% figure here is expected and normal whenever the disruption originates at a
+  facility outside NAATBatt's North American coverage (i.e. most real Upstream events) — it means
+  "no NA-domestic Upstream capacity was affected", not "this event has no impact". Do not flag or
+  apologize for a 0% Upstream figure as a gap or contradiction.
+- If origin_tier is NOT "Upstream": do not report 0% as if it were a measurement. Instead write one
+  line: "Not applicable — this event originates at the {origin_tier} tier, not raw-material
+  production; NA capacity-share metrics only apply to Upstream events." Do not attempt to reconcile
+  or explain away a 0% figure here — there is nothing to reconcile, it is simply out of scope.
 
 ## Supply Chain Exposure Analysis
 Using the exposure summary provided in the context, explain — don't just restate the numbers:
@@ -213,17 +265,21 @@ Using the exposure summary provided in the context, explain — don't just resta
   affected material from the affected region — an import-dependency match, NOT a geographic one;
   they are not located in the affected region, NAATBatt only covers North America) and Propagated
   exposure (exposed only because they sit downstream of a Primary-exposure facility in the graph).
-- The High/Medium/Low risk-tier counts in the exposure summary are quantile-based (relative to this
-  event's own RiskScore distribution, not a fixed scale) — state plainly that most reachable facilities
-  are typically Low tier once TierWeight distance-discounting is applied, and only the High-tier
-  facilities warrant real attention. This is the key distinction: reachable ≠ high-risk.
-- If Affected NA capacity (Upstream) is 0% or low while many facilities are potentially exposed,
-  explicitly reconcile this: mining/Upstream capacity being untouched does not mean there is no risk —
-  say so, and point to the High-tier Midstream/Downstream exposure as the actual risk driver.
+- The highest/median RiskScore gap in the exposure summary is the key signal, not the raw counts —
+  state plainly that most reachable facilities score far below the highest exposure once TierWeight
+  distance-discounting is applied, and only the handful of facilities near the highest score (see
+  Top 3 below) warrant real attention. This is the key distinction: reachable ≠ high-risk.
+- Only if origin_tier is "Upstream" AND Affected NA capacity is 0% or low while many facilities are
+  potentially exposed: explicitly reconcile this — mining/Upstream capacity being untouched does not
+  mean there is no risk, point to the high-scoring Midstream/Downstream exposure (see the highest/
+  median gap) as the actual risk driver. Skip this reconciliation entirely for non-Upstream events —
+  see Capacity Impact above.
 
-## Top 3 High-Risk Facilities
-For each facility (numbered 1–3):
-**[Company] — [City, State/Country]** (Segment, RiskScore: X/100, Exposure: Primary|Propagated)
+## Top 3 Risk Facilities
+For each facility (numbered 1–3), lead with the specific facility name, not just the parent company —
+one company can own several distinctly-named facilities (e.g. "Lundin Mining" has both "Eagle Mine"
+and "Humboldt mill"; using only the company name would make them indistinguishable):
+**[Facility Name] ([Company]) — [City, State/Country]** (Segment, RiskScore: X/100, Exposure: Primary|Propagated)
 - One sentence explaining WHY this facility is high risk (import dependency, single source, capacity share).
   Do not imply the facility is physically located in the affected region — Primary exposure means it
   imports from there, nothing more.
@@ -231,7 +287,7 @@ For each facility (numbered 1–3):
   downstream of) — this is the causal chain, state it explicitly rather than skipping it.
 - Recommended action: [concrete mitigation step]
 
-## Expert Risk Synthesis
+## Risk Synthesis
 A multi-paragraph expert assessment (this is the section that earns your "senior analyst" title —
 go beyond restating earlier sections). Cover each of these angles explicitly, in your own words:
 - **Geopolitical / market structure**: what does supplier concentration and import dependency for
@@ -263,7 +319,8 @@ EVENT:
 - Origin tier: {origin_tier}
 - Assessment: {reason}
 
-CAPACITY METRICS:
+CAPACITY METRICS (Upstream-tier only — meaningless/always 0% for a non-Upstream origin_tier;
+see Capacity Impact section rules above):
 - Affected NA upstream capacity: {betroffene_na}%
 - Alternative NA upstream capacity: {alternative_na}%
 - Affected global capacity (USGS): {betroffene_global}%
@@ -271,7 +328,8 @@ CAPACITY METRICS:
 SUPPLY CHAIN EXPOSURE SUMMARY:
 {exposure_summary}
 
-TOP 3 HIGH-RISK FACILITIES (Exposure = Direct means Primary exposure — the facility itself matched the
+TOP 3 RISK FACILITIES (highest-scoring, not necessarily close to the highest RiskScore in the
+distribution above; Exposure = Direct means Primary exposure — the facility itself matched the
 event via import dependency, NOT that it is physically located in the affected region; Propagated means
 it was only reached via downstream supply-chain traversal — SupplyPath shows that chain):
 {top3_text}
@@ -327,30 +385,27 @@ def _compute_exposure_summary(state: PipelineState) -> str:
     )
 
 
-def compute_risk_tiers(risk_scores: dict[str, float]) -> dict[str, int]:
+def _compute_risk_score_stats(risk_scores: dict[str, float]) -> dict[str, float]:
     """
-    Buckets affected facilities into High/Medium/Low risk tiers using rank-based
-    quantiles (top 20% / next 30% / bottom 50% by RANK) rather than fixed score
-    bands or value-based thresholds.
-
-    RiskScore_normalized is heavily right-skewed in practice: TierWeight discounts
-    most facilities that aren't at the event's origin tier hard (0.6/0.35/0.15), so
-    fixed bands like 0-30/30-60/60-100 would put nearly everything in "Low" and
-    leave "High" empty. It's also common for many facilities to share the exact same
-    score (same segment + same TierWeight + similar Vulnerability inputs) — a
-    value-based cutoff (e.g. "low = score < median") can then collapse an entire
-    tier to zero because every tied value lands on one side of the cutoff. Ranking
-    first and slicing by position avoids both problems: proportions are always
-    ~20/30/50 regardless of how many scores are tied.
+    Replaces the old compute_risk_tiers() High/Medium/Low bucketing (removed
+    2026-08-03) — that function only ever read len(risk_scores), never the actual
+    score values, so its "20% High / 30% Medium / 50% Low" output was a fixed
+    proportion of facility COUNT, constant for every event regardless of how risky
+    it actually was. Reports the real shape of the distribution instead: max (the
+    worst single exposure) and median (the typical facility among all reachable
+    ones). RiskScore_normalized is heavily right-skewed in practice — TierWeight
+    discounts most facilities that aren't at the event's origin tier hard
+    (0.6/0.35/0.15) — so max >> median is the expected, informative signal ("a
+    small number of facilities are genuinely exposed, most reachable ones are not"),
+    not an artifact to bucket away.
     """
-    n = len(risk_scores)
-    if n == 0:
-        return {"high": 0, "medium": 0, "low": 0}
-
-    high_n = max(1, round(n * 0.2))
-    medium_n = round(n * 0.3)
-    low_n = n - high_n - medium_n
-    return {"high": high_n, "medium": medium_n, "low": low_n}
+    if not risk_scores:
+        return {"max": 0.0, "median": 0.0}
+    values = sorted(risk_scores.values())
+    n = len(values)
+    mid = n // 2
+    median = values[mid] if n % 2 else (values[mid - 1] + values[mid]) / 2
+    return {"max": round(values[-1], 2), "median": round(median, 2)}
 
 
 # ── Main agent function ────────────────────────────────────────────────────────
@@ -361,7 +416,7 @@ def _no_seed_found_report(state: PipelineState) -> PipelineState:
     free-write the full report template is unsafe: observed in testing (2026-07-20) that
     even with explicit instructions, the LLM would correctly flag the limitation in the
     "Supply Chain Exposure Analysis" section, then contradict itself two sections later
-    in "Expert Risk Synthesis" by analyzing the 0% capacity figures as if they were a
+    in "Risk Synthesis" by analyzing the 0% capacity figures as if they were a
     real finding ("the system has 0.0% affected capacity, which suggests there is no
     slack..."). A fixed, non-generative notice guarantees no self-contradiction and
     costs no API call / rate-limit budget.
@@ -392,7 +447,7 @@ def _no_seed_found_report(state: PipelineState) -> PipelineState:
         "top3_facilities":  [],
         "risk_scores":      {},
         "global_metrics":   _compute_global_metrics(state),
-        "risk_tier_counts": {"high": 0, "medium": 0, "low": 0},
+        "risk_score_stats": {"max": 0.0, "median": 0.0},
     }
 
 
@@ -429,7 +484,7 @@ def _entity_ambiguous_report(state: PipelineState) -> PipelineState:
         "top3_facilities":  [],
         "risk_scores":      {},
         "global_metrics":   _compute_global_metrics(state),
-        "risk_tier_counts": {"high": 0, "medium": 0, "low": 0},
+        "risk_score_stats": {"max": 0.0, "median": 0.0},
     }
 
 
@@ -463,7 +518,7 @@ def _entity_non_material_report(state: PipelineState) -> PipelineState:
         "top3_facilities":  [],
         "risk_scores":      {},
         "global_metrics":   _compute_global_metrics(state),
-        "risk_tier_counts": {"high": 0, "medium": 0, "low": 0},
+        "risk_score_stats": {"max": 0.0, "median": 0.0},
     }
 
 
@@ -482,14 +537,15 @@ def run_synthesis_agent(state: PipelineState) -> PipelineState:
 
     risk_scores, top3 = _compute_scores(state)
     global_metrics    = _compute_global_metrics(state)
-    risk_tiers        = compute_risk_tiers(risk_scores)
+    score_stats       = _compute_risk_score_stats(risk_scores)
 
     top3_text        = _format_top3(top3)
     exposure_summary = (
         f"{_compute_exposure_summary(state)} "
-        f"Risk tiers among affected facilities (quantile-based, top 20%/next 30%/bottom 50% "
-        f"of this event's RiskScore distribution — NOT a fixed absolute scale): "
-        f"High={risk_tiers['high']}, Medium={risk_tiers['medium']}, Low={risk_tiers['low']}."
+        f"RiskScore distribution among affected facilities: highest={score_stats['max']}/100, "
+        f"median={score_stats['median']}/100 — the gap between the two is the actual signal "
+        f"(most reachable facilities are far below the highest exposure once TierWeight distance-"
+        f"discounting applies; a small highest/median gap would mean broad, not narrow, exposure)."
     )
 
     messages = [
@@ -517,5 +573,5 @@ def run_synthesis_agent(state: PipelineState) -> PipelineState:
         "top3_facilities":  top3,
         "risk_scores":      risk_scores,
         "global_metrics":   global_metrics,
-        "risk_tier_counts": risk_tiers,
+        "risk_score_stats": score_stats,
     }

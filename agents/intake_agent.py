@@ -15,34 +15,27 @@ Output (written to PipelineState):
   mentioned_location : str | None   e.g. "Kansas" (city/state named alongside the company)
 """
 
-import os
 from pathlib import Path
 from typing import Optional
 
 from dotenv import load_dotenv
+from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.messages import SystemMessage, HumanMessage
-from langchain_groq import ChatGroq
 
 load_dotenv(Path(__file__).parent.parent / ".env")
 
-from agents.llm_utils import invoke_json
+from agents.llm_utils import get_llm, invoke_json
 from agents.state import PipelineState
 
 # ── LLM singleton ─────────────────────────────────────────────────────────────
 
-_llm: Optional[ChatGroq] = None
+_llm: Optional[BaseChatModel] = None
 
 
-def _get_llm() -> ChatGroq:
+def _get_llm() -> BaseChatModel:
     global _llm
     if _llm is None:
-        _llm = ChatGroq(
-            model="llama-3.1-8b-instant",
-            api_key=os.environ["GROQ_API_KEY"],
-            temperature=0,
-            request_timeout=20,
-            max_retries=1,
-        )
+        _llm = get_llm(temperature=0)
     return _llm
 
 
@@ -77,8 +70,11 @@ JSON schema:
 }
 
 Rules:
-- relevant=true only if the text concerns supply disruption, price volatility, regulatory risk,
-  logistics failure, or weather events affecting battery-critical materials or regions
+- relevant=true if the text concerns EITHER (a) supply disruption, price volatility, regulatory
+  risk, logistics failure, or weather events affecting battery-critical materials or regions, OR
+  (b) a facility-specific disruption (fire, strike, shutdown, quality recall, etc.) at a named
+  company's own battery supply chain plant/mine — this second category has no material/region of
+  its own; the named company and facility ARE the event, not a downstream effect of one
 - trigger_type "A" = the input looks like a news article; "B" = a direct user question/query
 - material must be one of: cobalt, lithium, nickel, manganese, graphite, copper — or empty
 - If not relevant, set material="", region="", keywords=[], filtered_text=""

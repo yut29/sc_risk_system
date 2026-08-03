@@ -369,10 +369,24 @@ def run_network_agent(state: PipelineState) -> PipelineState:
     # ── Build Node dicts ──────────────────────────────────────────────────────
     def to_node(nid: str) -> Node:
         attrs = all_nodes[nid]
+        # facility_name is missing for ~5% of NAATBatt rows (pandas NaN at CSV-build time,
+        # e.g. Vertical Partners West LLC) — build_graph.py stringifies it when writing JSON,
+        # so it round-trips as the literal string "nan" (verified: not a float here, despite
+        # being a real float NaN in facilities_clean.csv — str(float('nan')) == "nan"
+        # happens somewhere in the CSV->JSON step). Either form is truthy in Python
+        # (`nan or fallback` never falls back, and "nan" is a non-empty string), so every
+        # consumer (report headers, UI table) would otherwise literally print "nan".
+        # Normalize once here rather than guard at every call site.
+        raw_facility_name = attrs.get("facility_name", "")
+        facility_name = (
+            "" if isinstance(raw_facility_name, float)
+            or str(raw_facility_name).strip().lower() == "nan"
+            else raw_facility_name
+        )
         return Node(
             id=nid,
             company=attrs.get("company", ""),
-            facility_name=attrs.get("facility_name", ""),
+            facility_name=facility_name,
             segment=attrs.get("segment", ""),
             product_type=attrs.get("product_type", ""),
             material_keywords=attrs.get("material_keywords", ""),
@@ -388,7 +402,7 @@ def run_network_agent(state: PipelineState) -> PipelineState:
             import_dependency=bool(attrs.get("import_dependency", False)),
             import_origin_region=attrs.get("import_origin_region", ""),
             lead_time_weeks=int(attrs.get("lead_time_weeks", 0)),
-            cell_supplier_count=G.in_degree(nid),
+            direct_supplier_count=G.in_degree(nid),
         )
 
     affected_nodes = [to_node(nid) for nid in sorted(affected_ids)]

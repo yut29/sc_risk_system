@@ -15,34 +15,27 @@ Output (written to PipelineState):
   reason           : str       mandatory justification for Validation Agent
 """
 
-import os
 from pathlib import Path
 from typing import Optional
 
 from dotenv import load_dotenv
+from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.messages import SystemMessage, HumanMessage
-from langchain_groq import ChatGroq
 
-from agents.llm_utils import invoke_json
+from agents.llm_utils import get_llm, invoke_json
 from agents.state import PipelineState
 
 load_dotenv(Path(__file__).parent.parent / ".env")
 
 # ── LLM singleton ─────────────────────────────────────────────────────────────
 
-_llm: Optional[ChatGroq] = None
+_llm: Optional[BaseChatModel] = None
 
 
-def _get_llm() -> ChatGroq:
+def _get_llm() -> BaseChatModel:
     global _llm
     if _llm is None:
-        _llm = ChatGroq(
-            model="llama-3.1-8b-instant",
-            api_key=os.environ["GROQ_API_KEY"],
-            temperature=0,
-            request_timeout=20,
-            max_retries=1,
-        )
+        _llm = get_llm(temperature=0)
     return _llm
 
 

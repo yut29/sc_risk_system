@@ -23,6 +23,56 @@ LEAD_TIME = {
     "Downstream":     4,
 }
 
+# Lead-time refinement (2026-08-03): the pure per-segment base above made every facility
+# within the same segment identical regardless of material/region/data availability — a
+# documented model simplification (docs/data_processing.md §3). Combined with
+# supplier_concentration/import_dependency, which are also constant per material+segment
+# (see below), this left individual companies within the same segment+material combination
+# indistinguishable on 3 of Vulnerability's 4 terms. Extended to a rule-based proxy —
+# still fully rule-based, not measured, but more granular: tier + material criticality
+# (aligned to the SAME USGS NIR / HIGH_CONCENTRATION_MATERIALS data already cited above,
+# not a second independent judgment) + import-origin region + capacity data availability.
+#
+# NOTE: this does NOT by itself guarantee every company gets a unique score. Region is a
+# weighted-random per-facility draw skewed toward the real dominant source country (e.g.
+# 73% of cobalt facilities draw "Africa (DRC)", see IMPORT_ORIGIN_DISTRIBUTION) — realistic
+# concentration means most facilities of a concentrated material still collide on this
+# adjustment. Tie-breaking for Downstream/Midstream-BGM is handled separately by
+# SingleSourceDependency (graph-based direct_supplier_count, see
+# agents/data_retrieval_agent.py) — this formula is a complementary refinement to make the
+# LeadTime term itself more informative, not a substitute for that mechanism.
+MATERIAL_LEAD_TIME_ADJUSTMENT = {
+    "cobalt":    4,  # NIR=79% AND in HIGH_CONCENTRATION_MATERIALS (DRC 73%+Indonesia 14%=87%) — only
+                     # material that's both import-dependent and geographically concentrated
+    "graphite":  2,  # NIR=100% but diversified supply (China + 15+ countries per risk_model.md) —
+                     # not in HIGH_CONCENTRATION_MATERIALS, so lower than cobalt despite full NIR
+    "manganese": 2,  # NIR=100% but diversified (4 countries, 10-38% each)
+    "nickel":    1,  # NIR≈100% primary but "global surplus since 2022" (risk_model.md) — easier to
+                     # re-source despite high import dependence
+    "lithium":   1,  # NIR>50%, lowest import-dependence of the five + most diversified (10+ miners)
+    "copper":    0,  # not in IMPORT_MATERIALS — not treated as import-critical in this model
+}
+
+
+def _region_lead_time_adjustment(region: str) -> int:
+    """
+    Rough shipping-distance/logistics-complexity proxy from the assigned
+    import_origin_region string (see IMPORT_ORIGIN_DISTRIBUTION) — grouped by continent
+    prefix since the exact strings carry material-specific bracketed detail
+    (e.g. "Africa (DRC)" vs "Africa (South Africa, Gabon)").
+    """
+    if region.startswith("Africa"):
+        return 3
+    if region == "Asia (China)":
+        return 3
+    if region.startswith("Asia"):
+        return 2
+    if region.startswith("South America"):
+        return 2
+    if region == "Australia":
+        return 1
+    return 1  # "Other / Diversified" or unmatched
+
 IMPORT_MATERIALS = {"cobalt", "nickel", "lithium", "manganese", "graphite"}
 
 # IMPORT_ORIGIN_DISTRIBUTION: realistic supplier-country split instead of a single
@@ -70,13 +120,27 @@ HIGH_CONCENTRATION_MATERIALS = {"cobalt", "nmc", "nca"}
 # Facility-level import_dependency overrides (cobalt)
 # Basis: USGS NIR (79%) is a sector aggregate, not facility-level.
 # The following facilities are known to source cobalt outside the DRC supply chain:
-#   - Nth Cycle: secondary cobalt from battery recycling (no virgin DRC cobalt)
-#   - Sherritt International: Moa Bay (Cuba) + Ambatovy (Madagascar) JV; no DRC exposure
-#   - Boleo Copper Project (BGM): downstream processing of own Mexican mine output
+#   - Nth Cycle: secondary cobalt from battery recycling (no virgin DRC cobalt) — genuinely
+#     not import-dependent (domestic recycling feedstock), import_dependency=False is correct.
+#   - Sherritt International: Moa Bay (Cuba) + Ambatovy (Madagascar) JV — this facility IS
+#     import-dependent (it does import cobalt/nickel, just not from DRC), so import_dependency
+#     should be True, not False. Fixed 2026-08-03: the previous version set
+#     import_dependency=False with import_origin_region="Caribbean / Africa (non-DRC)" — a
+#     negation written as free text, which region_match()'s substring matching can't parse
+#     ("non-DRC" literally contains "drc" as a substring, so a DRC-region event still matched
+#     it whenever the import_dependency guard was bypassed) and which also meant Sherritt could
+#     never match ANY real region-based event, including a genuine Cuba/Madagascar-specific one
+#     it should be exposed to — overcorrected a false positive into a permanent false negative.
+#     Naming the real, specific, affirmative source countries instead avoids both problems:
+#     "Cuba / Madagascar" shares no substring with REGION_ALIASES["africa/drc"]'s
+#     ["africa","drc","congo"] list, so it won't falsely match a DRC event, while still being
+#     available to correctly match a real Cuba- or Madagascar-specific disruption.
+#   - Boleo Copper Project (BGM): downstream processing of own Mexican mine output — genuinely
+#     not import-dependent (captive upstream feedstock), import_dependency=False is correct.
 # Documented in docs/data_processing.md §4.4
 IMPORT_DEP_OVERRIDES: dict[str, dict] = {
     "Nth Cycle":              {"import_dependency": False, "import_origin_region": ""},
-    "Sherritt International": {"import_dependency": False, "import_origin_region": "Caribbean / Africa (non-DRC)"},
+    "Sherritt International": {"import_dependency": True, "import_origin_region": "Cuba / Madagascar"},
     "Boleo Copper Project":   {"import_dependency": False, "import_origin_region": ""},
 }
 
@@ -259,8 +323,24 @@ def build_computed_fields(df: pd.DataFrame) -> pd.DataFrame:
                   and any(kw in IMPORT_MATERIALS for kw in r["material_keywords"]),
         axis=1,
     )
+    # import_origin_region (2026-08-03 fix): previously infer_import_origin() ran
+    # unconditionally for every row, including Upstream — which produced nonsensical values
+    # like Albemarle's Silver Peak, NV lithium mine (itself the production site) being
+    # randomly assigned "Australia" as its "import origin". This value was never actually
+    # read anywhere (network_agent.py's _region_match() gates on import_dependency=True
+    # before ever looking at it, and Upstream is always import_dependency=False), so it was
+    # dead-but-misleading data, not a live bug. Now: Upstream facilities ARE the origin, so
+    # their own state IS the accurate origin region — use it instead of a random foreign
+    # draw. Non-Upstream facilities with import_dependency=False (e.g. copper, not in
+    # IMPORT_MATERIALS) get "" — we don't model where they actually source from, so leaving
+    # it empty is more honest than guessing either a foreign or domestic origin for them.
     df["import_origin_region"] = df.apply(
-        lambda r: infer_import_origin(str(r["facility_id"]), r["material_keywords"]), axis=1
+        lambda r: (
+            r["state"] if r["supply_chain_segment"] == "Upstream"
+            else infer_import_origin(str(r["facility_id"]), r["material_keywords"])
+                 if r["import_dependency"] else ""
+        ),
+        axis=1,
     )
 
     # Apply facility-specific overrides (documented exceptions to the USGS NIR rule)
@@ -269,8 +349,24 @@ def build_computed_fields(df: pd.DataFrame) -> pd.DataFrame:
         for col, val in overrides.items():
             df.loc[mask, col] = val
 
-    # lead_time_weeks
-    df["lead_time_weeks"] = df["supply_chain_segment"].map(LEAD_TIME)
+    # lead_time_weeks = base_by_segment + material_adjustment + region_adjustment
+    #                   + capacity_data_penalty (see MATERIAL_LEAD_TIME_ADJUSTMENT /
+    #                   _region_lead_time_adjustment above for rationale). Multi-material
+    #                   facilities (e.g. NMC cathode -> cobalt+nickel+manganese keywords)
+    #                   take the MAX adjustment among their materials, not the sum — same
+    #                   "any() dominates" pattern as supplier_concentration above, so a
+    #                   facility handling 3 materials isn't penalized 3x for that alone.
+    def _lead_time_weeks(row: pd.Series) -> int:
+        base = LEAD_TIME[row["supply_chain_segment"]]
+        material_adj = max(
+            (MATERIAL_LEAD_TIME_ADJUSTMENT.get(kw, 0) for kw in row["material_keywords"]),
+            default=0,
+        )
+        region_adj = _region_lead_time_adjustment(row["import_origin_region"])
+        capacity_penalty = 2 if row["capacity_source"] == "unknown" else 0
+        return base + material_adj + region_adj + capacity_penalty
+
+    df["lead_time_weeks"] = df.apply(_lead_time_weeks, axis=1)
 
     # material_keywords → 逗号分隔字符串
     df["material_keywords"] = df["material_keywords"].apply(lambda x: ",".join(x))

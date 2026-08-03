@@ -200,8 +200,11 @@ def test_facility_disruption_without_material_does_not_inflate_capacity_denomina
     state.update(run_network_agent(state))
     assert state["seed_generation_status"] == "entity_matched"
     state.update(run_data_retrieval_agent(state))
+    # capacity_share itself now defaults to 1.0 (max/worst-case), not 0.0, whenever it's
+    # inapplicable/unknown (2026-08-03, explicit instruction) — this test's actual concern,
+    # the GLOBAL percentage denominators, is unaffected by that and still checked below.
     for fd in state["facility_data"].values():
-        assert fd["capacity_share"] == 0.0
+        assert fd["capacity_share"] == 1.0
     assert state["betroffene_kapazitaet_pct"] == 0.0
     assert state["alternative_kapazitaet_pct"] == 0.0
 

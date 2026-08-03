@@ -16,8 +16,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from agents.network_agent import run_network_agent
 from agents.synthesis_agent import (
     _compute_global_metrics,
+    _compute_risk_score_stats,
     _compute_scores,
-    compute_risk_tiers,
     run_synthesis_agent,
 )
 from agents.validation_agent import run_validation_agent
@@ -52,7 +52,7 @@ def test_unmatched_event_reports_no_seed_found_not_a_silent_zero():
 def test_no_seed_found_report_is_deterministic_and_never_contradicts_itself():
     """Regression test (2026-07-20): synthesis_agent used to call the LLM even when
     seed_generation_status="no_seed_found", and the LLM would correctly flag the
-    limitation in one section, then contradict itself in "Expert Risk Synthesis" by
+    limitation in one section, then contradict itself in "Risk Synthesis" by
     analyzing the placeholder 0% capacity figures as if they were a real finding.
     Now short-circuited to a fixed notice — no LLM call, so it can't self-contradict
     and is byte-for-byte reproducible for the same input."""
@@ -69,7 +69,7 @@ def test_no_seed_found_report_is_deterministic_and_never_contradicts_itself():
     assert result1["risk_report"] == result2["risk_report"]  # deterministic, no LLM variance
     assert "System Limitation Notice" in result1["risk_report"]
     assert result1["top3_facilities"] == []
-    assert result1["risk_tier_counts"] == {"high": 0, "medium": 0, "low": 0}
+    assert result1["risk_score_stats"] == {"max": 0.0, "median": 0.0}
 
 
 def test_no_seed_found_report_skips_validation_llm_call():
@@ -175,17 +175,25 @@ def test_scenario_no_primary_exposure_facility_is_downstream_of_another(scenario
             )
 
 
-def test_risk_tiers_sum_to_total_and_are_never_empty_due_to_ties(scenario_state):
-    """compute_risk_tiers() buckets must partition all affected facilities exactly once.
-    Regression test for a bug (2026-07-20): a value-based median cutoff collapsed the
-    Low tier to 0 whenever >50% of facilities were tied on the same score (common,
-    since many facilities share segment + TierWeight + similar Vulnerability inputs) —
-    rank-based bucketing must keep proportions ~20/30/50 regardless of ties."""
+def test_risk_score_stats_reflect_actual_distribution(scenario_state):
+    """_compute_risk_score_stats() replaced compute_risk_tiers() (2026-08-03) — the old
+    function only ever read len(risk_scores), never the actual score values, so its
+    "High/Medium/Low" output was a fixed ~20/30/50 split of facility COUNT for every
+    event, regardless of how risky it actually was (found while investigating why S1's
+    Top-3 facilities all showed identical scores). max/median must be real, order-
+    consistent statistics of the actual RiskScore values, not a count-derived proxy."""
     risk_scores, _ = _compute_scores(scenario_state)
-    tiers = compute_risk_tiers(risk_scores)
-    assert tiers["high"] + tiers["medium"] + tiers["low"] == len(risk_scores)
-    assert tiers["high"] >= 1 or len(risk_scores) == 0
-    if len(risk_scores) >= 10:
-        # with >=10 facilities, none of the 3 tiers should be empty even under heavy ties
-        assert tiers["low"] > 0
-        assert tiers["medium"] > 0
+    stats = _compute_risk_score_stats(risk_scores)
+    if not risk_scores:
+        assert stats == {"max": 0.0, "median": 0.0}
+        return
+    values = sorted(risk_scores.values())
+    assert stats["max"] == round(values[-1], 2)
+    assert 0.0 <= stats["median"] <= stats["max"]
+    # median must track the actual middle of the sorted values, not a fixed proportion
+    # of the count — changing a single score must be able to move it.
+    mutated = dict(risk_scores)
+    some_id = next(iter(mutated))
+    mutated[some_id] = stats["max"] + 10.0
+    mutated_stats = _compute_risk_score_stats(mutated)
+    assert mutated_stats["max"] == round(stats["max"] + 10.0, 2)
