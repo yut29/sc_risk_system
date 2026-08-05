@@ -113,7 +113,10 @@ def test_correct_material_does_not_flag_misclassification():
 # ── Slow / opt-in: full pipeline with real LLM calls ────────────────────────────
 
 @pytest.mark.slow
-@pytest.mark.skipif(not os.environ.get("GROQ_API_KEY"), reason="needs GROQ_API_KEY + live API call")
+@pytest.mark.skipif(
+    not (os.environ.get("FAU_LLMAPI_KEY") or os.environ.get("GROQ_API_KEY")),
+    reason="needs FAU_LLMAPI_KEY or GROQ_API_KEY + live API call",
+)
 def test_full_pipeline_report_mentions_top3_companies_and_material():
     """End-to-end: run S1 through the real pipeline (all 6 agents, real LLM calls) and check
     the generated report is self-consistent — every Top-3 company and the material name

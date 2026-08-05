@@ -43,7 +43,7 @@ SAMPLES = {
         "and Lucid Motors. Local officials say it is too early to estimate how long "
         "the shutdown will last."
     ),
-    "User query (Trigger B)": (
+    "User query": (
         "What happens to North American battery supply if China bans graphite exports?"
     ),
 }
@@ -271,9 +271,12 @@ with st.container(border=True):
     pc1, pc2 = st.columns(2)
     pc1.metric(
         "Primary exposure", direct_count,
-        help="Facilities matched by import dependency on the affected region (e.g. a North American "
-             "plant that imports from the disrupted region) — NOT facilities physically located in "
-             "that region. NAATBatt only covers North America, so these are always NA-based.",
+        help="Facilities that are themselves the seed of this event — matched either by import "
+             "dependency on the affected region (a North American plant that imports from the "
+             "disrupted region, e.g. a cobalt/DRC event), or by facility-name matching for a "
+             "facility-specific event (e.g. a fire at a named company's own plant). NOT facilities "
+             "physically located in the affected region — NAATBatt only covers North America, so "
+             "every facility shown here, Primary or Propagated, is NA-based.",
     )
     pc2.metric(
         "Propagated exposure", propagated_count,
@@ -366,12 +369,13 @@ if top3:
     st.markdown(
         "**Supply chain path** (seed event → facility)",
         help=(
-            "**Primary** — the facility itself already satisfies the event-matching criteria "
-            "(import dependency on the affected region) and is therefore a risk propagation seed; "
-            "its path contains only the facility itself. This is a supply-chain/import-dependency "
-            "match, not a geographic one — NAATBatt only covers North America, so a 'Primary' facility "
-            "is always NA-based, even for an event originating abroad.\n\n"
-            "**Propagated** — the facility does not match the event criteria itself; "
+            "**Primary** — the facility itself is the seed of this event: either it satisfies the "
+            "import-dependency-on-the-affected-region rule (a regional material disruption, e.g. "
+            "cobalt/DRC), or it was matched directly by facility name for a facility-specific event "
+            "(e.g. a fire at a named company's own plant). Its path contains only the facility "
+            "itself. Not a geographic match either way — NAATBatt only covers North America, so a "
+            "'Primary' facility is always NA-based, even for an event originating abroad.\n\n"
+            "**Propagated** — the facility is not itself a seed; "
             "it was reached through multi-tier supply chain traversal from a Primary seed."
         ),
     )
@@ -408,7 +412,46 @@ with st.expander("Pipeline details", expanded=False):
             st.markdown(f"- {iss}")
 
     with st.expander("Raw pipeline state (debug)", expanded=False):
-        debug = {k: v for k, v in result.items()
-                 if k not in ("affected_nodes", "alt_nodes", "facility_data",
-                              "risk_scores", "tier_weights", "downstream_fanout")}
-        st.json(debug)
+        # Grouped by which agent actually writes each field (verified against each
+        # agent's own `return {**state, ...}` — not just its module docstring, which can
+        # drift from the code). Large per-facility fields (affected_nodes, alt_nodes,
+        # facility_data, risk_scores, tier_weights, downstream_fanout) are already shown
+        # elsewhere in the UI (Top-3 table, map, exposure cards) and excluded here.
+        # supply_chain_paths and facility_data are per-facility dicts too (one entry per
+        # affected facility, e.g. 128 for a broad S1-style event) — shown as a small sample
+        # (_SAMPLE_N entries) rather than dumped in full, same reasoning as the exclusions.
+        _SAMPLE_N = 3
+        _STATE_GROUPS = {
+            "Eingabe":          ["raw_input"],
+            "Intake":           ["relevant", "trigger_type", "material", "region", "keywords",
+                                  "filtered_text", "mentioned_company", "mentioned_location"],
+            "Risk Assessment":  ["severity", "risk_type", "affected_material", "affected_region",
+                                  "origin_tier", "reason"],
+            "Network":          ["seed_generation_status", "total_network_facilities"],
+            "Data Retrieval":   ["betroffene_kapazitaet_pct", "alternative_kapazitaet_pct"],
+            "Synthesis":        ["risk_report", "top3_facilities", "global_metrics",
+                                  "risk_score_stats"],
+            "Validation":       ["valid", "failure_type", "issues", "iteration"],
+        }
+        _SAMPLED_FIELDS = {"Network": "supply_chain_paths", "Data Retrieval": "facility_data"}
+        _EXCLUDED = {"affected_nodes", "alt_nodes", "facility_data",
+                     "risk_scores", "tier_weights", "downstream_fanout", "supply_chain_paths"}
+        _grouped_keys = {k for keys in _STATE_GROUPS.values() for k in keys} | set(_SAMPLED_FIELDS.values())
+
+        for group_name, keys in _STATE_GROUPS.items():
+            group_data = {k: result[k] for k in keys if k in result}
+            if group_data:
+                st.markdown(f"**{group_name}**")
+                st.json(group_data)
+            sampled_key = _SAMPLED_FIELDS.get(group_name)
+            if sampled_key and result.get(sampled_key):
+                full = result[sampled_key]
+                sample = dict(list(full.items())[:_SAMPLE_N])
+                st.caption(f"`{sampled_key}` — Beispiel: {len(sample)} von {len(full)} Anlagen")
+                st.json(sample)
+
+        _rest = {k: v for k, v in result.items()
+                 if k not in _grouped_keys and k not in _EXCLUDED}
+        if _rest:
+            st.markdown("**Sonstige**")
+            st.json(_rest)
