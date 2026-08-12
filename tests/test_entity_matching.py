@@ -115,7 +115,7 @@ def test_empty_material_and_region_do_not_match_everything():
     that treat an empty string as a substring of everything, so an empty/missing
     material or region used to match every node in the graph instead of none."""
     result = run_network_agent({
-        "affected_material": "", "affected_region": "", "origin_tier": "Upstream",
+        "material": "", "region": "", "origin_tier": "Upstream",
     })
     assert result["seed_generation_status"] == "no_seed_found"
     assert len(result["affected_nodes"]) == 0
@@ -185,7 +185,7 @@ def test_entity_non_material_report_is_deterministic_and_mentions_company():
 
 def test_facility_disruption_without_material_does_not_inflate_capacity_denominator():
     """Regression test (2026-07-31): a facility-specific disruption (Strategy B) has no
-    affected_material — data_retrieval_agent.py's material_rows filter used
+    material — data_retrieval_agent.py's material_rows filter used
     `.str.contains(material, na=False)`, and pandas treats an empty string as a substring
     of every non-null value, so an empty material matched all 386 facilities instead of
     none. This inflated the CapacityShare/capacity-percentage denominators with

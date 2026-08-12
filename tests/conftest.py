@@ -41,15 +41,15 @@ import pytest
 
 SCENARIOS = {
     "S1": {  # Kobaltminenstreik im Kongo
-        "affected_material": "cobalt",
-        "affected_region": "Africa/DRC",
+        "material": "cobalt",
+        "region": "Africa/DRC",
         "origin_tier": "Upstream",
         "severity": 5,
         "risk_type": "supply_disruption",
     },
     "S2": {  # Lithium-Exportbeschränkungen (Chile)
-        "affected_material": "lithium",
-        "affected_region": "South America / Australia",
+        "material": "lithium",
+        "region": "South America / Australia",
         "origin_tier": "Upstream",
         "severity": 4,
         "risk_type": "regulatory",

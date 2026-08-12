@@ -48,7 +48,7 @@ propagated → Facility wurde erst über BFS-Traversierung im Wissensgraphen err
 
 SeedGenerationStatus = Literal[
     "rule_matched", "entity_matched", "entity_ambiguous", "no_seed_found",
-    "entity_non_material"
+    "entity_non_material", "llm_fallback_used"
 ]
 """
 rule_matched         → mindestens ein Root-Seed über Material+Region-Matching gefunden (Strategy A).
@@ -74,8 +74,13 @@ entity_non_material  → Strategy B hat die genannte Firma eindeutig einer Anlag
                        entity_matched behandelt, sonst würde z.B. "Brand bei ArlanXEO" eine
                        Batterie-Rohstoff-Risikoausbreitung vortäuschen, obwohl ArlanXEO keine
                        Risikomaterialien verarbeitet.
-(Weiterer Wert "llm_fallback" vorgesehen, sobald Strategy C umgesetzt ist — siehe
- architecture.md "Vorschlag: Multi-Strategie Seed Generator".)
+llm_fallback_used   → Strategy C griff: weder A noch B fanden etwas, aber es gab eine Region;
+                       ein deterministischer Retrieval-Schritt (find_facilities_by_region in
+                       tools.py) lieferte eine geschlossene Kandidatenliste realer Anlagen in
+                       der Region, und die LLM wählte daraus aus (kann keine Anlage erfinden —
+                       jede zurückgegebene ID wird gegen die Kandidatenliste re-validiert).
+                       Umgesetzt 2026-08-06, siehe docs/architecture.md "Vorschlag:
+                       Multi-Strategie Seed Generator" und docs/open_issues.md P19.
 """
 
 
@@ -104,7 +109,10 @@ class Node(TypedDict):
     capacity_source: CapacitySource  # "naatbatt" = Originalwert | "unknown" = kein Wert in NAATBatt
     supplier_concentration: bool  # [literaturbasierte Regel] True = wenige globale Anbieter (cobalt: DRC 73%; nmc/nca: China ≥95% PCAM)
     import_dependency: bool       # [literaturbasierte Regel] True wenn Material import-abhängig UND Segment != Upstream (USGS NIR)
-    import_origin_region: str     # [simuliert] z.B. "Africa/DRC", "South America / Australia"
+    import_origin_region: str     # [simuliert] JSON-String {material: Herkunftsland}, z.B.
+                                   # '{"cobalt": "Democratic Republic of the Congo", "manganese": "South Africa"}'
+                                   # — pro Material, nicht pro Anlage (2026-08-06 Fix, siehe
+                                   # infer_import_origin() in build_facilities.py)
     lead_time_weeks: int          # [simuliert] Vorlaufzeit: Upstream=12W, BGM=8W, Cell=6W, Downstream=4W
     direct_supplier_count: int    # In-Degree im Graph = Anzahl direkt verbundener Knoten der
                                    # jeweils vorgelagerten Stufe (Downstream→Cell, Midstream-BGM→
@@ -165,6 +173,17 @@ class FacilityData(TypedDict):
                                    # die frühere AltCapacityRatio-Methode (globaler
                                    # Alternativkapazitäts-Pool), die für propagierte Knoten die
                                    # falsche Frage beantwortete.
+    product: str                  # z.B. "Nickel pellets, powder or rounds" — rohe NAATBatt-
+                                   # `product`-Spalte, ungekürzt
+    product_type: str             # z.B. "Cathode Battery Grade Materials" — NAATBatt-Kategorie
+    brief_profile: str            # NAATBatt-Firmenbeschreibung, freier Text
+    production_units: str         # z.B. "MT contained Ni/yr" — Einheit zu `capacity` oben
+    # Diese vier (2026-08-12) ergänzt, nachdem Top-3-Begründungen als austauschbare
+    # Textbausteine kritisiert wurden (docs/open_issues.md P37) — selbes Problem wie die vier
+    # Vulnerability-Teilterme oben: die Daten standen in facilities_clean.csv längst zur
+    # Verfügung, wurden aber nie bis zum Synthesis-Agent-Prompt durchgereicht, sodass das LLM
+    # keine anlagenspezifischen Fakten (was stellt diese Anlage konkret her, wie groß ist sie
+    # wirklich) zur Verfügung hatte und zwangsläufig generisch formulieren musste.
 
 
 class Facility(TypedDict):
@@ -185,9 +204,22 @@ class Facility(TypedDict):
     risk_score_normalized: float  # Normiert auf 0–100 (÷ theoretisches Maximum 5.0 × 20)
     tier_weight: float            # 1.0 / 0.6 / 0.35 / 0.15  (distance-based, see DISTANCE_WEIGHT)
     vulnerability: float          # 0–1 (gewichtete Summe aus 4 Dimensionen)
+    # Die 4 Vulnerability-Terme einzeln (2026-08-07, vorher nur die Summe gespeichert —
+    # der Rechenweg war zwar vollständig, aber gleich nach der Gewichtung verworfen, siehe
+    # synthesis_agent.py::_compute_scores). Rohwerte 0–1, VOR Gewichtung mit
+    # VULNERABILITY_WEIGHTS — für Nachvollziehbarkeit, welcher Term den Score treibt.
+    import_dep_term: float
+    supplier_conc_term: float
+    single_source_dependency_term: float
+    lead_time_norm_term: float
     resilience_discount: float    # 0–0.5 (basiert auf AltCapacityRatio)
     supply_path: str              # z.B. "Kamoto Copper (Upstream) → CATL Cathode (Midstream-BGM) → ..."
     exposure_type: ExposureType    # "direct" = Seed-Node selbst (MaterialMatch+RegionMatch) | "propagated" = via BFS erreicht
+    capacity: float                # siehe FacilityData oben — für anlagenspezifische Top-3-Begründungen (P37)
+    product: str
+    product_type: str
+    brief_profile: str
+    production_units: str
 
 
 class GlobalMetrics(TypedDict):
@@ -202,6 +234,29 @@ class GlobalMetrics(TypedDict):
     # Global-Scope (USGS — nur für Upstream/Midstream-BGM in MT sinnvoll)
     betroffene_kapazitaet_global_pct: float   # Σ betroffene NAATBatt / USGS Weltproduktion × 100
     alternative_kapazitaet_global_pct: float  # Σ Alternativ NAATBatt / USGS Weltproduktion × 100
+
+
+class StrategyCCandidate(TypedDict):
+    """One facility network_agent.py's find_facilities_by_region() retrieved as a Strategy C
+    candidate — kept regardless of whether the LLM selected it, so a rejected candidate is
+    visible too, not just the winners."""
+    facility_id: str
+    company: str
+    city: str
+    state: str
+    country: str
+    segment: str
+    material_keywords: str
+    selected: bool  # True if the LLM included this id in selected_facility_ids
+
+
+class StrategyCTrace(TypedDict):
+    """Strategy C (LLM-assisted regional fallback, 2026-08-07) — full record of what was
+    retrieved and why the LLM did/didn't pick from it, for report/UI transparency
+    (docs/open_issues.md P22). Only present when seed_generation_status="llm_fallback_used"."""
+    region_queried: str
+    candidates: list[StrategyCCandidate]
+    llm_reasoning: str
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -238,17 +293,37 @@ class PipelineState(TypedDict, total=False):
     material: str                      # Erkanntes Schlüsselmaterial, z.B. "cobalt"
     region: str                        # Betroffene Region, z.B. "Africa/DRC"
     keywords: list[str]
-    filtered_text: str                 # Bereinigter, relevanter Nachrichtentext
+    # filtered_text entfernt (2026-08-10): war eine "2-3 Sätze"-Kurzfassung ohne festen
+    # Code-Längenlimit, aber ohne funktionalen Leser mehr, nachdem risk_assessment_agent.py
+    # auf direktes raw_input umgestellt wurde (siehe dessen Docstring / docs/open_issues.md
+    # P29-Nachtrag) — nur noch ui/app.py's Debug-Ansicht hatte es je gelesen.
     mentioned_company: Optional[str]   # Konkret genannte Firma bei Facility-Ereignissen, sonst None
     mentioned_location: Optional[str]  # Stadt/Bundesstaat neben der Firma genannt, sonst None
+    additional_events_note: Optional[str]
+    # Gesetzt (2026-08-08), wenn der Eingabetext MEHRERE eigenständige, potenziell relevante
+    # Ereignisse enthält (z.B. ein langer Marktbericht, der sowohl einen Lithiumpreis-Rückgang
+    # in Chile als auch eine Kobalt-Förderstörung in der DRK erwähnt). Die Pipeline verarbeitet
+    # pro Lauf immer nur EIN Ereignis (material/region/severity/... sind Skalarfelder, kein
+    # Array) — dieses Feld macht sichtbar, dass ein zweites, nicht verarbeitetes Ereignis
+    # existiert, statt es stillschweigend zu verwerfen (gleiches Transparenzprinzip wie bei
+    # nicht unterstützten Ereignistypen, siehe docs/open_issues.md P21). None, wenn nur ein
+    # Kandidat gefunden wurde.
 
     # ── [R] Risk Assessment Agent — LLM ─────────────────────────────────────
     severity: int                      # 1 (gering) – 5 (kritisch)
     risk_type: RiskType
-    affected_material: str             # Bestätigt oder vom LLM präzisiert
-    affected_region: str               # Bestätigt oder vom LLM präzisiert
     origin_tier: Segment               # Lieferkettenstufe des Ereignisursprungs (LLM)
     reason: str                        # LLM-Begründung; Pflichtfeld für Validation
+    # tool_calls (query_facilities-Nachvollziehbarkeit) wieder entfernt (2026-08-07, gleicher
+    # Tag): der Tool-Aufruf selbst wurde noch am selben Tag zurückgebaut, siehe unten und
+    # risk_assessment_agent.py Docstring — severity/risk_type/origin_tier/reason profitieren
+    # keiner von ihnen von einer Anlagendaten-Abfrage, also gibt es hier nichts mehr
+    # nachzuvollziehen.
+    # affected_material/affected_region entfernt (2026-08-07): dieser Agent produzierte sie
+    # früher separat ("bestätigt oder präzisiert"), aber empirisch (8 Testfälle, siehe
+    # risk_assessment_agent.py Docstring) wich das Ergebnis nie sinnvoll vom [I]-Feld
+    # material/region ab — reines Duplikat. Alle nachgelagerten Agents (network_agent.py
+    # und weiter) lesen jetzt direkt material/region aus [I], kein separates Feld mehr nötig.
 
     # ── [N] Network Agent — Deterministic (NetworkX) ─────────────────────────
     affected_nodes: list[Node]         # MaterialMatch=True AND RegionMatch=True
@@ -258,6 +333,11 @@ class PipelineState(TypedDict, total=False):
     supply_chain_paths: dict[str, list[str]]  # {facility_id: [seed_id, ..., facility_id]}
     total_network_facilities: int     # Alle Facilities im Graph, unabhängig vom Material (Datensatz-Konstante)
     seed_generation_status: SeedGenerationStatus
+    # Nur gesetzt wenn seed_generation_status="llm_fallback_used" (Strategy C, 2026-08-07).
+    # Vorher wurde die LLM-Begründung + vollständige Kandidatenliste sofort verworfen
+    # (network_agent.py::_llm_assisted_seed_fallback gab nur die ausgewählten IDs zurück) —
+    # jetzt für Nachvollziehbarkeit im Bericht/UI festgehalten.
+    strategy_c_trace: StrategyCTrace
 
     # ── [D] Data Retrieval Agent — Deterministic (CSV + Arithmetik) ──────────
     facility_data: dict[str, FacilityData]  # {facility_id: FacilityData}

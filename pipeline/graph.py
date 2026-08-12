@@ -31,6 +31,19 @@ from agents.validation_agent import run_validation_agent
 def route_after_intake(state: PipelineState) -> str:
     if not state.get("relevant", False):
         return END
+    # Structurally unseedable (2026-08-12): network_agent's three seeding strategies each need
+    # one of these — Strategy A (material+region) and Strategy C (LLM regional fallback) both
+    # require a non-empty region, Strategy B (facility-specific) requires mentioned_company.
+    # material alone, with neither region nor mentioned_company, can never produce a seed no
+    # matter what runs downstream (see network_agent.py's rule_seed_ids/entity_seed_ids logic) —
+    # so continuing to risk_assessment/network/data_retrieval/synthesis/validation would just be
+    # 4-5 wasted LLM calls to re-derive the same "no facility identified" outcome intake already
+    # implies. This covers logistics events, unsupported-material events (material="" by design,
+    # see intake_agent.py "UNSUPPORTED MATERIAL"), and other domestic/tier-wide events with no
+    # named region or company. Still lets a genuine region (even one with no known origin data,
+    # e.g. an unmodeled country) through to give Strategy C a real chance.
+    if not state.get("region") and not state.get("mentioned_company"):
+        return END
     return "risk_assessment"
 
 

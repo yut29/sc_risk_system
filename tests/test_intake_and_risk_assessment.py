@@ -48,7 +48,10 @@ def test_intake_relevant_regional_event_extracts_material_and_region():
     result = run_intake_agent(state)
     assert result["relevant"] is True
     assert result["material"] == "cobalt"
-    assert "drc" in result["region"].lower() or "africa" in result["region"].lower()
+    # Region granularity fix (2026-08-06, P20): the prompt now asks the LLM to keep
+    # country-level specificity instead of generalizing to "Africa/DRC" — so "congo"
+    # (from "Democratic Republic of the Congo") is the expected match now, not "drc"/"africa".
+    assert "congo" in result["region"].lower()
 
 
 def test_intake_irrelevant_text_is_rejected():
@@ -89,7 +92,10 @@ def test_intake_direct_question_extracts_same_as_news_phrasing():
     result = run_intake_agent(state)
     assert result["relevant"] is True
     assert result["material"] == "cobalt"
-    assert "drc" in result["region"].lower() or "africa" in result["region"].lower()
+    # Region granularity fix (2026-08-06, P20): the prompt now asks the LLM to keep
+    # country-level specificity instead of generalizing to "Africa/DRC" — so "congo"
+    # (from "Democratic Republic of the Congo") is the expected match now, not "drc"/"africa".
+    assert "congo" in result["region"].lower()
 
 
 def test_intake_meta_question_about_system_itself_is_rejected():
@@ -106,7 +112,7 @@ def test_risk_assessment_severe_prolonged_disruption_gets_high_severity():
     """A months-long, near-total production halt with no resolution timeline is a textbook
     severity=4-5 case per the prompt's own scale definition."""
     state = {
-        "filtered_text": (
+        "raw_input": (
             "A months-long strike at major cobalt mines in the Democratic Republic of Congo "
             "has halted roughly 70% of regional cobalt ore production, with no confirmed "
             "timeline for resolution and no alternative near-term supply arranged."
@@ -123,7 +129,7 @@ def test_risk_assessment_minor_short_disruption_gets_low_severity():
     """A brief, small-scale, already-resolving disruption should score low, not be treated the
     same as a systemic multi-month event."""
     state = {
-        "filtered_text": (
+        "raw_input": (
             "A two-day localized labor dispute briefly slowed operations at one lithium "
             "processing line last week; normal output resumed after a minor wage adjustment "
             "was agreed, with no reported impact on shipments."
@@ -137,7 +143,7 @@ def test_risk_assessment_minor_short_disruption_gets_low_severity():
 def test_risk_assessment_origin_tier_matches_mining_event():
     """A mine-level strike is an Upstream-origin event."""
     state = {
-        "filtered_text": "A strike at cobalt mines in the DRC has halted ore production.",
+        "raw_input": "A strike at cobalt mines in the DRC has halted ore production.",
         "material": "cobalt", "region": "Africa/DRC",
     }
     result = run_risk_assessment_agent(state)
@@ -148,7 +154,7 @@ def test_risk_assessment_classifies_export_restriction_as_regulatory():
     """A government export-licensing measure is regulatory, not a physical supply_disruption —
     the two risk_type values feed different narrative framing downstream."""
     state = {
-        "filtered_text": (
+        "raw_input": (
             "Chile's government announced new state-approval requirements for all lithium "
             "export contracts, a regulatory measure expected to delay shipments by months."
         ),

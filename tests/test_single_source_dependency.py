@@ -81,7 +81,7 @@ def _panasonic_state():
 
 def _cobalt_state():
     state = {
-        "affected_material": "cobalt", "affected_region": "Africa/DRC",
+        "material": "cobalt", "region": "Africa/DRC",
         "origin_tier": "Upstream", "severity": 3, "risk_type": "supply_disruption",
     }
     state.update(run_network_agent(state))

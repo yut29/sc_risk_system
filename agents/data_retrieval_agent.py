@@ -4,7 +4,8 @@ Data Retrieval Agent — Deterministic CSV lookup + arithmetic
 Input (from PipelineState):
   affected_nodes : list[Node]
   alt_nodes      : list[Node]
-  affected_material : str        e.g. "cobalt"
+  material       : str           e.g. "cobalt" (from Intake Agent — 2026-08-07, no longer a
+                                  separate affected_material field, see risk_assessment_agent.py)
 
 Output (written to PipelineState):
   facility_data             : dict[str, FacilityData]
@@ -65,12 +66,12 @@ def _capacity_share(facility_capacity: float, total_capacity: float) -> float:
 def run_data_retrieval_agent(state: PipelineState) -> PipelineState:
     """
     LangGraph-compatible node function.
-    Reads affected_nodes / alt_nodes / affected_material from state,
+    Reads affected_nodes / alt_nodes / material from state,
     returns updated state with facility_data and capacity percentages.
     """
     affected_nodes = state.get("affected_nodes", [])
     alt_nodes      = state.get("alt_nodes", [])
-    material: str  = state.get("affected_material") or state.get("material", "")
+    material: str  = state.get("material", "")
 
     df = _load_csv()
 
@@ -84,7 +85,7 @@ def run_data_retrieval_agent(state: PipelineState) -> PipelineState:
     #
     # Guard (2026-07-31): pandas .str.contains("") is True for every non-null string —
     # an empty/missing material (facility-specific disruption events, e.g. Strategy B,
-    # carry no affected_material) would otherwise match every one of the 386 facilities,
+    # carry no material) would otherwise match every one of the 386 facilities,
     # inflating the capacity denominators with unrelated materials instead of correctly
     # yielding "not applicable" (CapacityShare/capacity % already degrade gracefully to 0
     # for a zero/empty denominator — see _capacity_share() below). Same bug class as
@@ -131,12 +132,17 @@ def run_data_retrieval_agent(state: PipelineState) -> PipelineState:
             supplier_concentration = bool(row.get("supplier_concentration", False))
             import_dep             = bool(row.get("import_dependency", False))
             lead_time_w   = int(row.get("lead_time_weeks", 0))
+            product          = str(row.get("product", "") or "")
+            product_type     = str(row.get("product_type", "") or "")
+            brief_profile    = str(row.get("brief_profile", "") or "")
+            production_units = str(row.get("production_units", "") or "")
         else:
             # Node exists in graph but not in CSV (should not happen in practice)
             cap_source             = "unknown"
             supplier_concentration = node.get("supplier_concentration", False)
             import_dep             = node.get("import_dependency", False)
             lead_time_w            = node.get("lead_time_weeks", 0)
+            product = product_type = brief_profile = production_units = ""
 
         # Capped at 1.0 (2026-08-03): lead_time_weeks can now exceed 12 once material/
         # region/capacity-data adjustments are added on top of the segment base (see
@@ -222,6 +228,10 @@ def run_data_retrieval_agent(state: PipelineState) -> PipelineState:
             capacity_share=cap_share,
             single_source_dependency=single_source_dependency,
             resilience_discount=resilience_discount,
+            product=product,
+            product_type=product_type,
+            brief_profile=brief_profile,
+            production_units=production_units,
         )
 
     # ── Global capacity percentages (NA scope, Upstream only) ────────────────

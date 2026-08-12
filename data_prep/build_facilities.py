@@ -6,6 +6,7 @@
 v2 (2026-06-10): 适配 March 2026 版本，Midstream 按 Product/Facility Type 拆分为 BGM/Cell
 """
 
+import json
 import random
 import re
 import pandas as pd
@@ -15,6 +16,38 @@ NAATBATT_FILE = Path(__file__).parent.parent / "data" / "naatbatt-database-31mar
 OUTPUT_FILE   = Path(__file__).parent.parent / "data" / "facilities_clean.csv"
 
 NORTH_AMERICA = {"US", "USA", "CA", "Canada", "MX", "Mexico"}
+
+# Expand bare 2-letter state/province abbreviations to full names for Upstream's own
+# import_origin_region (2026-08-06, fixing a real bug found while testing the removal of
+# _region_match()'s import_dependency gate in network_agent.py): a bare "UT" or "CA" is
+# dangerously short for substring matching against an event region string — "ut" is a
+# literal substring of "south" (as in "South America"), "ca" of "america", causing false
+# positives with zero geographic relation to Utah/California. Only US states + Canadian
+# provinces need this — the Mexican `state` values in this dataset are already full names
+# ("Baja California Sur", "Coahuila", "Querétaro", "Sonora").
+US_STATE_ABBREV = {
+    "AL": "Alabama", "AK": "Alaska", "AZ": "Arizona", "AR": "Arkansas", "CA": "California",
+    "CO": "Colorado", "CT": "Connecticut", "DE": "Delaware", "FL": "Florida", "GA": "Georgia",
+    "HI": "Hawaii", "ID": "Idaho", "IL": "Illinois", "IN": "Indiana", "IA": "Iowa",
+    "KS": "Kansas", "KY": "Kentucky", "LA": "Louisiana", "ME": "Maine", "MD": "Maryland",
+    "MA": "Massachusetts", "MI": "Michigan", "MN": "Minnesota", "MS": "Mississippi", "MO": "Missouri",
+    "MT": "Montana", "NE": "Nebraska", "NV": "Nevada", "NH": "New Hampshire", "NJ": "New Jersey",
+    "NM": "New Mexico", "NY": "New York", "NC": "North Carolina", "ND": "North Dakota", "OH": "Ohio",
+    "OK": "Oklahoma", "OR": "Oregon", "PA": "Pennsylvania", "RI": "Rhode Island", "SC": "South Carolina",
+    "SD": "South Dakota", "TN": "Tennessee", "TX": "Texas", "UT": "Utah", "VT": "Vermont",
+    "VA": "Virginia", "WA": "Washington", "WV": "West Virginia", "WI": "Wisconsin", "WY": "Wyoming",
+}
+CA_PROVINCE_ABBREV = {
+    "AB": "Alberta", "BC": "British Columbia", "MB": "Manitoba", "NB": "New Brunswick",
+    "NL": "Newfoundland and Labrador", "NS": "Nova Scotia", "ON": "Ontario",
+    "PE": "Prince Edward Island", "QC": "Quebec", "SK": "Saskatchewan",
+}
+# "N.L." (with periods) is NAATBatt's abbreviation for Nuevo León, Mexico — distinct from
+# Canada's "NL" (Newfoundland and Labrador, no periods) above; the one facility using it
+# (Sungwoo Hitech, Pesqueria) has country="Mexico" so there's no real ambiguity, just a
+# format the dict above doesn't already cover.
+MX_STATE_ABBREV = {"N.L.": "Nuevo León"}
+STATE_ABBREV_TO_FULL = {**US_STATE_ABBREV, **CA_PROVINCE_ABBREV, **MX_STATE_ABBREV}
 
 LEAD_TIME = {
     "Upstream":       12,
@@ -54,16 +87,29 @@ MATERIAL_LEAD_TIME_ADJUSTMENT = {
 }
 
 
+# Countries IMPORT_ORIGIN_DISTRIBUTION now names directly (2026-08-06, P20) instead of via a
+# continent-prefixed bucket string — need an explicit lookup for these so
+# _region_lead_time_adjustment() below doesn't silently lose their distance tier just because
+# the string no longer starts with "Africa"/"Asia".
+_HIGH_DISTANCE_COUNTRIES = {"democratic republic of the congo", "china"}
+_MED_DISTANCE_COUNTRIES = {"indonesia", "philippines"}
+
+
 def _region_lead_time_adjustment(region: str) -> int:
     """
     Rough shipping-distance/logistics-complexity proxy from the assigned
     import_origin_region string (see IMPORT_ORIGIN_DISTRIBUTION) — grouped by continent
     prefix since the exact strings carry material-specific bracketed detail
-    (e.g. "Africa (DRC)" vs "Africa (South Africa, Gabon)").
+    (e.g. "Africa (DRC)" vs "Africa (South Africa, Gabon)"). Still-bundled multi-country
+    buckets (South America (Chile/Argentina) etc., pending sourced per-country split, P20)
+    keep falling through to the continent-prefix rules below.
     """
-    if region.startswith("Africa"):
+    r = region.lower()
+    if r in _HIGH_DISTANCE_COUNTRIES:
         return 3
-    if region == "Asia (China)":
+    if r in _MED_DISTANCE_COUNTRIES:
+        return 2
+    if region.startswith("Africa"):
         return 3
     if region.startswith("Asia"):
         return 2
@@ -73,7 +119,14 @@ def _region_lead_time_adjustment(region: str) -> int:
         return 1
     return 1  # "Other / Diversified" or unmatched
 
-IMPORT_MATERIALS = {"cobalt", "nickel", "lithium", "manganese", "graphite"}
+IMPORT_MATERIALS = {
+    "cobalt", "nickel", "lithium", "manganese", "graphite",
+    # Ergänzt 2026-08-11 (docs/open_issues.md — Rohstoff-Recherche für die 7 P26/P28-Materialien):
+    # anders als silicon/cnt/electrolyte (keine belastbare Länderkonzentration gefunden, dort
+    # bewusst NICHT ergänzt) haben diese 4 Komponentenmaterialien reale, zitierfähige globale
+    # Produktionskonzentrationsdaten — siehe IMPORT_ORIGIN_DISTRIBUTION unten für Quellen.
+    "copper_foil", "aluminum_foil", "separator", "pvdf",
+}
 
 # IMPORT_ORIGIN_DISTRIBUTION: realistic supplier-country split instead of a single
 # dominant region — every NA facility handling e.g. cobalt was previously tagged
@@ -86,36 +139,85 @@ IMPORT_MATERIALS = {"cobalt", "nickel", "lithium", "manganese", "graphite"}
 # facility_id so it's reproducible across re-runs — see infer_import_origin().
 IMPORT_ORIGIN_DISTRIBUTION: dict[str, list[tuple[str, float]]] = {
     "cobalt": [
-        ("Africa (DRC)",            0.73),  # USGS MCS 2026: DRC 73% of world mine production
-        ("Asia (Indonesia)",        0.14),  # USGS MCS 2026: Indonesia 14%
-        ("Other / Diversified",     0.13),
+        ("Democratic Republic of the Congo", 0.73),  # USGS MCS 2026: DRC 73% of world mine production
+        ("Indonesia",                        0.14),  # USGS MCS 2026: Indonesia 14%
+        ("Other / Diversified",              0.13),
     ],
     "nickel": [
-        ("Asia (Indonesia)",              0.67),  # USGS MCS 2026: Indonesia ~67%
-        ("Asia / Pacific (Philippines)",  0.18),
-        ("Other / Diversified",           0.15),
+        ("Indonesia",            0.67),  # USGS MCS 2026: Indonesia ~67%
+        ("Philippines",          0.18),
+        ("Other / Diversified",  0.15),
     ],
     "lithium": [
-        ("South America (Chile/Argentina)", 0.45),
-        ("Australia",                        0.35),
-        ("Other / Diversified",              0.20),
+        # Split into named countries 2026-08-12 (docs/open_issues.md P46; was a combined
+        # "South America (Chile/Argentina)" bucket, TODO since P20). Global lithium mine
+        # production by country, ~2025/2026: Australia 36%, Chile 22%, China 16%, Argentina
+        # 10% (rounded market-share estimates from multiple industry sources, e.g.
+        # worldpopulationreview.com "Lithium Production by Country 2026", Statista); these
+        # four together account for the large majority of global output, remainder spread
+        # across smaller producers (Brazil, Zimbabwe, Canada, Portugal, etc.).
+        ("Australia",             0.36),
+        ("Chile",                 0.22),
+        ("China",                 0.16),
+        ("Argentina",             0.10),
+        ("Other / Diversified",   0.16),
     ],
     "manganese": [
-        ("Africa (South Africa, Gabon)",  0.55),
-        ("Asia / Pacific (Australia)",    0.25),
+        ("Africa (South Africa, Gabon)",  0.55),  # TODO(P20): split into South Africa/Gabon with sourced shares
+        ("Australia",                     0.25),
         ("Other / Diversified",           0.20),
     ],
     "graphite": [
-        ("Asia (China)",                                0.77),  # USGS MCS 2026: China ~77%
-        ("Africa (Mozambique, Madagascar, Tanzania)",   0.15),
-        ("Other / Diversified",                          0.08),
+        ("China",                                      0.77),  # USGS MCS 2026: China ~77%
+        ("Africa (Mozambique, Madagascar, Tanzania)",  0.15),  # TODO(P20): split into 3 countries with sourced shares
+        ("Other / Diversified",                         0.08),
+    ],
+    # Ergänzt 2026-08-11 — 4 der 7 P26/P28-Komponentenmaterialien, für die eine reale
+    # Länderkonzentration recherchierbar war (Marktforschungsberichte, nicht USGS-Niveau, aber
+    # echte zitierfähige Quellen, keine erfundenen Zahlen). silicon/cnt/electrolyte bewusst NICHT
+    # ergänzt: keine belastbare Konzentrationsangabe gefunden, und für silicon zeigt der Datensatz
+    # selbst bereits US-Inlandskapazität (Group14, Sila u.a. als Upstream/BGM-Facilities gelistet)
+    # — eine pauschale Importabhängigkeits-Annahme wäre dort nicht durch Daten gedeckt.
+    "copper_foil": [
+        # Lithium-ion battery copper foil shipments, China 82.9% of global deliveries 2025
+        # (metalnomist.com, "Lithium-Ion Battery Copper Foil Shipments Surge...", Jul 2026)
+        ("China",                 0.83),
+        ("South Korea / Japan",   0.12),
+        ("Other / Diversified",   0.05),
+    ],
+    "aluminum_foil": [
+        # China 66.1% revenue share of battery-grade aluminum foil market 2025
+        # (grandviewresearch.com, "Aluminum Foil Market Size, Share & Trends Report")
+        ("China",                0.66),
+        ("Europe",               0.14),  # Europe ~13.6% of global lithium battery aluminum foil market
+        ("Other / Diversified",  0.20),
+    ],
+    "separator": [
+        # China >50% of global lithium-ion battery separator production (multiple market
+        # research sources, e.g. mobilityforesights.com); Asia-Pacific overall 64.74% market
+        # share 2025, with Japan (Asahi Kasei, Toray) and South Korea (SK) as other major producers
+        ("China",                0.55),
+        ("Japan / South Korea",  0.30),
+        ("Other / Diversified",  0.15),
+    ],
+    "pvdf": [
+        # China ~68% of global lithium battery-grade PVDF production capacity 2025
+        # (verifiedmarketreports.com / cognitivemarketresearch.com); other top-3/4 producers
+        # Solvay (Belgium), Arkema (France), Kureha/Daikin (Japan) cover most of the remainder
+        ("China",                 0.68),
+        ("Europe / Japan",        0.22),
+        ("Other / Diversified",   0.10),
     ],
 }
 
 # SupplierConcentration: literaturbasierte Regel — globale Marktstruktur (nicht Nordamerika-Zählung)
 # cobalt: DRC 73% mine share, 2-3 major miners (USGS MCS 2026, Feb 2026)
 # nmc/nca: China ≥95% PCAM share (IEA Global Critical Minerals Outlook 2025)
-HIGH_CONCENTRATION_MATERIALS = {"cobalt", "nmc", "nca"}
+# copper_foil/aluminum_foil/separator/pvdf ergänzt 2026-08-11: chinesischer Marktanteil
+# (66-83%, siehe IMPORT_ORIGIN_DISTRIBUTION oben) liegt über der Kobalt-Schwelle, die diese
+# Einordnung ursprünglich begründet hat — Konsistenz mit der gleichen zugrundeliegenden
+# Recherche, nicht separat neu bewertet.
+HIGH_CONCENTRATION_MATERIALS = {"cobalt", "nmc", "nca", "copper_foil", "aluminum_foil", "separator", "pvdf"}
 
 # Facility-level import_dependency overrides (cobalt)
 # Basis: USGS NIR (79%) is a sector aggregate, not facility-level.
@@ -152,10 +254,23 @@ KEYWORD_RULES = [
     (["lithium"],                          "lithium"),
     (["nickel"],                           "nickel"),
     (["manganese"],                        "manganese"),
-    (["graphite", "anode"],                "graphite"),
+    # "anode" removed (2026-08-06): checked every facility that relied on this bare word
+    # instead of literally saying "graphite" — all 4 were false positives (Amprius/Nexeon
+    # are silicon anodes, MSE Supplies is a generic supplies listing, Schlenk makes
+    # copper/nickel foils) and zero were real graphite hits. "anode" alone doesn't imply
+    # graphite now that silicon anodes exist in this dataset — see the new "silicon" rule
+    # below for those.
+    (["graphite"],                         "graphite"),
     (["electrolyte"],                      "electrolyte"),
     (["separator"],                        "separator"),
     (["lead acid", "lead-acid"],           "lead_acid"),
+    # Added 2026-08-06 while auditing the 50 Midstream-BGM facilities with empty
+    # material_keywords (docs/open_issues.md — material dependency chain work). Verified
+    # against product text for zero false-positive collisions with existing rules
+    # (checked separately: no other product field contains these substrings).
+    (["silicon", "nano-silicon", "silane"], "silicon"),
+    (["pvdf"],                              "pvdf"),
+    (["carbon nanotube", "conductive carbon"], "cnt"),
 ]
 
 # Product/Facility Type 中包含这些词 → Midstream-Cell
@@ -164,29 +279,73 @@ CELL_TYPE_KEYWORDS = [
     "cell assembly", "consumer batter",
 ]
 
-# NMC/NCA sind Kathodenchemien (Verbundprodukte), keine Rohstoffe — enthalten aber
+# NMC/NCA/LFP sind Kathodenchemien (Verbundprodukte), keine Rohstoffe — enthalten aber
 # die genannten Rohstoffe. Ohne diese Zuordnung würde ein Produkttext wie "NMC
 # Cathode Active Material" nur material_keywords=["nmc"] ergeben, ohne "cobalt" —
 # ein Kobalt-Ereignis würde diese Anlage dann über _material_match() nicht finden,
 # obwohl NMC-Kathodenmaterial de facto Kobalt enthält (docs/architecture.md
 # "Bekannte Grenzen des Seeding-Mechanismus" Punkt 4). Aluminium wird in diesem
 # System nicht als Risikomaterial geführt, daher kein "aluminum" für NCA.
+#
+# lithium ergänzt bei allen drei (2026-08-10, docs/open_issues.md P29-Nachtrag):
+# NMC (LiNiMnCoO2), NCA (LiNiCoAlO2) und LFP (LiFePO4) sind alle drei Lithium-
+# Verbindungen — lithium fehlte hier bisher komplett, obwohl es (anders als
+# Aluminium) zu den 6 verfolgten Rohstoffen gehört. Gefunden beim Auswerten,
+# wie viele BGM-Anlagen Rohstoffe brauchen: 2 reine "lfp"-Anlagen matchten nicht
+# auf material="lithium", obwohl LFP chemisch zwingend Lithium enthält — beim
+# Nachprüfen stellte sich heraus, dass auch "nmc"/"nca"-Anlagen ohne separat
+# genanntes "lithium" denselben Fehler hatten (nur zufällig durch andere
+# Rohstoffe wie Kobalt/Nickel überdeckt, nie isoliert aufgefallen). "lfp" selbst
+# war vorher gar nicht in dieser Tabelle — nur implizit über UPSTREAM_TO_BGM in
+# build_graph.py als Graph-Kanten-Ziel bekannt, nicht als material_match-Signal.
 CATHODE_CHEMISTRY_RAW_MATERIALS: dict[str, list[str]] = {
-    "nmc": ["cobalt", "nickel", "manganese"],
-    "nca": ["cobalt", "nickel"],
+    "nmc": ["cobalt", "nickel", "manganese", "lithium"],
+    "nca": ["cobalt", "nickel", "lithium"],
+    "lfp": ["lithium"],
 }
 
-# Manuelle Ergänzung für Midstream-Cell-Hersteller, deren `product`/`product_type`
-# nur generische Begriffe enthalten ("Other/Unknown", "Cell", "Solid-state battery" o.ä.)
-# ohne Chemie zu nennen — anders als bei den literaturbasierten Regeln (USGS/IEA, siehe
-# oben) beruht dies auf öffentlich zugänglichen Firmen-/Produktinformationen, nicht auf
-# einer standardisierten Statistikquelle, und ist daher im Sinn von Baris' "reale Daten /
-# simulierte Annahmen / Modellvereinfachungen"-Dreiteilung als Modellvereinfachung mit
-# manueller Recherche zu kennzeichnen (siehe docs/data_processing.md §4.6). Nur Firmen
-# aufgenommen, deren Kernchemie öffentlich eindeutig dokumentiert ist; Stryten Energy
-# (führt sowohl Blei-Säure- als auch Lithium-Produktlinien) bewusst NICHT aufgenommen,
-# da für genau diese Anlage (Ottawa Transportation Manufacturing Plant) keine
-# Chemie-spezifische Quelle gefunden wurde — Rätselraten hier wäre nicht vertretbar.
+# Gleiches Prinzip wie oben, aber für verarbeitete Komponentenmaterialien statt
+# Kathodenchemien: copper_foil ist ein Kupfer-Verarbeitungsprodukt (gewalzte/elektrolytisch
+# abgeschiedene Kupferfolie als Stromkollektor), enthält also zwingend Kupfer als Rohstoff.
+#
+# Gefunden 2026-08-11 (docs/open_issues.md P30): _material_match() prüfte bisher per
+# Teilstring statt exaktem Token-Match, wodurch material="copper" ALLE copper_foil-Anlagen
+# traf (Zufallstreffer, weil "copper" ein Präfix von "copper_foil" ist) — UND dabei jede
+# Regionsprüfung übersprang, weil keine dieser Anlagen je "copper"-Herkunftsdaten hatte.
+# Die Teilstring-Prüfung wurde durch exaktes Token-Matching ersetzt (network_agent.py),
+# was den Zufallstreffer korrekt beseitigt hat — aber copper_foil-Anlagen brauchen ja
+# tatsächlich echtes Kupfer als Input, das war kein reiner Bug, sondern ein unvollständig
+# modelliertes echtes Bedürfnis. Diese Tabelle macht die Abhängigkeit jetzt explizit,
+# statt sie über einen Namenszufall laufen zu lassen.
+#
+# Kein Aluminium-Äquivalent für aluminum_foil: Aluminium wird in diesem System nicht als
+# eigener Rohstoff geführt (gleiche Begründung wie bei NCA oben) — es gibt keine
+# "aluminum" IMPORT_ORIGIN_DISTRIBUTION, also auch nichts, worauf aluminum_foil abbilden
+# könnte.
+#
+# Hinweis zur Regionsschärfe: copper ist nicht in IMPORT_MATERIALS (siehe unten,
+# USGS-Nettoimportabhängigkeit für Kupfer ist gering, anders als bei den 5 anderen
+# Rohstoffen) — d.h. selbst mit dieser Ergänzung hat keine copper_foil-Anlage eine echte
+# import_origin_region für "copper", ein Kupfer-Ereignis matcht also weiterhin nur über den
+# materialbasierten Fallback (region wird ignoriert), nicht über einen echten Regionsabgleich
+# — bewusst, gleiches "unbekannt ≠ ausgeschlossen"-Prinzip wie bei den P26/P28-Materialien.
+COMPONENT_RAW_MATERIALS: dict[str, list[str]] = {
+    "copper_foil": ["copper"],
+}
+
+# Manuelle Ergänzung für Hersteller (ursprünglich nur Midstream-Cell, seit 2026-08-06 auch
+# Midstream-BGM — siehe unten), deren `product`/`product_type` nur generische Begriffe
+# enthalten ("Other/Unknown", "Cell", "Additives", "Binders" o.ä.) ohne Chemie zu nennen —
+# anders als bei den literaturbasierten Regeln (USGS/IEA, siehe oben) beruht dies auf
+# öffentlich zugänglichen Firmen-/Produktinformationen, nicht auf einer standardisierten
+# Statistikquelle, und ist daher im Sinn von Baris' "reale Daten / simulierte Annahmen /
+# Modellvereinfachungen"-Dreiteilung als Modellvereinfachung mit manueller Recherche zu
+# kennzeichnen (siehe docs/data_processing.md §4.6). Nur Firmen aufgenommen, deren
+# Kernchemie öffentlich eindeutig dokumentiert ist; wo `brief_profile` keine Chemie nennt
+# (z.B. Chemours "Binders", Parker LORD "Adhesives", DuPont/Black Diamond Structures
+# "Additives", PPG "Other", The Mosaic Company/Nouryon Chemicals ohne jeden Batteriebezug),
+# bewusst NICHT aufgenommen — Rätselraten wäre nicht vertretbar, gleiches Prinzip wie bei
+# Stryten Energy unten.
 MATERIAL_KEYWORD_OVERRIDES: dict[str, list[str]] = {
     "ABSL Power Solutions, Inc.": ["lithium"],           # EnerSys/ABSL Li-ion Zellen für Raumfahrt/Verteidigung
     "American Lithium Energy":    ["lithium"],           # Hochsicherheits-Li-Ion-Zellen (100C), Silizium-Anode
@@ -194,20 +353,58 @@ MATERIAL_KEYWORD_OVERRIDES: dict[str, list[str]] = {
     "Nuvvon Inc":                   ["lithium", "nickel"],  # Festkörper-Polymerelektrolyt + Lithium-Metall-Anode + Hochnickel-Kathode
     "Samsung SDI America Inc.":    ["lithium", "nmc"],      # NMC-Dreistoff-Li-Ion-Zellen (EV/ESS)
     "Solid Power Inc.":             ["lithium", "nmc"],      # Sulfid-Festelektrolyt + NMC-Kathode
+    # Ergänzt 2026-08-06 beim Audit der 50 leeren Midstream-BGM material_keywords
+    # (docs/open_issues.md P-Serie, Material-Dependency-Diskussion). Quelle jeweils
+    # brief_profile in facilities_clean.csv, nicht externe Recherche.
+    "Kureha":                       ["pvdf"],       # product_type explizit "PVDF Binder", product-Feld nur "Cell materials"
+    "Arkema":                       ["pvdf"],       # brief_profile: "Fluoropolymer... materials" für Elektroden
+    "Daikin America":               ["pvdf"],       # brief_profile: Fluorchemie explizit für Li-Ion-Batterien
+    "Advanced Carbon Products":     ["graphite"],   # product_type "Anode Battery Grade Materials" + "carbon-based materials"
+    "Borman Specialty Materials":   ["manganese"],  # brief_profile: "electrolytic manganese dioxide"
+    "Birla Carbon":                 ["cnt"],         # brief_profile: "carbon black additives"
+    "Cabot Corp.":                   ["cnt"],         # gleiche Firma wie "Cabot Corporation" (andere Schreibweise
+                                                        # in NAATBatt), gleiches Kerngeschäft: "Conductive additives,
+                                                        # fumed metal oxides, and aerogel" statt "carbon nanotube"
+                                                        # im product-Feld, daher von den KEYWORD_RULES nicht erfasst
+    "Sakuu Corp":                    ["lithium"],     # brief_profile: "Cypress Li-Metal Cell technology"
+    "Medtronic":                     ["lithium"],     # brief_profile: "specialized li-ion batteries"
+    "Innophos":                      ["lfp"],         # brief_profile: Phosphat-Vorstufen explizit für LFP/LMFP
+    "Sun Chemicals":                 ["lfp"],         # brief_profile: Eisenoxid explizit als LFP-Feedstock
+    "Sparkz Inc":                     ["lfp", "lithium"],  # brief_profile: "FeCAM... LFP (Lithium Iron Phosphate)"
+    "BASF":                           ["electrolyte"], # product_type bereits "Electrolyte (liquid)"
+    "Huntsman Petrochemical LLC":    ["electrolyte"], # product_type bereits "Electrolyte (liquid)"
+    "Addionics ":                     ["copper_foil"],           # product-Feld "Copper", Current-Collector-Hersteller
+    "Armor Battery Films":            ["copper_foil", "aluminum_foil"],  # "aluminum and copper foils"
+    "CBC America":                    ["aluminum_foil"],         # "Aluminum laminated film"
+    "Chang Chun Petrochemical Co., Ltd.": ["copper_foil"],       # brief_profile: "copper foil"
+    "Denkai America":                 ["copper_foil"],           # brief_profile: "electrodeposited copper foils"
+    "Gränges":                         ["aluminum_foil"],         # brief_profile: "aluminum current collectors for LIBs"
+    "Lotte Aluminum Materials USA LLC": ["aluminum_foil"],        # brief_profile: "current collectors for ... LIBs"
+    "Redwood Materials":               ["copper_foil"],           # brief_profile: "extracts ... copper" (Recycling)
+    "Schlenk Metallfolien GmbH & Co. KG": ["copper_foil"],        # product: "Rolled copper and nickel anode foils"
+                                                                    # (gefunden beim "anode"-Keyword-Audit, siehe unten)
 }
 
-# Diese Midstream-Cell-Anlagen liefern nachweislich mechanische/sicherheitstechnische
-# Komponenten (Gehäuse, Dichtungen, Klebstoffe, BMS-Module, Thermomanagement), keine
-# elektrochemisch aktiven Materialien — anhand von product_type/product einzeln geprüft
-# (docs/data_processing.md §4.6). Ohne diese Markierung würde build_graph.py sie via
-# "if not c_kws" fälschlich als Treffer für JEDE BGM-Materialsuche werten (Kanten zu
-# jedem geografisch nahen BGM-Knoten, unabhängig vom Material). Der Marker-Keyword
-# "non_active_material" taucht in keiner KEYWORD_RULES/BGM_TO_CELL-Zielmenge auf und
-# bewirkt daher über die bestehende `c_kws & cell_targets`-Logik automatisch "kein
-# Treffer", ohne build_graph.py selbst ändern zu müssen.
+# Diese Midstream-BGM/-Cell-Anlagen liefern nachweislich mechanische/sicherheitstechnische
+# oder elektronische Komponenten (Gehäuse, Dichtungen, Klebstoffe, BMS-Module,
+# Thermomanagement, Leistungselektronik, Testgeräte) oder sind reine
+# Vertriebs-/Projektentwickler-Firmen — keine elektrochemisch aktiven Materialien,
+# anhand von product_type/product/brief_profile einzeln geprüft (docs/data_processing.md
+# §4.6). Ohne diese Markierung würde build_graph.py sie via "if not c_kws" fälschlich als
+# Treffer für JEDE BGM-Materialsuche werten (Kanten zu jedem geografisch nahen BGM-Knoten,
+# unabhängig vom Material). Der Marker-Keyword "non_active_material" taucht in keiner
+# KEYWORD_RULES/BGM_TO_CELL-Zielmenge auf und bewirkt daher über die bestehende
+# `c_kws & cell_targets`-Logik automatisch "kein Treffer", ohne build_graph.py selbst
+# ändern zu müssen.
 NON_MATERIAL_COMPONENT_COMPANIES = {
     "3M", "ADA Technologies, Inc.", "ArlanXEO", "Avery Dennison Corp",
     "Intriplex", "Vertical Partners West LLC",
+    # Ergänzt 2026-08-06 (BGM-Audit):
+    "Dukosi, Inc.",                                            # Integrated Circuits, Firmware — Elektronik, kein Material
+    "Hyundai MOBIS North America Electrified Powertrain, LLC", # Leistungselektronik (PE Systems, ICCUs)
+    "Battery Technology, Inc. (BTI)",                           # Distributor, kein Hersteller
+    "Aypa Power",                                                # Utility-Scale-Speicher-Projektentwickler, kein Materialhersteller
+    "MSE Supplies LLC",                                          # Laborausrüstung/Testgeräte-Anbieter
 }
 
 
@@ -234,15 +431,37 @@ def extract_keywords(product_text: str) -> list[str]:
                 if raw not in found:
                     found.append(raw)
 
+    # Verarbeitete Komponentenmaterialien implizieren ebenso ihre Rohstoffe
+    # (siehe COMPONENT_RAW_MATERIALS oben)
+    for component, raw_materials in COMPONENT_RAW_MATERIALS.items():
+        if component in found:
+            for raw in raw_materials:
+                if raw not in found:
+                    found.append(raw)
+
     return found
 
 
-def infer_import_origin(facility_id: str, keywords: list[str]) -> str:
+def infer_import_origin(facility_id: str, keywords: list[str]) -> dict[str, str]:
     """
-    Weighted, per-facility draw from IMPORT_ORIGIN_DISTRIBUTION — not every facility
-    handling a material gets the single dominant source country; seeded by facility_id
-    so the assignment is reproducible across re-runs of this script.
+    Weighted, per-facility, PER-MATERIAL draw from IMPORT_ORIGIN_DISTRIBUTION — returns
+    {material: origin_country} for every keyword that has a real distribution, not just
+    the first one found. Seeded by f"{facility_id}:{kw}" so each material's draw is
+    independently reproducible across re-runs.
+
+    Fixed 2026-08-06: the previous version returned on the FIRST matching keyword and
+    stopped — for a multi-material facility (e.g. an NMC cathode plant needing
+    cobalt+nickel+manganese, material_keywords ordered ["nmc","cobalt","nickel","manganese"]
+    by extract_keywords()), this meant every material after the first (nickel, manganese)
+    silently never got its own origin computed at all, and _region_match() in
+    network_agent.py had no way to tell them apart anyway since it only received one
+    string. A manganese-specific regional event could therefore never reach an NMC
+    facility, even though it genuinely depends on manganese — the facility's stored
+    origin was always cobalt's draw. Real-world NMC production genuinely sources
+    different metals from different countries simultaneously, so the data model needs a
+    distinct origin per material, not one string per facility.
     """
+    origins: dict[str, str] = {}
     for kw in keywords:
         dist = IMPORT_ORIGIN_DISTRIBUTION.get(kw)
         if not dist:
@@ -253,9 +472,11 @@ def infer_import_origin(facility_id: str, keywords: list[str]) -> str:
         for region, share in dist:
             cumulative += share
             if r < cumulative:
-                return region
-        return dist[-1][0]  # float-rounding fallback
-    return ""
+                origins[kw] = region
+                break
+        else:
+            origins[kw] = dist[-1][0]  # float-rounding fallback
+    return origins
 
 
 
@@ -291,6 +512,11 @@ def build_computed_fields(df: pd.DataFrame) -> pd.DataFrame:
                 for raw in raw_materials:
                     if raw not in kws:
                         kws.append(raw)
+        for component, raw_materials in COMPONENT_RAW_MATERIALS.items():
+            if component in kws:
+                for raw in raw_materials:
+                    if raw not in kws:
+                        kws.append(raw)
         return kws
 
     df["material_keywords"] = df.apply(_apply_material_overrides, axis=1)
@@ -323,31 +549,49 @@ def build_computed_fields(df: pd.DataFrame) -> pd.DataFrame:
                   and any(kw in IMPORT_MATERIALS for kw in r["material_keywords"]),
         axis=1,
     )
-    # import_origin_region (2026-08-03 fix): previously infer_import_origin() ran
-    # unconditionally for every row, including Upstream — which produced nonsensical values
-    # like Albemarle's Silver Peak, NV lithium mine (itself the production site) being
-    # randomly assigned "Australia" as its "import origin". This value was never actually
-    # read anywhere (network_agent.py's _region_match() gates on import_dependency=True
-    # before ever looking at it, and Upstream is always import_dependency=False), so it was
-    # dead-but-misleading data, not a live bug. Now: Upstream facilities ARE the origin, so
-    # their own state IS the accurate origin region — use it instead of a random foreign
-    # draw. Non-Upstream facilities with import_dependency=False (e.g. copper, not in
-    # IMPORT_MATERIALS) get "" — we don't model where they actually source from, so leaving
+    # import_origin_region (2026-08-03 fix, restructured 2026-08-06): previously
+    # infer_import_origin() ran unconditionally for every row, including Upstream — which
+    # produced nonsensical values like Albemarle's Silver Peak, NV lithium mine (itself the
+    # production site) being randomly assigned "Australia" as its "import origin". Now:
+    # Upstream facilities ARE the origin, so their own state IS the accurate origin region
+    # for every material they handle — use it instead of a random foreign draw.
+    # Non-Upstream facilities with import_dependency=False (e.g. copper, not in
+    # IMPORT_MATERIALS) get {} — we don't model where they actually source from, so leaving
     # it empty is more honest than guessing either a foreign or domestic origin for them.
+    #
+    # 2026-08-06: changed from a single string to a dict {material: origin_country} — see
+    # infer_import_origin()'s docstring for why a single string per facility silently
+    # dropped every material past the first for any multi-material facility (e.g. NMC
+    # cathode needing cobalt+nickel+manganese from three different real countries).
+    # `state` is already normalized to a full name by this point (see the top-level
+    # STATE_ABBREV_TO_FULL normalization above, applied to the whole column) — no need to
+    # re-expand it here.
     df["import_origin_region"] = df.apply(
         lambda r: (
-            r["state"] if r["supply_chain_segment"] == "Upstream"
+            {kw: r["state"] for kw in r["material_keywords"]}
+            if r["supply_chain_segment"] == "Upstream"
             else infer_import_origin(str(r["facility_id"]), r["material_keywords"])
-                 if r["import_dependency"] else ""
+                 if r["import_dependency"] else {}
         ),
         axis=1,
     )
 
-    # Apply facility-specific overrides (documented exceptions to the USGS NIR rule)
+    # Apply facility-specific overrides (documented exceptions to the USGS NIR rule).
+    # import_origin_region overrides are now per-material dicts too — a company's override
+    # applies to every import-critical material it's tagged with (e.g. Sherritt handles
+    # both cobalt and nickel, both actually sourced from Cuba/Madagascar per this override,
+    # not the DRC/Indonesia draw the generic distribution would otherwise assign).
     for company, overrides in IMPORT_DEP_OVERRIDES.items():
         mask = df["company"] == company
         for col, val in overrides.items():
-            df.loc[mask, col] = val
+            if col == "import_origin_region" and val:
+                df.loc[mask, col] = df.loc[mask, "material_keywords"].apply(
+                    lambda kws: {kw: val for kw in kws if kw in IMPORT_MATERIALS}
+                )
+            elif col == "import_origin_region":
+                df.loc[mask, col] = [dict() for _ in range(mask.sum())]
+            else:
+                df.loc[mask, col] = val
 
     # lead_time_weeks = base_by_segment + material_adjustment + region_adjustment
     #                   + capacity_data_penalty (see MATERIAL_LEAD_TIME_ADJUSTMENT /
@@ -362,7 +606,14 @@ def build_computed_fields(df: pd.DataFrame) -> pd.DataFrame:
             (MATERIAL_LEAD_TIME_ADJUSTMENT.get(kw, 0) for kw in row["material_keywords"]),
             default=0,
         )
-        region_adj = _region_lead_time_adjustment(row["import_origin_region"])
+        # region_adj: import_origin_region is now {material: origin_country} (2026-08-06) —
+        # take the MAX adjustment across all of this facility's per-material origins, same
+        # "worst case among its materials" pattern as material_adj above, not just whichever
+        # material happened to be drawn/listed first.
+        region_adj = max(
+            (_region_lead_time_adjustment(o) for o in row["import_origin_region"].values()),
+            default=0,
+        )
         capacity_penalty = 2 if row["capacity_source"] == "unknown" else 0
         return base + material_adj + region_adj + capacity_penalty
 
@@ -370,6 +621,9 @@ def build_computed_fields(df: pd.DataFrame) -> pd.DataFrame:
 
     # material_keywords → 逗号分隔字符串
     df["material_keywords"] = df["material_keywords"].apply(lambda x: ",".join(x))
+
+    # import_origin_region dict → JSON 字符串（CSV 列只能存字符串）
+    df["import_origin_region"] = df["import_origin_region"].apply(json.dumps)
 
     return df
 
@@ -422,6 +676,17 @@ def main():
     keep_cols = list(col_map.values()) + ["supply_chain_segment"]
     keep_cols = [c for c in keep_cols if c in df.columns]
     df = df[keep_cols].copy()
+
+    # state 缩写 → 全称 (2026-08-07): 之前只在派生 import_origin_region 时临时展开一次
+    # （Upstream 分支），但 state 字段本身在别处也被当文本比对用——例如
+    # network_agent.py::_entity_match_seeds() 用 mentioned_location（LLM 输出的全称，如
+    # "Kansas"）去匹配 state 字段做地点消歧，缩写("KS")对全称("Kansas")永远匹配不上，
+    # 是同一类 bug，只是还没被现有测试用例踩到（测试里 mentioned_location 恰好总是给了
+    # city，掩盖了 state 匹配失败）。改到源头一次性解决，比在每个用到 state 的地方各自
+    # 展开一遍更不容易漏。同时用 .strip() 顺手清掉像 "CA " 这种脏尾随空格。
+    df["state"] = df["state"].apply(
+        lambda s: STATE_ABBREV_TO_FULL.get(str(s).strip(), str(s).strip()) if pd.notna(s) else s
+    )
 
     # 计算派生字段
     df = build_computed_fields(df)

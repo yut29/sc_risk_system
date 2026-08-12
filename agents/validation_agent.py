@@ -3,7 +3,7 @@ Validation Agent — Source verification + hallucination check
 
 Input (from PipelineState):
   risk_report, top3_facilities, reason
-  affected_material, affected_region, risk_type, severity
+  material, region, risk_type, severity
   affected_nodes, facility_data
   iteration (current retry count)
 
@@ -21,11 +21,12 @@ Retry routing (handled by LangGraph pipeline):
 Three check layers (2026-08-02 redesign — see docs/agent_prompts_zh.md for the reasoning):
   1. _deterministic_checks — pure lookups (Top-3 IDs in affected_nodes, source citation, material
      mention).
-  2. _structural_checks    — regex-extracts the RIGIDLY TEMPLATED Capacity Impact and Top-3 Facility
-     sections (see synthesis_agent.py's format spec) and compares them against computed state values.
-     Moved out of the LLM prompt because the validation LLM applied these numeric/tier-logic rules
+  2. _structural_checks    — regex-extracts the RIGIDLY TEMPLATED Top-3 Facility section (see
+     synthesis_agent.py's format spec) and compares it against computed state values. Moved out
+     of the LLM prompt because the validation LLM applied these numeric/tier-logic rules
      unreliably across reruns — they're pure arithmetic/lookup, not reading comprehension, so code
-     does them exactly instead of "reliably enough".
+     does them exactly instead of "reliably enough". (Capacity Impact section removed 2026-08-12
+     per user request — this layer no longer checks it.)
   3. LLM checks            — narrowed to what code genuinely can't verify: coherence of the free-form
      Risk Synthesis prose, whether Top-3 justifications are specific vs generic boilerplate,
      and narrative-level hallucination in prose that isn't part of the fixed-format sections.
@@ -48,6 +49,16 @@ from agents.state import (
 from agents.synthesis_agent import _compute_exposure_summary
 
 load_dotenv(Path(__file__).parent.parent / ".env")
+
+# Mirrors intake_agent.py's SYSTEM_PROMPT "material must be one of" list (2026-08-12) — used
+# only by _deterministic_checks' Source Context cross-material check (see check #5 below), not
+# duplicated from agents/state.py's IMPORT_MATERIALS/KNOWN_MATERIALS because those two serve a
+# different purpose (import-dependency classification) and don't include the 4 newer materials
+# with real origin data (pvdf/copper_foil/aluminum_foil/separator) yet.
+_ALL_TRACKED_MATERIALS: frozenset[str] = frozenset({
+    "cobalt", "lithium", "nickel", "manganese", "graphite", "copper",
+    "pvdf", "copper_foil", "aluminum_foil", "separator",
+})
 
 _llm: Optional[BaseChatModel] = None
 
@@ -77,7 +88,7 @@ def _deterministic_checks(state: PipelineState) -> list[str]:
     issues: list[str] = []
     top3        = state.get("top3_facilities", [])
     report      = state.get("risk_report", "")
-    af_material = state.get("affected_material", "").lower()
+    af_material = state.get("material", "").lower()
     affected_ids = {n["id"] for n in state.get("affected_nodes", [])}
     facility_data = state.get("facility_data", {})
 
@@ -111,6 +122,32 @@ def _deterministic_checks(state: PipelineState) -> list[str]:
             f"possible material misclassification."
         )
 
+    # 5. Source Context must not smuggle in a DIFFERENT material's analysis as if it were
+    # about af_material (2026-08-12, docs/open_issues.md P39). Prompt-level instructions to
+    # keep the Source Context section scoped to af_material were tried twice and both failed
+    # reliably (3/3 repeated runs on a real DRC copper+cobalt test case rewrote a passage
+    # explicitly about copper into one about cobalt) — same lesson as the 2026-08-02
+    # _structural_checks redesign: an LLM instruction that fails deterministically, not just
+    # occasionally, needs a code-level check, not another prompt tweak. additional_events_note
+    # is where intake records "this event also affects material X" (see intake_agent.py's
+    # MULTI-MATERIAL SINGLE EVENT rule) — any material named there that ISN'T af_material is a
+    # material this report must NOT discuss the impact of.
+    note = (state.get("additional_events_note") or "").lower()
+    if note and af_material:
+        for other_material in _ALL_TRACKED_MATERIALS - {af_material}:
+            if other_material in note:
+                section_match = re.search(
+                    r"##\s*Source Context.*?\n(.*?)(?=\n##\s|\Z)", report, re.DOTALL | re.IGNORECASE
+                )
+                source_context = section_match.group(1) if section_match else ""
+                if other_material in source_context.lower():
+                    issues.append(
+                        f"SEVERE: Source Context section mentions '{other_material}', a "
+                        f"material this report explicitly does not cover (see "
+                        f"additional_events_note) — likely misattributed to '{af_material}' "
+                        f"instead of the material it actually concerns."
+                    )
+
     return issues
 
 
@@ -128,59 +165,35 @@ def _deterministic_checks(state: PipelineState) -> list[str]:
 # is structurally impossible — nothing to check.
 
 _TOP3_HEADER_RE = re.compile(
-    r"\*\*(?P<company>.+?)\s+—\s+.+?\*\*\s*"
+    r"\*\*(?P<header>.+?)\*\*\s*"
     r"\((?P<segment>[^,]+),\s*RiskScore:\s*(?P<score>[\d.]+)/100,\s*Exposure:\s*(?P<exposure>\w+)\)"
 )
+# Matches the whole bolded header blob rather than requiring a specific internal structure
+# (2026-08-11 fix): originally required "**Facility (Company) — Location**" exactly (company
+# captured only from before the em-dash). Empirically (5 repeated runs, same input) found
+# synthesis_agent's LLM call (temperature=0.2, not 0) flips unpredictably between that format
+# and a pipe-separated one ("**Company | Facility | Location**") — the LLM appears to sometimes
+# anchor on _format_top3()'s pipe-delimited INPUT formatting instead of the em-dash OUTPUT
+# format the prompt specifies. Both formats are semantically identical (same data, different
+# punctuation), so the fix doesn't chase the LLM's formatting — it makes the check format-
+# agnostic: capture the whole header blob and substring-match the real company name against
+# it (see below), instead of relying on a fixed capture-group position that only one of the
+# two observed formats satisfies. The (Segment, RiskScore: X/100, Exposure: Y) suffix was
+# consistent across both observed formats, so that part of the regex is unchanged.
 
 _CAPACITY_TOLERANCE_PCT = 0.6  # allow for LLM rounding/formatting drift
 
 
 def _structural_checks(state: PipelineState) -> list[str]:
     """
-    Regex-extracts the rigidly-templated Capacity Impact and Top-3 Facility
-    sections and compares them against the deterministic state values. Falls
-    back to a MINOR "format deviation" issue if the expected pattern isn't found
-    at all, rather than silently skipping the check.
+    Regex-extracts the rigidly-templated Top-3 Facility section and compares it
+    against the deterministic state values. Falls back to a MINOR "format
+    deviation" issue if the expected pattern isn't found at all, rather than
+    silently skipping the check.
     """
     issues: list[str] = []
     report = state.get("risk_report", "")
-    origin_tier = state.get("origin_tier", "")
-    global_metrics = state.get("global_metrics", {})
     top3 = state.get("top3_facilities", [])
-
-    # ── Capacity Impact (North America) ──────────────────────────────────────
-    section_match = re.search(
-        r"##\s*Capacity Impact.*?\n(.*?)(?=\n##\s|\Z)", report, re.DOTALL | re.IGNORECASE
-    )
-    cap_section = section_match.group(1) if section_match else ""
-
-    if origin_tier == "Upstream":
-        expected_fields = {
-            "Affected NA capacity":    global_metrics.get("betroffene_kapazitaet_na_pct"),
-            "Alternative NA capacity": global_metrics.get("alternative_kapazitaet_na_pct"),
-        }
-        for label, expected_val in expected_fields.items():
-            if expected_val is None:
-                continue
-            m = re.search(re.escape(label) + r".*?([\d.]+)\s*%", cap_section, re.IGNORECASE)
-            if not m:
-                issues.append(
-                    f"MINOR: Capacity Impact section is missing the expected '{label}' figure "
-                    f"for an Upstream event — format deviation from the report template."
-                )
-                continue
-            reported_val = float(m.group(1))
-            if abs(reported_val - float(expected_val)) > _CAPACITY_TOLERANCE_PCT:
-                issues.append(
-                    f"MINOR: Capacity Impact section states {label}={reported_val}%, but the "
-                    f"computed value is {expected_val}% — numeric mismatch."
-                )
-    else:
-        if "not applicable" not in cap_section.lower():
-            issues.append(
-                "MINOR: Capacity Impact section for a non-Upstream event doesn't state "
-                "'Not applicable' as the report template requires."
-            )
 
     # ── Top 3 Risk Facilities ────────────────────────────────────────────────
     if top3:
@@ -194,13 +207,12 @@ def _structural_checks(state: PipelineState) -> list[str]:
             if i >= len(matches):
                 break
             m = matches[i]
-            reported_company = m.group("company").strip()
-            if (f["company"].lower() not in reported_company.lower()
-                    and reported_company.lower() not in f["company"].lower()):
+            reported_header = m.group("header").strip()
+            if f["company"].lower() not in reported_header.lower():
                 issues.append(
-                    f"SEVERE: Top-3 entry #{i + 1} reports company '{reported_company}', which "
-                    f"does not match the provided facility '{f['company']}' — possible "
-                    f"hallucinated entity."
+                    f"SEVERE: Top-3 entry #{i + 1} header '{reported_header}' does not contain "
+                    f"the provided facility's company '{f['company']}' — possible hallucinated "
+                    f"entity."
                 )
                 continue  # other field checks are meaningless if the company itself is wrong
 
@@ -232,11 +244,11 @@ def _structural_checks(state: PipelineState) -> list[str]:
 # ── LLM checks ────────────────────────────────────────────────────────────────
 
 SYSTEM_PROMPT = """You are the Validation Agent for a Battery Supply Chain Risk System.
-Numeric/structural facts — Capacity Impact percentages, Top-3 facility company/segment/RiskScore/
-Exposure fields, source citation, material mention — are already checked deterministically by code
-before you see this report (see _structural_checks / _deterministic_checks in validation_agent.py).
-Do NOT re-derive or second-guess those numbers; your job is limited to the parts of the report that
-require reading comprehension, not arithmetic or lookup.
+Numeric/structural facts — Top-3 facility company/segment/RiskScore/Exposure fields, source
+citation, material mention — are already checked deterministically by code before you see this
+report (see _structural_checks / _deterministic_checks in validation_agent.py). Do NOT re-derive
+or second-guess those numbers; your job is limited to the parts of the report that require reading
+comprehension, not arithmetic or lookup.
 
 Check for:
 1. COHERENCE — Is the reasoning in the "Risk Synthesis" section logically self-consistent,
@@ -248,7 +260,7 @@ Check for:
 3. NARRATIVE HALLUCINATION — Does the free-form prose (Risk Synthesis, Risk Event paragraph,
    Supply Chain Exposure Analysis) assert any specific fact, relationship, or figure not supported by
    the context below? This is about invented claims in the prose, not about the already-verified
-   Capacity Impact / Top-3 numbers.
+   Top-3 numbers.
 
 Respond ONLY with a JSON object — no explanation, no markdown, no code blocks.
 
@@ -267,9 +279,9 @@ Failure type rules:
 """
 
 USER_PROMPT_TEMPLATE = """Validate this risk report's narrative sections against the provided context.
-Numeric facts (Capacity Impact %, Top-3 fields, source citation) are already checked by code —
-focus only on the free-form prose: Risk Event paragraph, Supply Chain Exposure Analysis, Top-3
-justification quality, and Risk Synthesis.
+Numeric facts (Top-3 fields, source citation) are already checked by code — focus only on the
+free-form prose: Risk Event paragraph, Supply Chain Exposure Analysis, Top-3 justification
+quality, and Risk Synthesis.
 
 CONTEXT:
 - Risk type: {risk_type}
@@ -355,8 +367,8 @@ def run_validation_agent(state: PipelineState) -> PipelineState:
         HumanMessage(content=USER_PROMPT_TEMPLATE.format(
             risk_type        = state.get("risk_type", ""),
             severity         = state.get("severity", 3),
-            affected_material= state.get("affected_material", ""),
-            affected_region  = state.get("affected_region", ""),
+            affected_material= state.get("material", ""),
+            affected_region  = state.get("region", ""),
             origin_tier      = state.get("origin_tier", ""),
             reason           = state.get("reason", ""),
             affected_count   = len(state.get("affected_nodes", [])),

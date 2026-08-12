@@ -34,7 +34,7 @@ def test_entity_precision_flags_facility_not_in_affected_nodes():
         "affected_nodes": [],  # "99999" is NOT here
         "facility_data": {},
         "risk_report": "Source: NAATBatt facility data. Fictional Corp faces cobalt risk.",
-        "affected_material": "cobalt",
+        "material": "cobalt",
     }
     issues = _deterministic_checks(state)
     assert any("SEVERE" in i and "99999" in i for i in issues)
@@ -47,7 +47,7 @@ def test_entity_precision_passes_for_verifiable_facility():
         "affected_nodes": [node],
         "facility_data": {"123": {}},
         "risk_report": "Source: NAATBatt facility data. Real Corp faces cobalt risk.",
-        "affected_material": "cobalt",
+        "material": "cobalt",
     }
     issues = _deterministic_checks(state)
     assert not any("SEVERE" in i for i in issues)
@@ -60,7 +60,7 @@ def test_facility_data_missing_flags_minor():
         "affected_nodes": [node],
         "facility_data": {},  # no entry for "555"
         "risk_report": "Source: NAATBatt facility data. No Data Corp faces cobalt risk.",
-        "affected_material": "cobalt",
+        "material": "cobalt",
     }
     issues = _deterministic_checks(state)
     assert any("MINOR" in i and "555" in i for i in issues)
@@ -72,7 +72,7 @@ def test_source_coverage_flags_missing_citation():
     state = {
         "top3_facilities": [], "affected_nodes": [], "facility_data": {},
         "risk_report": "This report has no citation whatsoever about cobalt.",
-        "affected_material": "cobalt",
+        "material": "cobalt",
     }
     issues = _deterministic_checks(state)
     assert any("MINOR" in i and "source citation" in i.lower() for i in issues)
@@ -82,7 +82,7 @@ def test_source_coverage_passes_with_naatbatt_mention():
     state = {
         "top3_facilities": [], "affected_nodes": [], "facility_data": {},
         "risk_report": "Based on NAATBatt facility data, cobalt supply is at risk.",
-        "affected_material": "cobalt",
+        "material": "cobalt",
     }
     issues = _deterministic_checks(state)
     assert not any("source citation" in i.lower() for i in issues)
@@ -94,7 +94,7 @@ def test_material_misclassification_flagged_severe():
     state = {
         "top3_facilities": [], "affected_nodes": [], "facility_data": {},
         "risk_report": "Source: NAATBatt facility data. Nickel supply chains face disruption.",
-        "affected_material": "cobalt",
+        "material": "cobalt",
     }
     issues = _deterministic_checks(state)
     assert any("SEVERE" in i and "cobalt" in i for i in issues)
@@ -104,7 +104,7 @@ def test_correct_material_does_not_flag_misclassification():
     state = {
         "top3_facilities": [], "affected_nodes": [], "facility_data": {},
         "risk_report": "Source: NAATBatt facility data. Cobalt supply chains face disruption.",
-        "affected_material": "cobalt",
+        "material": "cobalt",
     }
     issues = _deterministic_checks(state)
     assert not any("misclassification" in i.lower() for i in issues)
@@ -122,7 +122,7 @@ def test_full_pipeline_report_mentions_top3_companies_and_material():
     the generated report is self-consistent — every Top-3 company and the material name
     appear in the report text. Slow and uses Groq API quota; not run by default
     (`pytest -m slow` to include it)."""
-    from pipeline.pipeline import run_pipeline
+    from pipeline.graph import run_pipeline
 
     result = run_pipeline(
         "Major strike at Glencore cobalt mines in the Democratic Republic of Congo halts "

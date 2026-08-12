@@ -2,17 +2,30 @@
 Synthesis Agent — RiskScore computation + LLM report generation
 
 Input (from PipelineState):
-  severity, risk_type, affected_material, affected_region, origin_tier, reason
+  severity, risk_type, material, region, origin_tier, reason
   affected_nodes, alt_nodes, tier_weights, downstream_fanout
   facility_data, betroffene_kapazitaet_pct, alternative_kapazitaet_pct
+  raw_input (2026-08-11, "Source Context" section, see below)
 
 Output (written to PipelineState):
   risk_report     : str             structured narrative report
   top3_facilities : list[Facility]  top 3 by risk_score_normalized
   risk_scores     : dict[str, float]
   global_metrics  : GlobalMetrics
+
+raw_input added (2026-08-11): until now this agent worked purely from computed graph/score
+data, never re-reading the original article — so context a human analyst would naturally pick
+up from the source (historical precedent, analyst commentary, stated recovery timelines) was
+silently dropped even when the article said it outright. Added a "Source Context" report
+section that reads raw_input for exactly this — instructed to only report what the source text
+actually states (attributed), and to explicitly say "no additional context" rather than pad
+with invented generic industry background when the source is short/terse. This is a different
+risk surface than risk_assessment_agent's raw_input usage (which anchors severity/type/tier
+judgment) — here it's purely supplementary narrative, added only if the source actually
+supports it.
 """
 
+import re
 from pathlib import Path
 from typing import Optional
 
@@ -41,20 +54,37 @@ _llm: Optional[BaseChatModel] = None
 def _get_llm() -> BaseChatModel:
     global _llm
     if _llm is None:
-        _llm = get_llm(temperature=0.2)
+        # Was temperature=0.2 (undocumented, no rationale in history) until 2026-08-12: this
+        # was the only agent in the pipeline not pinned to temperature=0, and it was the only
+        # agent where a real bug turned out to be non-deterministic-generation-shaped — P36
+        # (Top-3 header format flipped between two styles across repeated identical runs) and
+        # P39 (Source Context misattributed another material's context to this report's
+        # material, reproduced 3/3 times) both trace directly to this setting, not to a prompt
+        # wording problem (two separate prompt fixes for P39 failed to help). Switched to 0 to
+        # test whether reliability improves — see docs/open_issues.md P41 for the before/after.
+        _llm = get_llm(temperature=0)
     return _llm
 
 
 # ── Deterministic: RiskScore calculation ─────────────────────────────────────
 
 def _format_supply_path(path_ids: list[str], node_by_id: dict[str, dict]) -> str:
-    """Turns a list of facility IDs into a readable 'Company (Segment) → ...' chain."""
+    """
+    Turns a list of facility IDs into a readable 'Company — Facility Name (Segment) → ...'
+    chain. Facility name is required, not just company (2026-08-12 fix): several companies
+    in this dataset operate multiple distinct physical sites (e.g. Vale Canada has 10,
+    BASF Toda America has several) — a company-only path can't tell you which specific
+    facility is at each hop, even though that data (facility_name) is already on the node.
+    """
     parts = []
     for pid in path_ids:
         n = node_by_id.get(pid)
         if n is None:
             continue
-        parts.append(f"{n.get('company', pid)} ({n.get('segment', '')})")
+        company = n.get("company", pid)
+        facility_name = n.get("facility_name", "")
+        label = f"{company} — {facility_name}" if facility_name else company
+        parts.append(f"{label} ({n.get('segment', '')})")
     return " → ".join(parts)
 
 
@@ -64,7 +94,7 @@ def _compute_scores(state: PipelineState) -> tuple[dict[str, float], list[Facili
     tier_weights   = state.get("tier_weights", {})
     supply_chain_paths = state.get("supply_chain_paths", {})
     severity       = state.get("severity", 3)
-    affected_material = (state.get("affected_material") or "").lower()
+    material = (state.get("material") or "").lower()
 
     node_by_id = {n["id"]: n for n in affected_nodes}
     risk_scores: dict[str, float] = {}
@@ -84,7 +114,7 @@ def _compute_scores(state: PipelineState) -> tuple[dict[str, float], list[Facili
 
         # 2026-08-03 (corrected same day — see state.py's KNOWN_MATERIALS comment for the
         # full rationale): propagated facilities inherit ImportDep/SupplierConcentration from
-        # the EVENT's own affected_material classification, NOT the facility's own
+        # the EVENT's own material classification, NOT the facility's own
         # material_keywords (which is right for a PRIMARY-exposure facility that directly
         # handles the material, but empty/irrelevant for a PROPAGATED one several tiers
         # downstream — e.g. Tesla/Toyota/Lucid Motors carry no "cobalt" keyword themselves,
@@ -99,14 +129,14 @@ def _compute_scores(state: PipelineState) -> tuple[dict[str, float], list[Facili
         #
         # Now: look up the event's own material against the same IMPORT_MATERIALS/
         # HIGH_CONCENTRATION_MATERIALS tables every other facility is classified against. Only
-        # falls back to the precautionary "unknown -> True" default when affected_material
+        # falls back to the precautionary "unknown -> True" default when material
         # isn't one of the tracked materials at all (KNOWN_MATERIALS) — e.g. a Strategy B
         # facility-specific event's free-text label like "battery cells", which was never
         # given a real classification either way.
         if exposure_type == "propagated":
-            if affected_material in KNOWN_MATERIALS:
-                import_dep_term = 1.0 if affected_material in IMPORT_MATERIALS else 0.0
-                supplier_conc_term = 1.0 if affected_material in HIGH_CONCENTRATION_MATERIALS else 0.0
+            if material in KNOWN_MATERIALS:
+                import_dep_term = 1.0 if material in IMPORT_MATERIALS else 0.0
+                supplier_conc_term = 1.0 if material in HIGH_CONCENTRATION_MATERIALS else 0.0
             else:
                 import_dep_term = 1.0
                 supplier_conc_term = 1.0
@@ -156,9 +186,23 @@ def _compute_scores(state: PipelineState) -> tuple[dict[str, float], list[Facili
             "risk_score_normalized": normalized,
             "tier_weight":        tw,
             "vulnerability":      round(vulnerability, 4),
+            # Individual terms (2026-08-07, P22) — raw 0-1 values BEFORE VULNERABILITY_WEIGHTS
+            # weighting, kept alongside the combined `vulnerability` above instead of being
+            # discarded once summed, so a report/UI can show which term actually drove the score.
+            "import_dep_term":               round(import_dep_term, 4),
+            "supplier_conc_term":             round(supplier_conc_term, 4),
+            "single_source_dependency_term":  round(ssd_term, 4),
+            "lead_time_norm_term":            round(float(fd["lead_time_norm"]), 4),
             "resilience_discount": rd,
             "supply_path":        supply_path,
             "exposure_type":      exposure_type,
+            # (P37) real facility-specific context for differentiated Top-3 justifications —
+            # was already sitting in facility_data unused, see FacilityData docstring.
+            "capacity":           fd.get("capacity", 0.0),
+            "product":            fd.get("product", ""),
+            "product_type":       fd.get("product_type", ""),
+            "brief_profile":      fd.get("brief_profile", ""),
+            "production_units":   fd.get("production_units", ""),
         })
 
     # Deduplicate by physical site (company + city + state) before ranking Top 3.
@@ -183,7 +227,7 @@ def _compute_scores(state: PipelineState) -> tuple[dict[str, float], list[Facili
 # ── Deterministic: GlobalMetrics ──────────────────────────────────────────────
 
 def _compute_global_metrics(state: PipelineState) -> GlobalMetrics:
-    material       = state.get("affected_material", "")
+    material       = state.get("material", "")
     affected_nodes = state.get("affected_nodes", [])
     alt_nodes      = state.get("alt_nodes", [])
     facility_data  = state.get("facility_data", {})
@@ -230,31 +274,34 @@ Report format (use these exact section headers):
 ## Risk Event
 One paragraph: what happened, where, when. End with: "Source: NAATBatt facility data + LLM analysis."
 
+## Source Context
+The ORIGINAL SOURCE TEXT is provided below in the context — read it for anything beyond the
+structured event fields (risk_type/severity/material/region/reason) that a human analyst would
+find relevant: historical precedent ("the third such disruption in 18 months"), analyst/expert
+commentary or quotes, market reaction, stated recovery timelines, or similar context explicitly
+present in the source text.
+- Only report what the source text actually says. Attribute it ("the article notes...", "according
+  to [named source/official/analyst] quoted in the source..."). Never invent a historical pattern,
+  expert opinion, or typical-case generalization that is not literally present in the source text —
+  this is exactly the kind of unverifiable claim this system must not fabricate.
+- MATERIAL SCOPE CHECK (apply this BEFORE writing anything): this report is scoped to ONE material
+  only — see the "Material" field in the EVENT section below. If the source text covers more than
+  one material, some passages may concern a DIFFERENT material than the one this report is about
+  (e.g. the source discusses both copper and cobalt; this report's Material field says cobalt).
+  Silently skip any such passage — do not mention it, do not summarize it, and above all do not
+  reword it to be about the report's material instead (e.g. never turn a statement about copper
+  concentrate exports into one about cobalt concentrate exports — that is fabricating a claim the
+  source never made). Only use passages that are genuinely about the report's own material.
+- After applying that filter: if anything usable remains, report it, attributed ("the article
+  notes...", "according to [source] quoted in the article..."). Never invent a historical pattern,
+  expert opinion, or generalization not literally present in the source text.
+- If nothing usable remains (source is short, purely factual, or every relevant passage was about a
+  different material per the filter above), write EXACTLY one line and nothing else: "No additional
+  context provided in the source material." Never write both real content AND this fallback line —
+  it is one or the other.
+
 ## Affected Material & Supply Chain Tier
 One sentence: material, origin tier, risk type.
-
-## Capacity Impact (North America)
-These percentages measure NAATBatt-tracked NORTH AMERICAN domestic mining/production capacity
-only — NAATBatt has no coverage outside the US/Canada/Mexico, so a foreign mine or refinery (e.g.
-a DRC cobalt mine, an Australian lithium operation) is never itself a node in this graph. They are
-NOT a measurement of the disrupted facility's own output or its share of world production — do not
-treat them as verifying, contradicting, or needing to reconcile with any percentage the source event
-text itself claims (e.g. "8% of global output"). That claim is unverified input, not something this
-system computes or can confirm — if you mention it, attribute it to the source ("as reported") and
-do not imply the capacity metrics below confirm or refute it.
-This metric ONLY applies when origin_tier is "Upstream" — it measures raw-material mining/
-production capacity, which structurally cannot be affected by a disruption starting at any other
-tier (Midstream-BGM/Cell/Downstream events can never propagate backward to Upstream in this graph).
-- If origin_tier is "Upstream": two bullet points using the provided percentages —
-  Affected NA capacity: X%; Alternative NA capacity: X%; Affected global capacity (USGS basis): X%
-  [only if > 0]. A 0% figure here is expected and normal whenever the disruption originates at a
-  facility outside NAATBatt's North American coverage (i.e. most real Upstream events) — it means
-  "no NA-domestic Upstream capacity was affected", not "this event has no impact". Do not flag or
-  apologize for a 0% Upstream figure as a gap or contradiction.
-- If origin_tier is NOT "Upstream": do not report 0% as if it were a measurement. Instead write one
-  line: "Not applicable — this event originates at the {origin_tier} tier, not raw-material
-  production; NA capacity-share metrics only apply to Upstream events." Do not attempt to reconcile
-  or explain away a 0% figure here — there is nothing to reconcile, it is simply out of scope.
 
 ## Supply Chain Exposure Analysis
 Using the exposure summary provided in the context, explain — don't just restate the numbers:
@@ -269,23 +316,47 @@ Using the exposure summary provided in the context, explain — don't just resta
   state plainly that most reachable facilities score far below the highest exposure once TierWeight
   distance-discounting is applied, and only the handful of facilities near the highest score (see
   Top 3 below) warrant real attention. This is the key distinction: reachable ≠ high-risk.
-- Only if origin_tier is "Upstream" AND Affected NA capacity is 0% or low while many facilities are
-  potentially exposed: explicitly reconcile this — mining/Upstream capacity being untouched does not
-  mean there is no risk, point to the high-scoring Midstream/Downstream exposure (see the highest/
-  median gap) as the actual risk driver. Skip this reconciliation entirely for non-Upstream events —
-  see Capacity Impact above.
 
 ## Top 3 Risk Facilities
 For each facility (numbered 1–3), lead with the specific facility name, not just the parent company —
 one company can own several distinctly-named facilities (e.g. "Lundin Mining" has both "Eagle Mine"
 and "Humboldt mill"; using only the company name would make them indistinguishable):
 **[Facility Name] ([Company]) — [City, State/Country]** (Segment, RiskScore: X/100, Exposure: Primary|Propagated)
-- One sentence explaining WHY this facility is high risk (import dependency, single source, capacity share).
-  Do not imply the facility is physically located in the affected region — Primary exposure means it
-  imports from there, nothing more.
+- One sentence explaining WHY this facility is high risk — using the four Vulnerability sub-terms
+  provided for each facility (ImportDep, SupplierConc, SingleSourceDep, LeadTimeNorm, with their
+  weights) to identify which factor(s) actually drive this facility's risk, but describe them in
+  PLAIN LANGUAGE for a reader — never write the raw term names (e.g. never write "ImportDep" or
+  "SupplierConc" literally in the sentence). Instead describe what each elevated term actually
+  means in context: ImportDep → depends on imported supply for this material; SupplierConc → the
+  global supplier base for this material is concentrated among very few producers; SingleSourceDep
+  → this specific facility itself has few alternate suppliers of its own to fall back on;
+  LeadTimeNorm → recovery/replacement would take a long time. Do not just restate "it imports the
+  material" for every entry — that's true of all three and explains nothing about why THIS one
+  differs from the other two. Say which factor(s) are actually elevated for this specific facility
+  and which are not, in your own words (e.g. "this facility's risk comes mainly from having very
+  few alternate suppliers of its own to fall back on, rather than the broader import exposure it
+  shares with the other two entries here"). If two facilities have nearly identical RiskScores, say
+  so and explain briefly why (e.g. same tier-distance from the disruption, but a different mix of
+  underlying factors) — do not paper over it with interchangeable boilerplate. Do not imply the
+  facility is physically located in the affected region — Primary exposure means it imports from
+  there, nothing more.
+- Ground the justification in what this facility ACTUALLY makes and how big it is — Product, ProductType,
+  Capacity, and CompanyProfile are provided for each facility; use them to say something a reader
+  couldn't get from the Vulnerability numbers alone (e.g. what specific product line is exposed, whether
+  this is a large or small operation relative to its capacity figure). If a field is "unknown", don't
+  mention it — do not guess or pad with generic industry description to fill the gap.
 - If Exposure=Propagated, briefly trace the supply path provided (which upstream event/facility it is
   downstream of) — this is the causal chain, state it explicitly rather than skipping it.
-- Recommended action: [concrete mitigation step]
+- Recommended action: [concrete mitigation step, targeted at the specific driving factor named above
+  in plain language, not the raw term names — a risk driven by concentrated global suppliers needs
+  supplier diversification, a risk driven by slow replacement/recovery needs inventory or buffer
+  stock, these are not interchangeable — AND, where the Product/Capacity/ProductType data actually
+  supports it, make the action specific to what this facility makes and how big it is (e.g. a
+  small-capacity single-product-line facility has fewer substitution options than a large
+  multi-product one — say so if the data shows it). Do not let the action regress into the same
+  generic "diversify suppliers" phrasing you just avoided in the justification above — the actual
+  driving factor AND the facility's real product/scale should both be visible in what you recommend,
+  not just in the sentence above it.]
 
 ## Risk Synthesis
 A multi-paragraph expert assessment (this is the section that earns your "senior analyst" title —
@@ -311,6 +382,12 @@ Rules:
 
 USER_PROMPT_TEMPLATE = """Generate the risk report based on this data:
 
+ORIGINAL SOURCE TEXT (for the "Source Context" section only — do not use this to override or
+re-derive any of the structured fields below, those are already final):
+---
+{raw_input}
+---
+
 EVENT:
 - Risk type: {risk_type}
 - Severity: {severity}/5
@@ -318,12 +395,6 @@ EVENT:
 - Region: {affected_region}
 - Origin tier: {origin_tier}
 - Assessment: {reason}
-
-CAPACITY METRICS (Upstream-tier only — meaningless/always 0% for a non-Upstream origin_tier;
-see Capacity Impact section rules above):
-- Affected NA upstream capacity: {betroffene_na}%
-- Alternative NA upstream capacity: {alternative_na}%
-- Affected global capacity (USGS): {betroffene_global}%
 
 SUPPLY CHAIN EXPOSURE SUMMARY:
 {exposure_summary}
@@ -339,15 +410,26 @@ it was only reached via downstream supply-chain traversal — SupplyPath shows t
 def _format_top3(top3: list[Facility]) -> str:
     lines = []
     for i, f in enumerate(top3, 1):
+        capacity_text = (
+            f"{f['capacity']:.0f} {f['production_units']}" if f["capacity"] else "unknown"
+        )
         lines.append(
             f"{i}. {f['company']} | {f['facility_name']} | {f['segment']} | "
             f"{f['city']}, {f['state']}, {f['country']} | "
             f"RiskScore={f['risk_score_normalized']}/100 | "
-            f"Vulnerability={f['vulnerability']:.3f} | "
+            f"Vulnerability={f['vulnerability']:.3f} "
+            f"(ImportDep[30%]={f['import_dep_term']:.2f}, "
+            f"SupplierConc[30%]={f['supplier_conc_term']:.2f}, "
+            f"SingleSourceDep[25%]={f['single_source_dependency_term']:.2f}, "
+            f"LeadTimeNorm[15%]={f['lead_time_norm_term']:.2f}) | "
             f"TierWeight={f['tier_weight']} | "
             f"ResilienceDiscount={f['resilience_discount']:.2f} | "
             f"Exposure={f['exposure_type']} | "
-            f"SupplyPath={f['supply_path']}"
+            f"SupplyPath={f['supply_path']} | "
+            f"Product={f['product'] or 'unknown'} | "
+            f"ProductType={f['product_type'] or 'unknown'} | "
+            f"Capacity={capacity_text} | "
+            f"CompanyProfile={f['brief_profile'] or 'unknown'}"
         )
     return "\n".join(lines) if lines else "No high-risk facilities identified."
 
@@ -421,8 +503,8 @@ def _no_seed_found_report(state: PipelineState) -> PipelineState:
     slack..."). A fixed, non-generative notice guarantees no self-contradiction and
     costs no API call / rate-limit budget.
     """
-    material = state.get("affected_material", "")
-    region   = state.get("affected_region", "")
+    material = state.get("material", "")
+    region   = state.get("region", "")
     report = (
         "## System Limitation Notice\n\n"
         f"This event (material: {material or 'unknown'}, region: {region or 'unknown'}, "
@@ -522,6 +604,59 @@ def _entity_non_material_report(state: PipelineState) -> PipelineState:
     }
 
 
+# Mirrors intake_agent.py's SYSTEM_PROMPT "material must be one of" list — same set validation_
+# agent.py uses for its Source Context cross-material check (kept as a separate local copy there
+# rather than imported, see that file's comment for why).
+_ALL_TRACKED_MATERIALS: frozenset[str] = frozenset({
+    "cobalt", "lithium", "nickel", "manganese", "graphite", "copper",
+    "pvdf", "copper_foil", "aluminum_foil", "separator",
+})
+
+
+def _sanitize_source_context(report: str, state: PipelineState) -> str:
+    """
+    Deterministic safety net for the Source Context section (2026-08-12, docs/open_issues.md
+    P39 follow-up): two separate prompt-level attempts to stop the LLM from misattributing a
+    DIFFERENT material's context to the material this report is about both failed — not
+    occasionally, but reliably (3/3 repeated runs on a real DRC copper+cobalt test case). Retrying
+    generation (what SEVERE validation failures normally trigger) doesn't help either, since this
+    is a systematic bias, not random noise — verified: still failed after hitting
+    MAX_VALIDATION_ITERATIONS. Same lesson as the 2026-08-02 _structural_checks redesign, applied
+    one step further: don't just detect the unreliable LLM judgment in validation, replace it with
+    a deterministic action here so the pipeline doesn't need a retry (or a human) to get a correct
+    report. If the OTHER material named in additional_events_note appears anywhere in the Source
+    Context section, the whole section is replaced with the safe fallback line rather than trusting
+    whatever the LLM wrote — losing that section's content is a smaller loss than shipping a
+    misattributed claim.
+    """
+    other_note = (state.get("additional_events_note") or "").lower()
+    material = state.get("material", "").lower()
+    if not other_note or not material:
+        return report
+
+    mentioned_other_materials = {
+        m for m in _ALL_TRACKED_MATERIALS - {material} if m in other_note
+    }
+    if not mentioned_other_materials:
+        return report
+
+    section_re = re.compile(
+        r"(##\s*Source Context.*?\n)(.*?)(?=\n##\s|\Z)", re.DOTALL | re.IGNORECASE
+    )
+    match = section_re.search(report)
+    if not match:
+        return report
+
+    section_body = match.group(2)
+    if any(m in section_body.lower() for m in mentioned_other_materials):
+        report = section_re.sub(
+            r"\1No additional context provided in the source material.\n",
+            report,
+            count=1,
+        )
+    return report
+
+
 def run_synthesis_agent(state: PipelineState) -> PipelineState:
     """
     LangGraph-compatible node function.
@@ -551,21 +686,20 @@ def run_synthesis_agent(state: PipelineState) -> PipelineState:
     messages = [
         SystemMessage(content=SYSTEM_PROMPT),
         HumanMessage(content=USER_PROMPT_TEMPLATE.format(
+            raw_input        = state.get("raw_input", ""),
             risk_type        = state.get("risk_type", ""),
             severity         = state.get("severity", 3),
-            affected_material= state.get("affected_material", ""),
-            affected_region  = state.get("affected_region", ""),
+            affected_material= state.get("material", ""),
+            affected_region  = state.get("region", ""),
             origin_tier      = state.get("origin_tier", ""),
             reason           = state.get("reason", ""),
-            betroffene_na    = global_metrics["betroffene_kapazitaet_na_pct"],
-            alternative_na   = global_metrics["alternative_kapazitaet_na_pct"],
-            betroffene_global= global_metrics["betroffene_kapazitaet_global_pct"],
             exposure_summary = exposure_summary,
             top3_text        = top3_text,
         )),
     ]
 
     report = _get_llm().invoke(messages).content.strip()
+    report = _sanitize_source_context(report, state)
 
     return {
         **state,

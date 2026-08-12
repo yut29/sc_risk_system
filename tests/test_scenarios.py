@@ -40,8 +40,8 @@ def test_unmatched_event_reports_no_seed_found_not_a_silent_zero():
     a genuine "0 facilities affected" finding — see SeedGenerationStatus docstring in
     state.py and the "no_seed_found" handling in synthesis_agent.py."""
     state = {
-        "affected_material": "unobtainium",
-        "affected_region": "Nowhere",
+        "material": "unobtainium",
+        "region": "Nowhere",
         "origin_tier": "Upstream",
     }
     result = run_network_agent(state)
@@ -55,9 +55,16 @@ def test_no_seed_found_report_is_deterministic_and_never_contradicts_itself():
     limitation in one section, then contradict itself in "Risk Synthesis" by
     analyzing the placeholder 0% capacity figures as if they were a real finding.
     Now short-circuited to a fixed notice — no LLM call, so it can't self-contradict
-    and is byte-for-byte reproducible for the same input."""
+    and is byte-for-byte reproducible for the same input.
+
+    region="Nowhere" (not a real place, 2026-08-07): Strategy C (network_agent.py) now
+    makes a real LLM call whenever region is non-empty and Strategy A/B found nothing —
+    a real place name like "Kansas" would trigger that live call, breaking this test's
+    fast/deterministic/no-LLM contract (see this file's module docstring). "Nowhere" has
+    zero candidates in find_facilities_by_region(), so Strategy C fails closed before ever
+    calling the LLM (agents/tools.py) — same intent as the sibling test above."""
     state = {
-        "affected_material": "battery cell", "affected_region": "Kansas",
+        "material": "battery cell", "region": "Nowhere",
         "origin_tier": "Midstream-Cell", "severity": 4, "risk_type": "supply_disruption",
         "reason": "Fire at a plant halts cell production.",
     }
@@ -77,9 +84,12 @@ def test_no_seed_found_report_skips_validation_llm_call():
     the no_seed_found notice too, judging it by normal-report standards (e.g. flagging
     "missing Top-3 justification") and marking it invalid — which would trigger a wasted
     retry loop back to Risk Assessment Agent that could only ever reproduce the same
-    no_seed_found result. Must now short-circuit to valid=True with zero issues."""
+    no_seed_found result. Must now short-circuit to valid=True with zero issues.
+
+    region="Nowhere": see the sibling test above for why a real place name isn't used here
+    anymore (would trigger a live Strategy C LLM call, 2026-08-07)."""
     state = {
-        "affected_material": "battery cell", "affected_region": "Kansas",
+        "material": "battery cell", "region": "Nowhere",
         "origin_tier": "Midstream-Cell", "severity": 4, "risk_type": "supply_disruption",
         "reason": "Fire at a plant halts cell production.",
     }
