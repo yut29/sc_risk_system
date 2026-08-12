@@ -138,8 +138,10 @@ JSON schema:
 
 Rules:
 - relevant=true if the text concerns EITHER (a) a battery supply chain risk of any kind
-  (material shortage, price volatility, regulatory action, logistics disruption, weather event,
-  labor/capacity disruption, etc. — do not require it to match one of the specific
+  (material shortage, price volatility, regulatory action, logistics disruption — including a
+  shipping chokepoint/strait closure or blockade, e.g. Hormuz, Malacca, Suez, Panama Canal, even
+  though these are usually reported as oil/general-trade stories, not battery-specific ones —
+  weather event, labor/capacity disruption, etc. — do not require it to match one of the specific
   materials/regions listed above, those are just examples), OR (b) a facility-specific
   disruption (fire, strike, shutdown, quality recall, etc.) at a named company's own battery
   supply chain plant/mine — this second category has no material/region of its own; the named
