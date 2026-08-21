@@ -23,35 +23,17 @@ def get_llm(
     provider: Optional[str] = None,
 ) -> BaseChatModel:
     """
-    Provider switch (2026-07-31): default is FAU's NHR HPC LLM gateway
-    (OpenAI-compatible) — Baris pointed to this as a free alternative after
-    repeated Groq free-tier rate-limit hits (6000 TPM) during testing. Groq
-    (llama-3.1-8b-instant) is kept as a LLM_PROVIDER=groq fallback in case the
-    FAU endpoint has an outage or quota issue — set the env var to switch back
-    without touching any agent code.
+    Provider: FAU's NHR HPC LLM gateway (OpenAI-compatible) — Baris pointed to
+    this as a free option for this project.
 
     Model: Mistral-Small-3.2-24B-Instruct (not gpt-oss-120b, tried first) — the
     120B model hallucinated company names outside the provided context in
     testing and got noticeably more verbose/embellished in the free-form
-    synthesis report than llama-3.1-8b-instant ever did. 24B is a closer size
-    match to the original 8B model this pipeline's prompts were tuned against,
-    and stayed within JSON-schema/report-structure expectations more reliably.
+    synthesis report. 24B stayed within JSON-schema/report-structure
+    expectations more reliably.
 
-    request_timeout default raised from Groq's original 20s to 60s (2026-07-31):
-    FAU's models are larger than llama-3.1-8b-instant, and the full synthesis
-    report generation (long-form, multi-section) hit APITimeoutError at 20s
-    with the 120B model in testing. 60s comfortably covers slower generation
-    while still being well above Groq's typical response time, so this is safe
-    for both providers.
-
-    `provider` param (2026-08-02): per-agent override, independent of the global
-    LLM_PROVIDER env var. Added because the Validation Agent's multi-condition
-    rule-following (e.g. "don't flag a 0% capacity figure as a hallucination
-    under these specific circumstances") got noticeably less reliable/reproducible
-    on FAU's 24B model than it was on Groq's llama-3.1-8b-instant, which is what
-    the validation prompt's rules were originally tuned against. Pass
-    provider="groq" to pin a single agent back to Groq while everything else
-    stays on FAU's default.
+    `provider` param: per-agent override, independent of the global
+    LLM_PROVIDER env var.
     """
     provider = (provider or os.environ.get("LLM_PROVIDER", "fau")).lower()
 
@@ -65,17 +47,8 @@ def get_llm(
             request_timeout=request_timeout,
             max_retries=max_retries,
         )
-    elif provider == "groq":
-        from langchain_groq import ChatGroq
-        return ChatGroq(
-            model="llama-3.1-8b-instant",
-            api_key=os.environ["GROQ_API_KEY"],
-            temperature=temperature,
-            request_timeout=request_timeout,
-            max_retries=max_retries,
-        )
     else:
-        raise ValueError(f"Unknown LLM_PROVIDER={provider!r} (expected 'fau' or 'groq')")
+        raise ValueError(f"Unknown LLM_PROVIDER={provider!r} (expected 'fau')")
 
 
 def _strip_code_fence(content: str) -> str:

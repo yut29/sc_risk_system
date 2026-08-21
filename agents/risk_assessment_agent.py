@@ -66,7 +66,7 @@ from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.messages import SystemMessage, HumanMessage
 
 from agents.llm_utils import get_llm, invoke_json
-from agents.state import PipelineState
+from agents.state import PipelineState, TIER_ORDER
 
 load_dotenv(Path(__file__).parent.parent / ".env")
 
@@ -161,10 +161,28 @@ def run_risk_assessment_agent(state: PipelineState) -> PipelineState:
 
     parsed = invoke_json(llm, messages)
 
+    # Defensive parsing (found in review, 2026-08-17): `.get(key, default)` only substitutes
+    # the default when the key is ABSENT, not when the LLM explicitly emits "severity": null
+    # or an origin_tier string outside the 4 literal Segment values — a very plausible failure
+    # mode for a 24B model. Unguarded, either one crashes deep downstream instead of here
+    # (int(None) -> TypeError; TIER_ORDER[bad_tier] -> KeyError in network_agent.py, several
+    # calls removed from this agent, much harder to diagnose). Fixed at the source, same
+    # philosophy as intake_agent.py's CANONICAL SPELLING / UNSUPPORTED MATERIAL handling:
+    # normalize/validate the LLM's output once, right where it's parsed.
+    try:
+        severity = int(parsed.get("severity") or 3)
+    except (TypeError, ValueError):
+        severity = 3
+    severity = min(5, max(1, severity))
+
+    origin_tier = parsed.get("origin_tier")
+    if origin_tier not in TIER_ORDER:
+        origin_tier = "Upstream"
+
     return {
         **state,
-        "severity":    int(parsed.get("severity", 3)),
-        "risk_type":   parsed.get("risk_type", "supply_disruption"),
-        "origin_tier": parsed.get("origin_tier", "Upstream"),
-        "reason":      parsed.get("reason", ""),
+        "severity":    severity,
+        "risk_type":   parsed.get("risk_type") or "supply_disruption",
+        "origin_tier": origin_tier,
+        "reason":      parsed.get("reason") or "",
     }

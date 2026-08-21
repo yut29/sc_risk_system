@@ -368,7 +368,8 @@ go beyond restating earlier sections). Cover each of these angles explicitly, in
 - **Resilience**: given the alternative/remaining capacity figures, how much slack does the system
   actually have — is that slack usable in practice (same tier, comparable lead time) or theoretical?
 - **Severity in context**: why does this event warrant its severity rating — what would make it worse
-  or better, and over what time horizon?
+  or better? Only discuss a time horizon if the source text actually gives one (recovery estimate,
+  stated timeline) — otherwise say the timeline is unspecified rather than estimating one.
 - **Strategic recommendation**: 1-2 concrete, prioritized actions for a supply chain risk manager reading
   this — distinguish immediate mitigation from longer-term structural fixes (e.g. diversification).
 
@@ -376,6 +377,17 @@ Rules:
 - Be factual. Only reference data provided in the context — do not invent facts, but you MAY draw
   reasonable inferences and judgments from the data provided (that is the point of this section).
 - Do not invent company relationships or capacities not in the input.
+- NEVER STATE A SPECIFIC DURATION, QUANTITY, OR DATE THE SOURCE TEXT DOES NOT ACTUALLY GIVE (found
+  in review, 2026-08-17 — repeatedly observed inventing a plausible-sounding recovery timeframe
+  like "1-3 months" or "weeks to months" for disruptions whose source text explicitly says the
+  duration is unknown, then using that invented number to justify the severity rating). This
+  applies everywhere in the report, not just Source Context: the "Severity in context" paragraph
+  below, the Risk Event summary — anywhere a specific number/timeframe could be written. If the
+  source text does not state how long something will last, how much of something is affected, or
+  when something will happen, say so plainly ("no timeline was given in the source", "duration is
+  unconfirmed") instead of supplying a specific-sounding estimate. A vague source does not license
+  a confident, specific-sounding report — an honest "unknown" is correct, a plausible-sounding
+  invented number is not, even if it seems like a reasonable guess.
 - Prioritize interpretation over restating numbers — a reader should understand *why* the numbers mean what they mean.
 - Keep the report under 750 words.
 """
@@ -400,9 +412,11 @@ SUPPLY CHAIN EXPOSURE SUMMARY:
 {exposure_summary}
 
 TOP 3 RISK FACILITIES (highest-scoring, not necessarily close to the highest RiskScore in the
-distribution above; Exposure = Direct means Primary exposure — the facility itself matched the
-event via import dependency, NOT that it is physically located in the affected region; Propagated means
-it was only reached via downstream supply-chain traversal — SupplyPath shows that chain):
+distribution above; each entry already states its Exposure as Primary or Propagated below — copy
+that word as-is into the report header, do not invent a different one. Primary means the facility
+itself matched the event via import dependency, NOT that it is physically located in the affected
+region; Propagated means it was only reached via downstream supply-chain traversal — SupplyPath
+shows that chain):
 {top3_text}
 """
 
@@ -424,7 +438,16 @@ def _format_top3(top3: list[Facility]) -> str:
             f"LeadTimeNorm[15%]={f['lead_time_norm_term']:.2f}) | "
             f"TierWeight={f['tier_weight']} | "
             f"ResilienceDiscount={f['resilience_discount']:.2f} | "
-            f"Exposure={f['exposure_type']} | "
+            # Display word, not the raw internal exposure_type value (found in review,
+            # 2026-08-17): this used to write f['exposure_type'] verbatim ("direct"/
+            # "propagated"), then relied on a prompt instruction telling the LLM to
+            # translate "direct" to "Primary" in its OUTPUT — unreliable, the LLM often
+            # just echoed the "direct" it was shown here instead, which validation_agent.py
+            # then flagged as wrong. Showing the already-correct display word here means
+            # there's nothing left to translate — the LLM only has to copy it, and it now
+            # matches ui/app.py's own "Primary"/"Propagated" labels (e.g. line ~501), which
+            # were never "direct"/"propagated" to begin with.
+            f"Exposure={'Primary' if f['exposure_type'] == 'direct' else 'Propagated'} | "
             f"SupplyPath={f['supply_path']} | "
             f"Product={f['product'] or 'unknown'} | "
             f"ProductType={f['product_type'] or 'unknown'} | "
@@ -492,21 +515,43 @@ def _compute_risk_score_stats(risk_scores: dict[str, float]) -> dict[str, float]
 
 # ── Main agent function ────────────────────────────────────────────────────────
 
+def _system_limitation_report(state: PipelineState, title: str, body: str, source_note: str) -> PipelineState:
+    """
+    Shared builder for all three deterministic "can't analyze this" short-circuits below
+    (consolidated 2026-08-17 — these were three separate ~35-line copies of the same
+    report shape and the same 5-key return dict; a future PipelineState field added to
+    one copy but not the others was exactly the kind of drift risk this collapses away).
+
+    No LLM call in any of these — letting the LLM free-write the full report template
+    here is unsafe: observed in testing (2026-07-20) that even with explicit
+    instructions, the LLM would correctly flag the limitation in "Supply Chain Exposure
+    Analysis", then contradict itself two sections later in "Risk Synthesis" by
+    analyzing the 0% capacity figures as if they were a real finding ("the system has
+    0.0% affected capacity, which suggests there is no slack..."). A fixed,
+    non-generative notice guarantees no self-contradiction and costs no API call.
+    """
+    report = (
+        f"## {title}\n\n"
+        f"{body}\n\n"
+        f"Assessment reason (from Risk Assessment Agent): {state.get('reason', 'n/a')}\n\n"
+        f"Source: {source_note}"
+    )
+    return {
+        **state,
+        "risk_report":      report,
+        "top3_facilities":  [],
+        "risk_scores":      {},
+        "global_metrics":   _compute_global_metrics(state),
+        "risk_score_stats": {"max": 0.0, "median": 0.0},
+    }
+
+
 def _no_seed_found_report(state: PipelineState) -> PipelineState:
-    """
-    Deterministic short-circuit — no LLM call. When no seed was found, letting the LLM
-    free-write the full report template is unsafe: observed in testing (2026-07-20) that
-    even with explicit instructions, the LLM would correctly flag the limitation in the
-    "Supply Chain Exposure Analysis" section, then contradict itself two sections later
-    in "Risk Synthesis" by analyzing the 0% capacity figures as if they were a
-    real finding ("the system has 0.0% affected capacity, which suggests there is no
-    slack..."). A fixed, non-generative notice guarantees no self-contradiction and
-    costs no API call / rate-limit budget.
-    """
+    """seed_generation_status="no_seed_found" — see _system_limitation_report for why this
+    is a fixed notice, not an LLM call."""
     material = state.get("material", "")
     region   = state.get("region", "")
-    report = (
-        "## System Limitation Notice\n\n"
+    body = (
         f"This event (material: {material or 'unknown'}, region: {region or 'unknown'}, "
         f"risk type: {state.get('risk_type', 'unknown')}, severity: {state.get('severity', '?')}/5) "
         "could not be classified into either event type this system currently supports: (1) an "
@@ -519,35 +564,24 @@ def _no_seed_found_report(state: PipelineState) -> PipelineState:
         "detect. See `docs/architecture.md`, \"Bekannte Grenzen des Seeding-Mechanismus\", for "
         "supported vs. unsupported event types.\n\n"
         "**Recommendation: this case requires manual review.** Do not treat the absence of results "
-        "as evidence of no risk.\n\n"
-        f"Assessment reason (from Risk Assessment Agent): {state.get('reason', 'n/a')}\n\n"
-        "Source: NAATBatt facility data — no matching facility found."
+        "as evidence of no risk."
     )
-    return {
-        **state,
-        "risk_report":      report,
-        "top3_facilities":  [],
-        "risk_scores":      {},
-        "global_metrics":   _compute_global_metrics(state),
-        "risk_score_stats": {"max": 0.0, "median": 0.0},
-    }
+    return _system_limitation_report(
+        state, "System Limitation Notice", body, "NAATBatt facility data — no matching facility found."
+    )
 
 
 def _entity_ambiguous_report(state: PipelineState) -> PipelineState:
-    """
-    Deterministic short-circuit for seed_generation_status="entity_ambiguous" — a
-    company was recognized in the text, but it has multiple facilities in the graph
-    and the mentioned location (if any) wasn't enough to resolve it to exactly one.
-    Same rationale as _no_seed_found_report: no LLM call, no risk of self-contradiction.
-    """
+    """seed_generation_status="entity_ambiguous" — a company was recognized in the text,
+    but it has multiple facilities in the graph and the mentioned location (if any)
+    wasn't enough to resolve it to exactly one. See _system_limitation_report."""
     company = state.get("mentioned_company", "unknown")
     location = state.get("mentioned_location")
     location_clause = (
         f'the mentioned location ("{location}") did not' if location
         else "no location was mentioned to"
     )
-    report = (
-        "## System Limitation Notice — Ambiguous Facility Reference\n\n"
+    body = (
         f"The text named a company (\"{company}\") that has multiple facilities in the current "
         f"network, and {location_clause} "
         "narrow this down to exactly one.\n\n"
@@ -556,33 +590,21 @@ def _entity_ambiguous_report(state: PipelineState) -> PipelineState:
         "Multi-Strategie Seed Generator\", for the entity-matching design (deliberately scoped to "
         "not include company-alias mapping or automatic disambiguation).\n\n"
         "**Recommendation: this case requires manual review** — identify the specific facility "
-        f"(e.g. city/state) and re-run the analysis with that detail included.\n\n"
-        f"Assessment reason (from Risk Assessment Agent): {state.get('reason', 'n/a')}\n\n"
-        "Source: NAATBatt facility data — company matched, facility ambiguous."
+        "(e.g. city/state) and re-run the analysis with that detail included."
     )
-    return {
-        **state,
-        "risk_report":      report,
-        "top3_facilities":  [],
-        "risk_scores":      {},
-        "global_metrics":   _compute_global_metrics(state),
-        "risk_score_stats": {"max": 0.0, "median": 0.0},
-    }
+    return _system_limitation_report(
+        state, "System Limitation Notice — Ambiguous Facility Reference", body,
+        "NAATBatt facility data — company matched, facility ambiguous."
+    )
 
 
 def _entity_non_material_report(state: PipelineState) -> PipelineState:
-    """
-    Deterministic short-circuit for seed_generation_status="entity_non_material" — the
-    named company resolved to exactly one facility, but that facility is a mechanical/
-    safety/BMS component supplier (marked `non_active_material`, docs/open_issues.md
-    P16), not a processor of any risk material this system tracks (cobalt, lithium,
-    nickel, graphite, manganese). Same rationale as the other short-circuits: no LLM
-    call, no risk of a fabricated material-flow narrative for a facility that doesn't
-    handle raw materials at all.
-    """
+    """seed_generation_status="entity_non_material" — the named company resolved to
+    exactly one facility, but that facility is a mechanical/safety/BMS component
+    supplier (marked `non_active_material`, docs/open_issues.md P16), not a processor
+    of any risk material this system tracks. See _system_limitation_report."""
     company = state.get("mentioned_company", "unknown")
-    report = (
-        "## System Limitation Notice — Non-Material Facility\n\n"
+    body = (
         f"The text named a company (\"{company}\") that was resolved to exactly one facility in "
         "the current network, but this facility is a mechanical/safety/component supplier "
         "(e.g. adhesives, thermal systems, cell lid assemblies, BMS modules) — it does not process "
@@ -590,18 +612,12 @@ def _entity_non_material_report(state: PipelineState) -> PipelineState:
         "manganese).\n\n"
         "**This system models raw-material supply-chain risk, not general component/BOM "
         "disruption.** A disruption at this facility may still be operationally significant, but it "
-        "falls outside this system's material-flow risk model and no propagation is computed.\n\n"
-        f"Assessment reason (from Risk Assessment Agent): {state.get('reason', 'n/a')}\n\n"
-        "Source: NAATBatt facility data — company matched, facility is not material-active."
+        "falls outside this system's material-flow risk model and no propagation is computed."
     )
-    return {
-        **state,
-        "risk_report":      report,
-        "top3_facilities":  [],
-        "risk_scores":      {},
-        "global_metrics":   _compute_global_metrics(state),
-        "risk_score_stats": {"max": 0.0, "median": 0.0},
-    }
+    return _system_limitation_report(
+        state, "System Limitation Notice — Non-Material Facility", body,
+        "NAATBatt facility data — company matched, facility is not material-active."
+    )
 
 
 # Mirrors intake_agent.py's SYSTEM_PROMPT "material must be one of" list — same set validation_

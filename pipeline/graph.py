@@ -48,7 +48,15 @@ def route_after_intake(state: PipelineState) -> str:
 
 
 def route_after_validation(state: PipelineState) -> str:
-    if state.get("iteration", 0) >= MAX_VALIDATION_ITERATIONS:
+    # Off-by-one fix (found in review, 2026-08-17): this used to be `>=`, which cuts the
+    # graph off after the 2nd validation call (iteration==2) — before the 3rd call that
+    # validation_agent.py's own "iteration > MAX_VALIDATION_ITERATIONS" graceful-acceptance
+    # branch (accept the report with a caveat instead of a hard failure) is written to
+    # handle. That branch was structurally unreachable as a result. `>` lets a 3rd
+    # validation call happen after a 2nd failed retry, so that branch can actually run —
+    # matching the documented behavior in docs/architecture.md ("max. 2 Iterationen, danach
+    # wird der Bericht mit Warnhinweis akzeptiert").
+    if state.get("iteration", 0) > MAX_VALIDATION_ITERATIONS:
         return END
     if not state.get("valid", False):
         ft = state.get("failure_type")

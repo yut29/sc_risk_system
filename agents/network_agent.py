@@ -217,24 +217,11 @@ def _region_match(node_attrs: dict[str, Any], region: str, material: str) -> boo
 
 # ── Core traversal ────────────────────────────────────────────────────────────
 
-def _bfs_descendants(G: nx.DiGraph, start_ids: list[str]) -> set[str]:
-    """All nodes reachable from start_ids via directed edges."""
-    visited: set[str] = set(start_ids)
-    queue = deque(start_ids)
-    while queue:
-        cur = queue.popleft()
-        for nxt in G.successors(cur):
-            if nxt not in visited:
-                visited.add(nxt)
-                queue.append(nxt)
-    return visited
-
-
 def _bfs_with_predecessors(G: nx.DiGraph, start_ids: list[str]) -> tuple[set[str], dict[str, str]]:
     """
-    Same traversal as _bfs_descendants, but also records which node first
-    discovered each newly-visited node (predecessor), so a path back to a
-    seed can be reconstructed later.
+    All nodes reachable from start_ids via directed edges, plus a predecessor map
+    recording which node first discovered each newly-visited node — so a path back
+    to a seed can be reconstructed later (see _reconstruct_path below).
     """
     visited: set[str] = set(start_ids)
     predecessor: dict[str, str] = {}
@@ -247,6 +234,14 @@ def _bfs_with_predecessors(G: nx.DiGraph, start_ids: list[str]) -> tuple[set[str
                 predecessor[nxt] = cur
                 queue.append(nxt)
     return visited, predecessor
+
+
+def _bfs_descendants(G: nx.DiGraph, start_ids: list[str]) -> set[str]:
+    """All nodes reachable from start_ids via directed edges (predecessors discarded —
+    consolidated onto _bfs_with_predecessors 2026-08-17, was a separate copy of the same
+    traversal loop)."""
+    visited, _ = _bfs_with_predecessors(G, start_ids)
+    return visited
 
 
 def _reconstruct_path(predecessor: dict[str, str], node_id: str) -> list[str]:
@@ -271,19 +266,14 @@ def _find_root_seeds(G: nx.DiGraph, candidates: list[str]) -> list[str]:
     a seed is defined by what it *is* (a root of the candidate set), not by which
     tier it happens to sit in.
     """
+    # Reuses _bfs_descendants (consolidated 2026-08-17, was its own third copy of the same
+    # traversal loop) — starting the frontier at c's successors rather than c itself, since
+    # c reaching itself isn't the question here, only whether c reaches an OTHER candidate.
     candidate_set = set(candidates)
     reached_by_other: set[str] = set()
     for c in candidates:
-        visited: set[str] = set()
-        queue = deque(G.successors(c))
-        while queue:
-            cur = queue.popleft()
-            if cur in visited:
-                continue
-            visited.add(cur)
-            if cur in candidate_set and cur != c:
-                reached_by_other.add(cur)
-            queue.extend(G.successors(cur))
+        reachable = _bfs_descendants(G, list(G.successors(c)))
+        reached_by_other.update(reachable & candidate_set - {c})
     return [c for c in candidates if c not in reached_by_other]
 
 

@@ -4,7 +4,7 @@ Ebene 3: Szenario-Tests (S1-S3) — deterministic end-to-end (docs/test_plan.md)
 Covers the Network Agent -> Data Retrieval Agent -> Synthesis scoring chain for
 each of the 3 expose.md scenarios. LLM classification (Intake/Risk Assessment) is
 fixed via conftest.SCENARIOS instead of called live, since it is non-deterministic
-and Groq's free tier rate-limits real calls (see tests/test_hallucination.py for a
+and live LLM calls are rate-limited (see tests/test_hallucination.py for a
 slow, opt-in end-to-end test that does call the LLM agents).
 """
 

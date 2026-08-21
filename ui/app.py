@@ -199,7 +199,6 @@ AGENT_LABELS = {
     "validation":      "Validation — Qualitätsprüfung",
 }
 
-SEVERITY_COLOR = {1: "🟢", 2: "🟡", 3: "🟠", 4: "🔴", 5: "🔴"}
 RISK_TYPE_LABEL = {
     "supply_disruption": "Supply Disruption",
     "price_volatility":  "Price Volatility",
@@ -318,7 +317,7 @@ risk_type  = result.get("risk_type", "")
 material   = result.get("material", "")
 region     = result.get("region", "")
 
-k1.metric("Severity", f"{SEVERITY_COLOR.get(severity, '')} {severity} / 5")
+k1.metric("Severity", f"{severity} / 5")
 k2.metric("Risk Type", RISK_TYPE_LABEL.get(risk_type, risk_type))
 k3.metric("Material", material.capitalize())
 k4.metric("Region", region)
@@ -530,7 +529,7 @@ if top3:
     )
     for i, f in enumerate(top3, 1):
         if f.get("supply_path"):
-            label = "🔴 Primary" if f.get("exposure_type") == "direct" else "🔀 Propagated"
+            label = "Primary" if f.get("exposure_type") == "direct" else "🔀 Propagated"
             st.markdown(f"{i}. [{label}] {f['supply_path']}")
 
     with st.expander("Full RiskScore calculation (step by step)", expanded=False):

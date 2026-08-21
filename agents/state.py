@@ -212,7 +212,10 @@ class Facility(TypedDict):
     supplier_conc_term: float
     single_source_dependency_term: float
     lead_time_norm_term: float
-    resilience_discount: float    # 0–0.5 (basiert auf AltCapacityRatio)
+    resilience_discount: float    # 0–0.5, CapacityShare-basiert: (1 − capacity_share) / 2,
+                                   # alle vier Tiers einheitlich seit 2026-08-03 (siehe die
+                                   # ausführliche Erklärung bei FacilityData.resilience_discount
+                                   # oben — ersetzt die frühere AltCapacityRatio-Methode)
     supply_path: str              # z.B. "Kamoto Copper (Upstream) → CATL Cathode (Midstream-BGM) → ..."
     exposure_type: ExposureType    # "direct" = Seed-Node selbst (MaterialMatch+RegionMatch) | "propagated" = via BFS erreicht
     capacity: float                # siehe FacilityData oben — für anlagenspezifische Top-3-Begründungen (P37)

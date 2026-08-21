@@ -5,7 +5,7 @@ Scenario configs mirror the 3 evaluation scenarios in expose.md / test_plan.md.
 Deterministic parts of the pipeline (Network Agent, Data Retrieval Agent) are run
 directly with a fixed event classification as input instead of going through the
 Intake/Risk Assessment LLM agents — this makes the tests fast, repeatable, and
-independent of Groq API availability/rate limits, while still exercising the real
+independent of LLM API availability/rate limits, while still exercising the real
 graph traversal, capacity math, and RiskScore logic against the real dataset.
 
 S3 redefinition (2026-07-31): originally modeled as a port/logistics event via the
@@ -47,9 +47,15 @@ SCENARIOS = {
         "severity": 5,
         "risk_type": "supply_disruption",
     },
-    "S2": {  # Lithium-Exportbeschränkungen (Chile)
+    "S2": {  # Lithium-Exportbeschränkungen (Chile) — region fixed 2026-08-17 (review finding):
+             # was "South America / Australia", a joined region string that silently matched
+             # ONLY Australia-origin facilities (0 Chile/Argentina facilities), the exact bug
+             # class the intake prompt's "Known risk regions" section now explicitly warns
+             # against. This fixture is fed straight into run_network_agent (no live LLM call,
+             # see scenario_state below), so it needs a single real, cleanly-matching region on
+             # its own regardless of the prompt fix.
         "material": "lithium",
-        "region": "South America / Australia",
+        "region": "Chile",
         "origin_tier": "Upstream",
         "severity": 4,
         "risk_type": "regulatory",

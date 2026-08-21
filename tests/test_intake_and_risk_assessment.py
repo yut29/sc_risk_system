@@ -5,7 +5,7 @@ Risk Assessment Agent — run in isolation with real LLM calls.
 Gap this fills: every other test file in this suite (test_scenarios.py, test_entity_matching.py,
 etc.) deliberately bypasses these two agents by hardcoding material/region/severity/origin_tier
 directly into the state (see conftest.py's SCENARIOS fixture docstring) — fast and
-Groq/FAU-rate-limit-independent, but it means Intake's and Risk Assessment's own judgment
+LLM-rate-limit-independent, but it means Intake's and Risk Assessment's own judgment
 behavior was never itself exercised by an automated test, only verified ad hoc during manual
 LLM queries in conversation. This file closes that gap directly.
 
@@ -29,8 +29,8 @@ from agents.risk_assessment_agent import run_risk_assessment_agent
 pytestmark = [
     pytest.mark.slow,
     pytest.mark.skipif(
-        not (os.environ.get("FAU_LLMAPI_KEY") or os.environ.get("GROQ_API_KEY")),
-        reason="needs FAU_LLMAPI_KEY or GROQ_API_KEY + live API call",
+        not os.environ.get("FAU_LLMAPI_KEY"),
+        reason="needs FAU_LLMAPI_KEY + live API call",
     ),
 ]
 

@@ -11,7 +11,8 @@ pip install -r requirements.txt
 `.env` im Projektroot anlegen:
 
 ```
-GROQ_API_KEY=<dein-key>
+LLM_PROVIDER=fau
+FAU_LLMAPI_KEY=<dein-key>
 ```
 
 ## Ausführen

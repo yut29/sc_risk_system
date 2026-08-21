@@ -50,30 +50,12 @@ from agents.synthesis_agent import _compute_exposure_summary
 
 load_dotenv(Path(__file__).parent.parent / ".env")
 
-# Mirrors intake_agent.py's SYSTEM_PROMPT "material must be one of" list (2026-08-12) — used
-# only by _deterministic_checks' Source Context cross-material check (see check #5 below), not
-# duplicated from agents/state.py's IMPORT_MATERIALS/KNOWN_MATERIALS because those two serve a
-# different purpose (import-dependency classification) and don't include the 4 newer materials
-# with real origin data (pvdf/copper_foil/aluminum_foil/separator) yet.
-_ALL_TRACKED_MATERIALS: frozenset[str] = frozenset({
-    "cobalt", "lithium", "nickel", "manganese", "graphite", "copper",
-    "pvdf", "copper_foil", "aluminum_foil", "separator",
-})
-
 _llm: Optional[BaseChatModel] = None
 
 
 def _get_llm() -> BaseChatModel:
     global _llm
     if _llm is None:
-        # Un-pinned from Groq back to the default FAU provider (2026-08-02, same day):
-        # the Groq pin was a workaround for this agent's multi-condition numeric/tier
-        # rules being applied unreliably — but those rules have since moved out of the
-        # LLM prompt entirely into _structural_checks() (pure regex+lookup, no model
-        # involved). The LLM's remaining job (narrative coherence/completeness) is
-        # narrow enough that model choice shouldn't matter much, so default back to
-        # FAU to avoid Groq's 6000 TPM rate limit, which repeated pipeline runs hit
-        # even with only this one agent pinned to it.
         _llm = get_llm(temperature=0)
     return _llm
 
@@ -122,31 +104,16 @@ def _deterministic_checks(state: PipelineState) -> list[str]:
             f"possible material misclassification."
         )
 
-    # 5. Source Context must not smuggle in a DIFFERENT material's analysis as if it were
-    # about af_material (2026-08-12, docs/open_issues.md P39). Prompt-level instructions to
-    # keep the Source Context section scoped to af_material were tried twice and both failed
-    # reliably (3/3 repeated runs on a real DRC copper+cobalt test case rewrote a passage
-    # explicitly about copper into one about cobalt) — same lesson as the 2026-08-02
-    # _structural_checks redesign: an LLM instruction that fails deterministically, not just
-    # occasionally, needs a code-level check, not another prompt tweak. additional_events_note
-    # is where intake records "this event also affects material X" (see intake_agent.py's
-    # MULTI-MATERIAL SINGLE EVENT rule) — any material named there that ISN'T af_material is a
-    # material this report must NOT discuss the impact of.
-    note = (state.get("additional_events_note") or "").lower()
-    if note and af_material:
-        for other_material in _ALL_TRACKED_MATERIALS - {af_material}:
-            if other_material in note:
-                section_match = re.search(
-                    r"##\s*Source Context.*?\n(.*?)(?=\n##\s|\Z)", report, re.DOTALL | re.IGNORECASE
-                )
-                source_context = section_match.group(1) if section_match else ""
-                if other_material in source_context.lower():
-                    issues.append(
-                        f"SEVERE: Source Context section mentions '{other_material}', a "
-                        f"material this report explicitly does not cover (see "
-                        f"additional_events_note) — likely misattributed to '{af_material}' "
-                        f"instead of the material it actually concerns."
-                    )
+    # Check #5 (Source Context cross-material check, added 2026-08-12 for P39) removed
+    # 2026-08-17: it was structurally dead code. synthesis_agent.py's _sanitize_source_context()
+    # runs deterministically on every report BEFORE this function ever sees it, and already
+    # strips out exactly the cross-material leak this check was looking for — so the condition
+    # this check fired on could never occur here. Same underlying fact this check encoded (which
+    # other material to watch for, via additional_events_note) still lives in
+    # _sanitize_source_context(); no need to check it twice. See run_validation_agent's LLM
+    # check (SYSTEM_PROMPT, "NARRATIVE HALLUCINATION") for the broader, still-live check that
+    # now also has raw_input available to catch invented claims in general, not just this one
+    # specific pattern.
 
     return issues
 
@@ -250,6 +217,15 @@ report (see _structural_checks / _deterministic_checks in validation_agent.py). 
 or second-guess those numbers; your job is limited to the parts of the report that require reading
 comprehension, not arithmetic or lookup.
 
+TWO SEPARATE GROUND-TRUTH SOURCES — do not mix them up:
+- Top-3 facility details (capacity, product, supplier/company profile, RiskScore inputs) come from
+  the NAATBatt database / this system's own deterministic computation, NOT from the news article.
+  They are correct even though the article never mentions them — that is expected and NOT an
+  issue. Never flag a Top-3 fact as unsupported just because it isn't in the ORIGINAL SOURCE TEXT.
+- The ORIGINAL SOURCE TEXT below is ground truth ONLY for claims about the EVENT ITSELF: what
+  happened, when, why, how long it might last, market/analyst reaction. This is what the Risk
+  Event paragraph and Source Context section must be checked against.
+
 Check for:
 1. COHERENCE — Is the reasoning in the "Risk Synthesis" section logically self-consistent,
    and does it actually follow from the facts stated earlier in the report (rather than contradicting
@@ -257,10 +233,19 @@ Check for:
 2. QUALITATIVE COMPLETENESS — Does each Top-3 facility justification say something specific to that
    facility (its import dependency, single-source risk, capacity share), or is it generic boilerplate
    that could be copy-pasted onto any other facility?
-3. NARRATIVE HALLUCINATION — Does the free-form prose (Risk Synthesis, Risk Event paragraph,
-   Supply Chain Exposure Analysis) assert any specific fact, relationship, or figure not supported by
-   the context below? This is about invented claims in the prose, not about the already-verified
-   Top-3 numbers.
+3. EVENT NARRATIVE HALLUCINATION — narrower than it sounds, do NOT over-flag here. Qualitative
+   analytical judgment ("this is a significant disruption", "this could tighten supply", "this
+   signals structural fragility") is EXPECTED and CORRECT — the whole point of the Synthesis
+   Agent is to draw exactly this kind of reasonable inference from sparse facts, like a senior
+   analyst would; do not flag an inference just because the source didn't spell it out in those
+   words. Only flag a SPECIFIC, CONCRETE, CHECKABLE detail — a duration ("1-3 months"), a
+   quantity, a date, a named cause — that is stated as if it were a known fact when the ORIGINAL
+   SOURCE TEXT below either doesn't mention it at all or explicitly says it's unknown/unconfirmed.
+   The test: could a reader mistake this for something the source actually reported, and would
+   they be wrong? A vague, uncertain source does not license a specific-sounding invented number;
+   it does license reasonable qualitative judgment about significance and implications (flag a
+   genuine fabricated specific as "severe" if it's used to justify the severity rating or a
+   Top-3 facility's risk assessment, "minor" otherwise).
 
 Respond ONLY with a JSON object — no explanation, no markdown, no code blocks.
 
@@ -297,6 +282,13 @@ CONTEXT:
 
 TOP 3 FACILITIES PROVIDED TO SYNTHESIS AGENT:
 {top3_summary}
+
+ORIGINAL SOURCE TEXT (added 2026-08-17 — ground truth for the NARRATIVE HALLUCINATION check;
+previously this check had no way to tell an invented specific detail from a real one, since it
+never saw the actual article/query the report is supposed to be based on):
+---
+{raw_input}
+---
 
 GENERATED RISK REPORT:
 ---
@@ -342,13 +334,19 @@ def run_validation_agent(state: PipelineState) -> PipelineState:
             "iteration":    iteration,
         }
 
-    # Hard stop: exceeded max iterations → accept report as-is with warning
+    # Hard stop: exceeded max iterations → accept report as-is with warning. Preserve
+    # the actual issues found on the last real check (2026-08-17 fix — this used to
+    # discard them and show only the generic "accepted with caveats" line, so a reader
+    # had no way to know WHAT was flagged, just that something was and got shipped
+    # anyway; ui/app.py already surfaces `issues` to the user, so this is now visible).
     if iteration > MAX_VALIDATION_ITERATIONS:
         return {
             **state,
             "valid":        True,
             "failure_type": None,
-            "issues":       ["Max iterations reached — report accepted with caveats."],
+            "issues":       state.get("issues", []) + [
+                "Max iterations reached — report accepted with the unresolved issue(s) above."
+            ],
             "iteration":    iteration,
         }
 
@@ -376,6 +374,7 @@ def run_validation_agent(state: PipelineState) -> PipelineState:
             risk_score_median = score_stats.get("median", 0.0),
             exposure_summary = _compute_exposure_summary(state) if state.get("affected_nodes") else "N/A",
             top3_summary     = _format_top3_summary(state.get("top3_facilities", [])),
+            raw_input        = state.get("raw_input", ""),
             risk_report      = state.get("risk_report", ""),
         )),
     ]

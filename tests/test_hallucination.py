@@ -114,13 +114,13 @@ def test_correct_material_does_not_flag_misclassification():
 
 @pytest.mark.slow
 @pytest.mark.skipif(
-    not (os.environ.get("FAU_LLMAPI_KEY") or os.environ.get("GROQ_API_KEY")),
-    reason="needs FAU_LLMAPI_KEY or GROQ_API_KEY + live API call",
+    not os.environ.get("FAU_LLMAPI_KEY"),
+    reason="needs FAU_LLMAPI_KEY + live API call",
 )
 def test_full_pipeline_report_mentions_top3_companies_and_material():
     """End-to-end: run S1 through the real pipeline (all 6 agents, real LLM calls) and check
     the generated report is self-consistent — every Top-3 company and the material name
-    appear in the report text. Slow and uses Groq API quota; not run by default
+    appear in the report text. Slow and uses live LLM API quota; not run by default
     (`pytest -m slow` to include it)."""
     from pipeline.graph import run_pipeline
 

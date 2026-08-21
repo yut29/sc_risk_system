@@ -75,14 +75,22 @@ materials with researched, source-backed origin-country data (2026-08-11): pvdf 
 copper_foil (current collector — distinct from raw "copper" above), aluminum_foil (current
 collector), separator
 
-Known risk regions:
+Known risk regions — each bullet lists the individual real places relevant to that material;
+region must always be exactly ONE of these single place names, NEVER a joined/combined string
+like "X / Y" or "X (A, B) / Y" even if several are listed together below or the source text
+discusses more than one (found in review, 2026-08-17: a joined region string like "South America
+/ Australia" silently fails to match ANY facility for the countries named first in the join —
+downstream matching only works for one clean place name at a time). If the text names one
+specific place, use that. If it genuinely discusses several of these places without one being
+clearly primary, pick whichever is most central to the actual disruption described, the same way
+you already pick one material/event under the MULTI-EVENT TEXTS rule below:
 - Democratic Republic of the Congo (cobalt, copper)
-- South America (Chile, Argentina) / Australia (lithium)
-- China / Mozambique / Madagascar / Tanzania (graphite)
-- Indonesia / Philippines (nickel)
-- South Africa / Gabon / Australia (manganese)
-- China (dominant) / South Korea / Japan (copper_foil, separator)
-- China (dominant) / Europe (aluminum_foil, pvdf)
+- Chile, Argentina, or Australia (lithium)
+- China, Mozambique, Madagascar, or Tanzania (graphite)
+- Indonesia or Philippines (nickel)
+- South Africa, Gabon, or Australia (manganese)
+- China (dominant), South Korea, or Japan (copper_foil, separator)
+- China (dominant) or Europe (aluminum_foil, pvdf)
 
 If the text names a specific country, use that country's name as the region — do not
 generalize it up to a broader category (e.g. a Chile-specific event should yield

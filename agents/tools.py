@@ -1,6 +1,11 @@
 """
-Shared LangChain tools for agents — lets an LLM query the real facility dataset
-on demand instead of classifying purely from prompt text, no ground-truth check.
+Deterministic facility-lookup helpers shared across agents (currently just
+find_facilities_by_region, used by network_agent.py's Strategy C).
+
+query_facilities (a LangChain @tool for on-demand LLM lookups) lived here until
+2026-08-17, when it was archived to archive/query_facilities_tool.py — it was never
+wired into any agent's actual LLM call, see that file's docstring for why and how to
+revive it if a real need turns up.
 """
 
 import re
@@ -8,7 +13,6 @@ from functools import lru_cache
 from pathlib import Path
 
 import pandas as pd
-from langchain_core.tools import tool
 
 FACILITIES_FILE = Path(__file__).parent.parent / "data" / "facilities_clean.csv"
 
@@ -99,38 +103,3 @@ def find_facilities_by_region(region: str, limit: int = 15) -> list[dict]:
         }
         for _, r in matched.iterrows()
     ]
-
-
-@tool
-def query_facilities(material: str, segment: str = "") -> str:
-    """Look up how many North American facilities in the real dataset handle a given
-    battery-supply-chain material, before judging an event's severity or scope.
-
-    Args:
-        material: material keyword to search for, e.g. "cobalt", "lithium", "copper".
-        segment: optional supply-chain tier filter — one of "Upstream", "Midstream-BGM",
-            "Midstream-Cell", "Downstream". Leave empty to search all tiers.
-
-    Returns:
-        A short text summary: how many facilities match, broken down by tier, with a
-        few example company names. If zero facilities match, says so explicitly —
-        that itself is useful signal (the material may not be tracked in this dataset).
-    """
-    df = _load_facilities()
-    material = material.strip().lower()
-    mask = df["material_keywords"].fillna("").str.contains(material, regex=False)
-    if segment:
-        mask &= df["supply_chain_segment"] == segment
-
-    matched = df[mask]
-    if matched.empty:
-        scope = f" in segment {segment!r}" if segment else ""
-        return f"0 facilities found handling material {material!r}{scope} in the NA dataset."
-
-    by_segment = matched["supply_chain_segment"].value_counts().to_dict()
-    examples = matched["company"].drop_duplicates().head(5).tolist()
-    return (
-        f"{len(matched)} facilities handle {material!r}"
-        + (f" (segment={segment!r})" if segment else "")
-        + f". By tier: {by_segment}. Example companies: {examples}."
-    )
