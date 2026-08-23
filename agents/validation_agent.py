@@ -12,6 +12,11 @@ Output (written to PipelineState):
   failure_type : "minor" | "severe" | None
   issues       : list[str]
   iteration    : int  (incremented)
+  quality_scores, overall_quality, quality_strengths, quality_summary : structured quality
+      assessment (2026-08-23), independent of valid/failure_type — see SYSTEM_PROMPT below for
+      the four-dimension rubric (groundedness/consistency/completeness/explainability). A report
+      can pass every hard check and still score low here, and a single SEVERE issue still forces
+      valid=false regardless of these scores.
 
 Retry routing (handled by LangGraph pipeline):
   minor  → re-run Synthesis Agent  (missing source, unverified entity)
@@ -263,6 +268,99 @@ Failure type rules:
   fundamentally contradicts the risk_type/severity/material classification itself)
 """
 
+# ── Quality assessment (2026-08-23) — separate LLM call, deliberately NOT merged into
+# SYSTEM_PROMPT above. First attempt combined both into one prompt/call; even with an explicit
+# "judge issues/valid first, ignore the quality rubric below" instruction, adding the quality
+# rubric measurably weakened the EVENT NARRATIVE HALLUCINATION check in the same call — a report
+# with an unsupported "estimated to be 1-3 months" duration (Szenario S4, Abschnitt 5.5) stopped
+# being flagged (issues=[], valid=True) as soon as the quality section was present, in 5/5
+# consecutive test runs, immediately after being caught in ~8/10 runs before that addition. This
+# is the reasoning that dictated a second, independent LLM call instead: two different judgment
+# tasks in one prompt interfere even when told not to, so a hard-checking task must not share a
+# call with anything else.
+
+SYSTEM_PROMPT_QUALITY = """You are assessing the quality of an already-finalized supply chain
+risk report. A separate, stricter process has already checked this report for hard factual and
+structural errors and lists its findings below (KNOWN ISSUES) — that pass/fail decision is final
+and not yours to make or revisit. Your job is to rate overall report quality on four dimensions,
+each an integer 1 (worst) to 5 (best), for a reader who wants to know not just "is it correct" but
+"how good is the analysis" — this includes reflecting any KNOWN ISSUES in your scores, particularly
+when the report ships despite unresolved findings (e.g. after exhausting retries): do not give a
+high groundedness score if KNOWN ISSUES lists an unresolved fabricated fact, even though deciding
+pass/fail itself is not your job.
+
+- groundedness: are the report's factual claims traceable to the input text, the NAATBatt data, or
+  the deterministic computation? 5 = fully grounded, no unsupported claim. 1 = core conclusions
+  rest mainly on invented information. Reduce this score for each unresolved fabricated/unsupported
+  claim listed in KNOWN ISSUES below. A report that explicitly states a fact is unknown/unspecified
+  when the source doesn't provide it should score HIGH here — do not penalize an honest "unknown".
+- consistency: this checks agreement BETWEEN parts of the report, regardless of whether any single
+  part is individually grounded (that is groundedness's job, not this one). Two sub-checks: (a) do
+  the report's own numbers/fields agree with each other and with the structured data provided below
+  (RiskScore, Exposure, segment, material)? (b) do different SECTIONS of the free-form prose agree
+  with each other — e.g. if one section says a duration/outcome is "unknown" or "uncertain" while
+  another section later states a specific, confident value for that same thing, that is a
+  consistency failure even if neither sentence individually looks unusual in isolation. 5 = no
+  contradictions anywhere, including between prose sections. 1 = the report conflicts with the
+  structured results it was given, or contradicts itself between sections.
+- completeness: is every REQUIRED SECTION of the report template present and populated (Risk Event,
+  Supply Chain Exposure Analysis, Top-3 Risk Facilities, Risk Synthesis)? This is a structural
+  check — the report format is fixed by the Synthesis Agent, so a report assembled from the
+  provided data will usually score 5 here. Only judge elements that actually apply to this
+  scenario — do not penalize a field that has no relevance here (e.g. no company name in a
+  regional event). 5 = fully complete for this scenario. 1 = severely incomplete.
+- explainability: this is NOT the same question as completeness — a report can have an
+  explanation for every Top-3 facility (satisfying completeness) while that explanation is still
+  low-quality. Judge whether EACH Top-3 justification names the SPECIFIC mechanism connecting this
+  particular facility to this particular event, using its own numbers/attributes (which vulnerability
+  term dominates, its capacity share, its supplier count, its tier distance) — not a phrase that
+  could be pasted onto any other facility in any other report unchanged.
+  Example scoring this LOW (2-3): "Company A has a high RiskScore because it is exposed to this
+  risk and has limited alternatives." — true but generic, gives no facility-specific mechanism.
+  Example scoring this HIGH (5): "Company A receives a high RiskScore because it is directly
+  exposed to the affected material, has only one direct supplier (raising SingleSourceDependency),
+  and represents a comparatively large share of the region's modeled production capacity." —
+  names the specific factors and ties them to this facility's actual data.
+  Do not give 5 by default merely because an explanation sentence exists for each facility; only
+  give 5 if most Top-3 justifications individually clear the bar above. 1 = conclusions are stated
+  without any reasoning at all.
+
+Respond ONLY with a JSON object — no explanation, no markdown, no code blocks.
+
+JSON schema:
+{
+  "quality_scores": {"groundedness": 1-5, "consistency": 1-5, "completeness": 1-5, "explainability": 1-5},
+  "quality_strengths": ["<specific strength1>", ...],
+  "quality_summary": "<one-sentence overall assessment>"
+}
+"""
+
+USER_PROMPT_TEMPLATE_QUALITY = """CONTEXT:
+- Risk type: {risk_type}
+- Severity: {severity}/5
+- Affected material: {affected_material}
+- Affected region: {affected_region}
+- RiskScore distribution: highest={risk_score_max}/100, median={risk_score_median}/100
+- Exposure summary: {exposure_summary}
+
+TOP 3 FACILITIES PROVIDED TO SYNTHESIS AGENT:
+{top3_summary}
+
+KNOWN ISSUES (already found by the separate hard-check process — do not re-decide pass/fail, but
+DO reflect these in your scores, especially groundedness, if this list is non-empty):
+{known_issues}
+
+ORIGINAL SOURCE TEXT:
+---
+{raw_input}
+---
+
+FINAL RISK REPORT (already validated for hard errors — assess its quality only):
+---
+{risk_report}
+---
+"""
+
 USER_PROMPT_TEMPLATE = """Validate this risk report's narrative sections against the provided context.
 Numeric facts (Top-3 fields, source citation) are already checked by code — focus only on the
 free-form prose: Risk Event paragraph, Supply Chain Exposure Analysis, Top-3 justification
@@ -295,6 +393,34 @@ GENERATED RISK REPORT:
 {risk_report}
 ---
 """
+
+
+_QUALITY_DIMENSIONS = ("groundedness", "consistency", "completeness", "explainability")
+
+
+def _extract_quality(llm_result: dict) -> tuple[dict[str, int], Optional[float], list[str], str]:
+    """
+    Parses/clamps the LLM's quality_scores into valid 1-5 ints (never trust an unclamped LLM
+    number — same reasoning as everywhere else in this system: a 24B model asked for "1-5" can
+    still emit 0, 6, or a float). overall_quality is the plain average, computed here in Python
+    rather than taken from the LLM — arithmetic is not an LLM's job in this system, same
+    principle as the RiskScore calculation itself (Abschnitt 4.3.3).
+    """
+    raw_scores = llm_result.get("quality_scores") or {}
+    scores: dict[str, int] = {}
+    for dim in _QUALITY_DIMENSIONS:
+        try:
+            v = int(raw_scores.get(dim, 3))
+        except (TypeError, ValueError):
+            v = 3
+        scores[dim] = min(5, max(1, v))
+
+    overall = round(sum(scores.values()) / len(_QUALITY_DIMENSIONS), 2)
+    strengths = llm_result.get("quality_strengths") or []
+    if not isinstance(strengths, list):
+        strengths = []
+    summary = llm_result.get("quality_summary") or ""
+    return scores, overall, strengths, summary
 
 
 def _format_top3_summary(top3: list) -> str:
@@ -332,6 +458,11 @@ def run_validation_agent(state: PipelineState) -> PipelineState:
             "failure_type": None,
             "issues":       [],
             "iteration":    iteration,
+            "quality_scores":   {},
+            "overall_quality":  None,
+            "quality_strengths": [],
+            "quality_summary":  "Not applicable — fixed system-limitation notice, no generated "
+                                "analysis to assess.",
         }
 
     # Hard stop: exceeded max iterations → accept report as-is with warning. Preserve
@@ -348,6 +479,12 @@ def run_validation_agent(state: PipelineState) -> PipelineState:
                 "Max iterations reached — report accepted with the unresolved issue(s) above."
             ],
             "iteration":    iteration,
+            # Quality fields from the last completed check (below) carry over unchanged —
+            # nothing new was assessed on this short-circuited call.
+            "quality_scores":    state.get("quality_scores", {}),
+            "overall_quality":   state.get("overall_quality"),
+            "quality_strengths": state.get("quality_strengths", []),
+            "quality_summary":   state.get("quality_summary", ""),
         }
 
     all_issues: list[str] = []
@@ -383,6 +520,27 @@ def run_validation_agent(state: PipelineState) -> PipelineState:
     llm_issues: list[str] = llm_result.get("issues", [])
     all_issues.extend(llm_issues)
 
+    # ── Step 2b: quality assessment — separate LLM call, see SYSTEM_PROMPT_QUALITY's
+    # docstring-comment above for why this is not merged into the call above.
+    quality_messages = [
+        SystemMessage(content=SYSTEM_PROMPT_QUALITY),
+        HumanMessage(content=USER_PROMPT_TEMPLATE_QUALITY.format(
+            risk_type        = state.get("risk_type", ""),
+            severity         = state.get("severity", 3),
+            affected_material= state.get("material", ""),
+            affected_region  = state.get("region", ""),
+            risk_score_max    = score_stats.get("max", 0.0),
+            risk_score_median = score_stats.get("median", 0.0),
+            exposure_summary = _compute_exposure_summary(state) if state.get("affected_nodes") else "N/A",
+            top3_summary     = _format_top3_summary(state.get("top3_facilities", [])),
+            known_issues     = "\n".join(f"- {i}" for i in all_issues) if all_issues else "None",
+            raw_input        = state.get("raw_input", ""),
+            risk_report      = state.get("risk_report", ""),
+        )),
+    ]
+    quality_result = invoke_json(_get_llm(), quality_messages)
+    quality_scores, overall_quality, quality_strengths, quality_summary = _extract_quality(quality_result)
+
     # ── Step 3: determine final validity and failure_type ─────────────────────
     # Deterministic SEVERE issues override LLM result
     has_severe = any("SEVERE" in i for i in all_issues)
@@ -401,10 +559,28 @@ def run_validation_agent(state: PipelineState) -> PipelineState:
         failure_type = None
         valid = True
 
+    # ── Step 4: deterministic clamp on quality_scores ────────────────────────
+    # Don't fully trust the LLM's self-assessment here either: passing KNOWN ISSUES into the
+    # quality prompt (above) makes a low groundedness score likely, but "likely" isn't a
+    # guarantee, and a "valid=false, quality=4.8" combination would be a visible, confusing
+    # inconsistency for anyone reading the UI (Abschnitt 4.4) or Kapitel 5. Enforce it in code
+    # instead of hoping the model applies its own instructions consistently — same reasoning
+    # as clamping severity/origin_tier in risk_assessment_agent.py.
+    if has_severe:
+        quality_scores["groundedness"] = min(quality_scores["groundedness"], 2)
+        quality_scores["consistency"]  = min(quality_scores["consistency"], 2)
+    elif has_minor:
+        quality_scores["groundedness"] = min(quality_scores["groundedness"], 4)
+    overall_quality = round(sum(quality_scores.values()) / len(quality_scores), 2)
+
     return {
         **state,
         "valid":        valid,
         "failure_type": failure_type,
         "issues":       all_issues,
         "iteration":    iteration,
+        "quality_scores":    quality_scores,
+        "overall_quality":   overall_quality,
+        "quality_strengths": quality_strengths,
+        "quality_summary":   quality_summary,
     }

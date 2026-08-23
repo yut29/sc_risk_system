@@ -365,6 +365,17 @@ class PipelineState(TypedDict, total=False):
     issues: list[str]                  # Konkrete Beanstandungen (leer wenn valid=True)
     iteration: int                     # Zähler; Pipeline bricht bei iteration > 2 ab
 
+    # Qualitätsbewertung (2026-08-23) — unabhängig von valid/failure_type: ein Bericht kann
+    # alle Hard Checks bestehen und trotzdem hier niedrig bewertet werden (und umgekehrt bleibt
+    # ein einzelner SEVERE-Befund weiterhin allein entscheidend für valid=False). Bewertet vier
+    # Dimensionen 1–5 (siehe validation_agent.py SYSTEM_PROMPT für die Rubrik); overall_quality
+    # ist der ungewichtete Durchschnitt, in Python berechnet statt vom LLM übernommen (dieselbe
+    # Begründung wie bei der RiskScore-Berechnung: Arithmetik ist kein LLM-Job).
+    quality_scores: dict[str, int]     # {"groundedness"/"consistency"/"completeness"/"explainability": 1-5}
+    overall_quality: Optional[float]   # Durchschnitt der vier quality_scores, None bei Kurzschluss-Berichten
+    quality_strengths: list[str]       # Vom LLM benannte Stärken des Berichts
+    quality_summary: str               # Ein-Satz-Gesamteinschätzung
+
 
 # ──────────────────────────────────────────────────────────────────────────────
 #  Konstanten für deterministisch berechnete Felder

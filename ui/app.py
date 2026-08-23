@@ -199,6 +199,23 @@ AGENT_LABELS = {
     "validation":      "Validation — Qualitätsprüfung",
 }
 
+QUALITY_DIMENSION_LABEL = {
+    "groundedness":   "Groundedness",
+    "consistency":    "Consistency",
+    "completeness":   "Completeness",
+    "explainability": "Explainability",
+}
+
+
+def _quality_tier(score: float) -> str:
+    if score >= 4.5:
+        return "sehr gut"
+    if score >= 4.0:
+        return "gut"
+    if score >= 3.0:
+        return "akzeptabel"
+    return "überarbeitungsbedürftig"
+
 RISK_TYPE_LABEL = {
     "supply_disruption": "Supply Disruption",
     "price_volatility":  "Price Volatility",
@@ -585,59 +602,85 @@ st.markdown(result.get("risk_report", ""))
 
 st.divider()
 
+# ── Validation & quality assessment (always visible, not tucked behind a click) ────────────
+
+st.subheader("Validation")
+
+val_col, iter_col = st.columns(2)
+val_col.metric("Validation",  "✅ Valid" if result.get("valid") else "⚠️ Issues found")
+iter_col.metric("Iterations", result.get("iteration", 1))
+
+issues = result.get("issues", [])
+if issues:
+    st.markdown("**Validation issues:**")
+    for iss in issues:
+        st.markdown(f"- {iss}")
+
+# Quality assessment (2026-08-23) — separate from the pass/fail decision above: a report
+# can pass every hard check and still score low here, e.g. after "accepted with warning"
+# (Abschnitt 5.5/5.6.2). quality_scores is {} for the fixed system-limitation reports
+# (no generated analysis to assess), so the section is skipped entirely there.
+quality_scores = result.get("quality_scores") or {}
+if quality_scores:
+    st.markdown("**Report quality assessment**")
+    overall = result.get("overall_quality")
+    if overall is not None:
+        st.markdown(f"Overall report quality: **{overall:.2f} / 5 — {_quality_tier(overall)}**")
+    quality_rows = "\n".join(
+        f"| {QUALITY_DIMENSION_LABEL.get(dim, dim)} | {quality_scores.get(dim, '–')}/5 |"
+        for dim in ("groundedness", "consistency", "completeness", "explainability")
+    )
+    st.markdown(f"| Criterion | Score |\n|---|---:|\n{quality_rows}")
+    summary = result.get("quality_summary")
+    if summary:
+        st.markdown(f"**Assessment:** {summary}")
+
+st.divider()
+
 # ── Pipeline details (expandable) ─────────────────────────────────────────────
 
-with st.expander("Pipeline details", expanded=False):
-    val_col, iter_col = st.columns(2)
-    val_col.metric("Validation",  "✅ Valid" if result.get("valid") else "⚠️ Issues found")
-    iter_col.metric("Iterations", result.get("iteration", 1))
+with st.expander("Raw pipeline state (debug)", expanded=False):
+    # Grouped by which agent actually writes each field (verified against each
+    # agent's own `return {**state, ...}` — not just its module docstring, which can
+    # drift from the code). Large per-facility fields (affected_nodes, alt_nodes,
+    # facility_data, risk_scores, tier_weights, downstream_fanout) are already shown
+    # elsewhere in the UI (Top-3 table, map, exposure cards) and excluded here.
+    # supply_chain_paths and facility_data are per-facility dicts too (one entry per
+    # affected facility, e.g. 128 for a broad S1-style event) — shown as a small sample
+    # (_SAMPLE_N entries) rather than dumped in full, same reasoning as the exclusions.
+    _SAMPLE_N = 3
+    _STATE_GROUPS = {
+        "Eingabe":          ["raw_input"],
+        "Intake":           ["relevant", "trigger_type", "material", "region", "keywords",
+                              "mentioned_company", "mentioned_location"],
+        "Risk Assessment":  ["severity", "risk_type", "origin_tier", "reason"],
+        "Network":          ["seed_generation_status", "total_network_facilities", "strategy_c_trace"],
+        "Data Retrieval":   ["betroffene_kapazitaet_pct", "alternative_kapazitaet_pct"],
+        "Synthesis":        ["risk_report", "top3_facilities", "global_metrics",
+                              "risk_score_stats"],
+        "Validation":       ["valid", "failure_type", "issues", "iteration",
+                              "quality_scores", "overall_quality", "quality_strengths",
+                              "quality_summary"],
+    }
+    _SAMPLED_FIELDS = {"Network": "supply_chain_paths", "Data Retrieval": "facility_data"}
+    _EXCLUDED = {"affected_nodes", "alt_nodes", "facility_data",
+                 "risk_scores", "tier_weights", "downstream_fanout", "supply_chain_paths"}
+    _grouped_keys = {k for keys in _STATE_GROUPS.values() for k in keys} | set(_SAMPLED_FIELDS.values())
 
-    issues = result.get("issues", [])
-    if issues:
-        st.markdown("**Validation issues:**")
-        for iss in issues:
-            st.markdown(f"- {iss}")
+    for group_name, keys in _STATE_GROUPS.items():
+        group_data = {k: result[k] for k in keys if k in result}
+        if group_data:
+            st.markdown(f"**{group_name}**")
+            st.json(group_data)
+        sampled_key = _SAMPLED_FIELDS.get(group_name)
+        if sampled_key and result.get(sampled_key):
+            full = result[sampled_key]
+            sample = dict(list(full.items())[:_SAMPLE_N])
+            st.caption(f"`{sampled_key}` — Beispiel: {len(sample)} von {len(full)} Anlagen")
+            st.json(sample)
 
-    with st.expander("Raw pipeline state (debug)", expanded=False):
-        # Grouped by which agent actually writes each field (verified against each
-        # agent's own `return {**state, ...}` — not just its module docstring, which can
-        # drift from the code). Large per-facility fields (affected_nodes, alt_nodes,
-        # facility_data, risk_scores, tier_weights, downstream_fanout) are already shown
-        # elsewhere in the UI (Top-3 table, map, exposure cards) and excluded here.
-        # supply_chain_paths and facility_data are per-facility dicts too (one entry per
-        # affected facility, e.g. 128 for a broad S1-style event) — shown as a small sample
-        # (_SAMPLE_N entries) rather than dumped in full, same reasoning as the exclusions.
-        _SAMPLE_N = 3
-        _STATE_GROUPS = {
-            "Eingabe":          ["raw_input"],
-            "Intake":           ["relevant", "trigger_type", "material", "region", "keywords",
-                                  "mentioned_company", "mentioned_location"],
-            "Risk Assessment":  ["severity", "risk_type", "origin_tier", "reason"],
-            "Network":          ["seed_generation_status", "total_network_facilities", "strategy_c_trace"],
-            "Data Retrieval":   ["betroffene_kapazitaet_pct", "alternative_kapazitaet_pct"],
-            "Synthesis":        ["risk_report", "top3_facilities", "global_metrics",
-                                  "risk_score_stats"],
-            "Validation":       ["valid", "failure_type", "issues", "iteration"],
-        }
-        _SAMPLED_FIELDS = {"Network": "supply_chain_paths", "Data Retrieval": "facility_data"}
-        _EXCLUDED = {"affected_nodes", "alt_nodes", "facility_data",
-                     "risk_scores", "tier_weights", "downstream_fanout", "supply_chain_paths"}
-        _grouped_keys = {k for keys in _STATE_GROUPS.values() for k in keys} | set(_SAMPLED_FIELDS.values())
-
-        for group_name, keys in _STATE_GROUPS.items():
-            group_data = {k: result[k] for k in keys if k in result}
-            if group_data:
-                st.markdown(f"**{group_name}**")
-                st.json(group_data)
-            sampled_key = _SAMPLED_FIELDS.get(group_name)
-            if sampled_key and result.get(sampled_key):
-                full = result[sampled_key]
-                sample = dict(list(full.items())[:_SAMPLE_N])
-                st.caption(f"`{sampled_key}` — Beispiel: {len(sample)} von {len(full)} Anlagen")
-                st.json(sample)
-
-        _rest = {k: v for k, v in result.items()
-                 if k not in _grouped_keys and k not in _EXCLUDED}
-        if _rest:
-            st.markdown("**Sonstige**")
-            st.json(_rest)
+    _rest = {k: v for k, v in result.items()
+             if k not in _grouped_keys and k not in _EXCLUDED}
+    if _rest:
+        st.markdown("**Sonstige**")
+        st.json(_rest)
